@@ -51,11 +51,11 @@
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
-            <ThreePartBitmap profile="lm_sliderDockedBg">
+            <GuiElement profile="lm_sliderDockedBg">
                 <ThreePartBitmap profile="fs25_sliderDockedBox">
                     <Slider profile="fs25_sliderDocked" id="wareSlider" dataElementId="wareList"/>
                 </ThreePartBitmap>
-            </ThreePartBitmap>
+            </GuiElement>
         </GuiElement>
 
         <!-- Wird angezeigt, wenn die Warenliste leer ist -->
@@ -86,11 +86,11 @@
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
-            <ThreePartBitmap profile="lm_sliderDockedBg">
+            <GuiElement profile="lm_sliderDockedBg">
                 <ThreePartBitmap profile="fs25_sliderDockedBox">
                     <Slider profile="fs25_sliderDocked" id="detailSlider" dataElementId="detailList"/>
                 </ThreePartBitmap>
-            </ThreePartBitmap>
+            </GuiElement>
         </GuiElement>
     </GuiElement>
 
@@ -157,7 +157,8 @@
             <absoluteSizeOffset value="74px 4px"/>
         </Profile>
 
-        <!-- Scrollbalken rechts im jeweiligen Rahmen -->
+        <!-- Scrollbalken rechts im jeweiligen Rahmen. Als GuiElement statt ThreePartBitmap:
+             übernimmt nur Lage/Größe, ohne den dunklen Verlauf über dem Zeilenende. -->
         <Profile name="lm_sliderDockedBg" extends="fs25_sliderDockedBg">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
