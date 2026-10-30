@@ -343,6 +343,11 @@ end
 function LivingMarketFrame:sortStations(stations)
     local key, asc = self.detailSort.key, self.detailSort.asc
     table.sort(stations, function(a, b)
+        -- Volle Stationen (kein Bedarf mehr) immer ans Ende, egal wie sortiert ist
+        local aFull, bFull = a.remaining < 1, b.remaining < 1
+        if aFull ~= bFull then
+            return bFull
+        end
         return compare(stationValue(a, key), stationValue(b, key), asc, a.searchKey, b.searchKey)
     end)
 end
