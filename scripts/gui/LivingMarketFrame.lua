@@ -329,7 +329,35 @@ function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
     return list == self.wareList and "ware" or "station"
 end
 
+-- Zeilenhintergrund wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün
+local ROW_DARK      = { 0.09, 0.09, 0.09, 1 }
+local ROW_LIGHT     = { 0.14, 0.14, 0.14, 1 }
+local ROW_HOVER     = { 0.20, 0.20, 0.20, 1 }
+local ROW_SELECTED  = { 0.47, 0.64, 0.11, 1 }
+
+local function setRowBackground(bg, index)
+    if bg == nil or bg.setImageColor == nil or GuiOverlay == nil then
+        return
+    end
+    local base = (index % 2 == 0) and ROW_LIGHT or ROW_DARK
+    local states = {
+        { GuiOverlay.STATE_NORMAL,      base },
+        { GuiOverlay.STATE_HIGHLIGHTED, ROW_HOVER },
+        { GuiOverlay.STATE_SELECTED,    ROW_SELECTED },
+        { GuiOverlay.STATE_FOCUSED,     ROW_SELECTED },
+        { GuiOverlay.STATE_PRESSED,     ROW_SELECTED },
+    }
+    for _, entry in ipairs(states) do
+        local state, c = entry[1], entry[2]
+        if state ~= nil then
+            bg:setImageColor(state, c[1], c[2], c[3], c[4])
+        end
+    end
+end
+
 function LivingMarketFrame:populateCellForItemInSection(list, section, index, cell)
+    setRowBackground(cell:getAttribute("bg"), index)
+
     if list == self.wareList then
         self:populateWareCell(self.visibleWares[index], cell)
     elseif self.detailWare ~= nil then

@@ -23,12 +23,12 @@
 
         <!-- ============ Obere Liste: Waren ============ -->
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Text profile="lm_colHeader" position="50px 10px" text="$l10n_livingMarket_colWare"/>
-            <Text profile="lm_colHeaderRight" position="290px 10px" text="$l10n_livingMarket_colStock"/>
-            <Text profile="lm_colHeader" position="520px 10px" text="$l10n_livingMarket_colBestStation"/>
-            <Text profile="lm_colHeaderRight" position="830px 10px" text="$l10n_livingMarket_colPrice"/>
-            <Text profile="lm_colHeaderRight" position="1050px 10px" text="$l10n_livingMarket_colSellable"/>
-            <Text profile="lm_colHeaderRight" position="1270px 10px" text="$l10n_livingMarket_colRevenue"/>
+            <Text profile="lm_colHeader" position="50px 0px" text="$l10n_livingMarket_colWare"/>
+            <Text profile="lm_colHeaderRight" position="20px 0px" text="$l10n_livingMarket_colStock"/>
+            <Text profile="lm_colHeader" position="520px 0px" text="$l10n_livingMarket_colBestStation"/>
+            <Text profile="lm_colHeaderRight" position="510px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Text profile="lm_colHeaderRight" position="720px 0px" text="$l10n_livingMarket_colSellable"/>
+            <Text profile="lm_colHeaderRight" position="940px 0px" text="$l10n_livingMarket_colRevenue"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
 
@@ -37,13 +37,14 @@
         <GuiElement profile="lm_wareArea">
             <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
+                    <ThreePartBitmap profile="fs25_settingsControlsListItemBg" name="bg"/>
                     <Bitmap profile="lm_wareIcon" name="icon"/>
                     <Text profile="lm_rowTextBold" name="title" position="50px 0px"/>
-                    <Text profile="lm_rowTextRight" name="stock" position="290px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="20px 0px"/>
                     <Text profile="lm_rowText" name="station" position="520px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="830px 0px"/>
-                    <Text profile="lm_rowTextRight" name="sellable" position="1050px 0px"/>
-                    <Text profile="lm_rowTextRight" name="revenue" position="1270px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="510px 0px"/>
+                    <Text profile="lm_rowTextRight" name="sellable" position="720px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="940px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
@@ -56,19 +57,20 @@
         <GuiElement profile="lm_detailArea" id="detailPanel">
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
-                <Text profile="lm_colHeader" id="detailTitle" position="50px 10px" text="$l10n_livingMarket_detailHint"/>
-                <Text profile="lm_colHeaderRight" position="830px 10px" text="$l10n_livingMarket_colPrice"/>
-                <Text profile="lm_colHeaderRight" position="1050px 10px" text="$l10n_livingMarket_colFreeMax"/>
-                <Text profile="lm_colHeaderRight" position="1270px 10px" text="$l10n_livingMarket_colShare"/>
+                <Text profile="lm_colHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint"/>
+                <Text profile="lm_colHeaderRight" position="510px 0px" text="$l10n_livingMarket_colPrice"/>
+                <Text profile="lm_colHeaderRight" position="770px 0px" text="$l10n_livingMarket_colFreeMax"/>
+                <Text profile="lm_colHeaderRight" position="940px 0px" text="$l10n_livingMarket_colShare"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
             <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="station">
+                    <ThreePartBitmap profile="fs25_settingsControlsListItemBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="830px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="1050px 0px"/>
-                    <Text profile="lm_rowTextRight" name="share" position="1270px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="510px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="770px 0px"/>
+                    <Text profile="lm_rowTextRight" name="share" position="940px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
@@ -118,14 +120,17 @@
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
-        <Profile name="lm_colHeader" extends="fs25_settingsControlsListHeaderName">
+        <!-- Spaltenköpfe mit derselben Geometrie wie die Zeilentexte, damit sie exakt über den Werten stehen -->
+        <Profile name="lm_colHeader" extends="fs25_settingsControlsListName">
             <textAlignment value="left"/>
-            <size value="400px 20px"/>
+            <textBold value="true"/>
+            <textUpperCase value="true"/>
+            <textSize value="15px"/>
+            <textColor value="0.85 0.85 0.85 1"/>
         </Profile>
 
-        <Profile name="lm_colHeaderRight" extends="fs25_settingsControlsListHeaderName">
+        <Profile name="lm_colHeaderRight" extends="lm_colHeader">
             <textAlignment value="right"/>
-            <size value="180px 20px"/>
         </Profile>
 
         <!-- Zeilen wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün -->
@@ -163,7 +168,6 @@
 
         <Profile name="lm_rowTextBold" extends="lm_rowText">
             <textBold value="true"/>
-            <size value="440px 100%"/>
         </Profile>
 
         <Profile name="lm_rowTextMuted" extends="lm_rowText">
@@ -171,9 +175,9 @@
             <textHighlightedColor value="0.65 0.65 0.65 1"/>
         </Profile>
 
-        <!-- Zahlen rechtsbündig: position = linker Rand, Breite 180px, rechter Rand = position + 180 -->
+        <!-- Zahlen rechtsbündig. Die Textfelder sind (laut Spielprofil) 450px breit:
+             position = gewünschter rechter Rand - 450 -->
         <Profile name="lm_rowTextRight" extends="lm_rowText">
-            <size value="180px 100%"/>
             <textAlignment value="right"/>
         </Profile>
 
