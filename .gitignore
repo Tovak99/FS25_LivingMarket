@@ -1,0 +1,9 @@
+# Gepackte Mod-Dateien nicht ins Repository
+*.zip
+
+# Betriebssystem / Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

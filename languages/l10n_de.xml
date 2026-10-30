@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <texts>
+        <text name="ui_DynamicMarketFrame" text="Dynamischer Markt"/>
+        <text name="dynamicMarket_title" text="Dynamischer Markt"/>
+        <text name="dynamicMarket_info" text="Beste Station = höchster Preis mit freiem Bedarf. Der Bedarf füllt sich jede Spielstunde um %d %% auf."/>
+        <text name="dynamicMarket_colFillType" text="Verkaufsstelle / Ware"/>
+        <text name="dynamicMarket_colAmount" text="Restbedarf / Maximum"/>
+        <text name="dynamicMarket_colShare" text="Frei"/>
+        <text name="dynamicMarket_none" text="Keine Verkaufsstellen gefunden"/>
+        <text name="dynamicMarket_unknownStation" text="Verkaufsstelle"/>
+        <text name="dynamicMarket_goodsCount" text="%d Waren"/>
+        <text name="dynamicMarket_lowCount" text="%d knapp"/>
+        <text name="dynamicMarket_expandAll" text="Alle aufklappen"/>
+        <text name="dynamicMarket_collapseAll" text="Alle zuklappen"/>
+        <text name="dynamicMarket_cat_WHOLESALE" text="Großhandel"/>
+        <text name="dynamicMarket_cat_AGRI" text="Landhandel"/>
+        <text name="dynamicMarket_cat_RETAIL" text="Einzelhandel"/>
+        <text name="dynamicMarket_cat_INDUSTRY" text="Industrie / Verarbeitung"/>
+        <text name="dynamicMarket_cat_OTHER" text="Sonstiges"/>
+        <text name="dynamicMarket_searchHint" text="Ware oder Station suchen …"/>
+        <text name="dynamicMarket_noResults" text="Keine Treffer für „%s“"/>
+        <text name="dynamicMarket_clearSearch" text="Suche löschen"/>
+        <text name="dynamicMarket_stockOnly" text="Nur Lagerbestand"/>
+        <text name="dynamicMarket_showAll" text="Alle Waren zeigen"/>
+        <text name="dynamicMarket_stockLabel" text="Lager: %s"/>
+        <text name="dynamicMarket_noStock" text="Du hast nichts auf Lager, was hier verkauft werden kann."/>
+        <text name="dynamicMarket_colWare" text="Ware"/>
+        <text name="dynamicMarket_colStock" text="Lager"/>
+        <text name="dynamicMarket_colBestStation" text="Beste Station"/>
+        <text name="dynamicMarket_colPrice" text="Preis / 1000 l"/>
+        <text name="dynamicMarket_colSellable" text="Verkaufbar"/>
+        <text name="dynamicMarket_colRevenue" text="Erlös"/>
+        <text name="dynamicMarket_colCategory" text="Art"/>
+        <text name="dynamicMarket_colFreeMax" text="Frei / Maximum"/>
+        <text name="dynamicMarket_allFull" text="Alle Stationen voll"/>
+        <text name="dynamicMarket_detailHint" text="Ware auswählen"/>
+    </texts>
+</l10n>
