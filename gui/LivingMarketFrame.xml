@@ -134,7 +134,9 @@
         </Profile>
 
         <!-- Zeilen wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün -->
+        <!-- Zeilenhöhe: zweiter Wert von size (Spielstandard ca. 45px) -->
         <Profile name="lm_listItem" extends="fs25_settingsControlsListItem">
+            <size value="100% 34px"/>
             <imageColor value="0.09 0.09 0.09 1"/>
             <alternateBackgroundColor value="0.14 0.14 0.14 1"/>
             <imageHighlightedColor value="0.20 0.20 0.20 1"/>
@@ -148,7 +150,7 @@
             <anchors value="0 0 0.5 0.5"/>
             <pivot value="0 0.5"/>
             <position value="12px 0px"/>
-            <size value="26px 26px"/>
+            <size value="22px 22px"/>
             <imageColor value="1 1 1 1"/>
             <imageSelectedColor value="1 1 1 1"/>
             <imageFocusedColor value="1 1 1 1"/>
