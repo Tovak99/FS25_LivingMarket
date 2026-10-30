@@ -1,5 +1,5 @@
 -- =====================================================================
--- DynamicMarket (LS25 / FS25)
+-- LivingMarket (LS25 / FS25)
 -- Verkaufsstellen nehmen pro Fruchtsorte nur eine begrenzte Menge an.
 -- Der Bedarf füllt sich jede Spielstunde langsam wieder auf.
 -- Anzeige auf einer eigenen Seite im Ingame-Menü (ESC).
@@ -7,21 +7,21 @@
 -- Stand: Grundgerüst, nur Singleplayer, noch ohne Speichern.
 -- =====================================================================
 
-DynamicMarket = {}
-DynamicMarket.modName = g_currentModName
-DynamicMarket.modDir  = g_currentModDirectory
+LivingMarket = {}
+LivingMarket.modName = g_currentModName
+LivingMarket.modDir  = g_currentModDirectory
 
 -- ---------------------------------------------------------------------
 -- Einstellungen
 -- ---------------------------------------------------------------------
-DynamicMarket.DEFAULT_MAX    = 30000   -- Liter, wenn Fruchtsorte nicht in der Liste
-DynamicMarket.REFILL_SHARE   = 0.05    -- Anteil vom Maximum, der pro Spielstunde zurückkommt
-DynamicMarket.MENU_PAGE_NAME = "pageDynamicMarket"
-DynamicMarket.MENU_AFTER     = "pagePrices"   -- Reiter hinter "Preise" einsortieren (falls vorhanden)
-DynamicMarket.DEBUG          = true
+LivingMarket.DEFAULT_MAX    = 30000   -- Liter, wenn Fruchtsorte nicht in der Liste
+LivingMarket.REFILL_SHARE   = 0.05    -- Anteil vom Maximum, der pro Spielstunde zurückkommt
+LivingMarket.MENU_PAGE_NAME = "pageLivingMarket"
+LivingMarket.MENU_AFTER     = "pagePrices"   -- Reiter hinter "Preise" einsortieren (falls vorhanden)
+LivingMarket.DEBUG          = true
 
 -- Grundmengen pro Fruchtsorte (Name wie in fillTypes.xml)
-DynamicMarket.BASE_AMOUNTS = {
+LivingMarket.BASE_AMOUNTS = {
     WHEAT     = 60000,
     BARLEY    = 60000,
     OAT       = 30000,
@@ -38,7 +38,7 @@ DynamicMarket.BASE_AMOUNTS = {
 
 -- Fruchtsorten, die nie begrenzt und nicht angezeigt werden (Name wie in fillTypes.xml).
 -- Geld/Bargeld: die Bank begrenzt auch nicht.
-DynamicMarket.EXCLUDED_FILLTYPES = {
+LivingMarket.EXCLUDED_FILLTYPES = {
     MONEY = true,
     CASH  = true,
 }
@@ -46,16 +46,16 @@ DynamicMarket.EXCLUDED_FILLTYPES = {
 -- ---------------------------------------------------------------------
 -- Laufzeitdaten
 -- ---------------------------------------------------------------------
-DynamicMarket.stations    = {}   -- [station] = { [fillTypeIndex] = { remaining, max, refill } }
-DynamicMarket.stationKind = {}   -- [station] = true (wird begrenzt) / false (z. B. Produktion)
-DynamicMarket.hasLoggedStations = false
-DynamicMarket.stationNames  = {}   -- [station] = Name (Cache)
-DynamicMarket.excludedCache = {}   -- [fillTypeIndex] = true/false (Cache)
-DynamicMarket.loggedMissionDeliveries = {}   -- nur fürs Log, damit jede Auftragslieferung einmal gemeldet wird
+LivingMarket.stations    = {}   -- [station] = { [fillTypeIndex] = { remaining, max, refill } }
+LivingMarket.stationKind = {}   -- [station] = true (wird begrenzt) / false (z. B. Produktion)
+LivingMarket.hasLoggedStations = false
+LivingMarket.stationNames  = {}   -- [station] = Name (Cache)
+LivingMarket.excludedCache = {}   -- [fillTypeIndex] = true/false (Cache)
+LivingMarket.loggedMissionDeliveries = {}   -- nur fürs Log, damit jede Auftragslieferung einmal gemeldet wird
 
 local function log(fmt, ...)
-    if DynamicMarket.DEBUG then
-        print(string.format("[DynamicMarket] " .. fmt, ...))
+    if LivingMarket.DEBUG then
+        print(string.format("[LivingMarket] " .. fmt, ...))
     end
 end
 
@@ -96,7 +96,7 @@ end
 
 -- Nur reine Verkaufsstellen (keine Produktionen) werden begrenzt.
 -- Ergebnis wird pro Station zwischengespeichert, weil die Abfrage beim Abladen oft kommt.
-function DynamicMarket:isLimitedStation(station)
+function LivingMarket:isLimitedStation(station)
     local cached = self.stationKind[station]
     if cached == nil then
         cached = isSellingStation(station) and not isProductionStation(station)
@@ -119,21 +119,21 @@ local function readStationName(station)
             return name
         end
     end
-    return station.stationName or g_i18n:getText("dynamicMarket_unknownStation")
+    return station.stationName or g_i18n:getText("livingMarket_unknownStation")
 end
 
 -- Name wird pro Station zwischengespeichert (wird beim Sortieren sehr oft abgefragt)
 local function getStationName(station)
-    local name = DynamicMarket.stationNames[station]
+    local name = LivingMarket.stationNames[station]
     if name == nil then
         name = readStationName(station)
-        DynamicMarket.stationNames[station] = name
+        LivingMarket.stationNames[station] = name
     end
     return name
 end
 
 -- Kleinschreibung für die Suche (utf8ToLower kann auch Umlaute)
-function DynamicMarket.toLower(text)
+function LivingMarket.toLower(text)
     if utf8ToLower ~= nil then
         return utf8ToLower(text or "")
     end
@@ -167,7 +167,7 @@ end
 -- Ausgenommene Fruchtsorte (z. B. Geld)? Prüft den internen Namen und als
 -- Rückfall alles, was "MONEY" oder "CASH" im Namen trägt (Mod-Füllarten).
 -- Ergebnis wird je Füllart gemerkt, weil die Abfrage beim Abladen jeden Frame kommt.
-function DynamicMarket:isExcludedFillType(fillTypeIndex)
+function LivingMarket:isExcludedFillType(fillTypeIndex)
     local cached = self.excludedCache[fillTypeIndex]
     if cached ~= nil then
         return cached
@@ -187,14 +187,14 @@ function DynamicMarket:isExcludedFillType(fillTypeIndex)
 end
 
 -- Maximum + Auffüllrate für eine Station/Fruchtsorte
-function DynamicMarket:getLimitFor(station, fillTypeIndex)
+function LivingMarket:getLimitFor(station, fillTypeIndex)
     local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
     local max = self.BASE_AMOUNTS[name] or self.DEFAULT_MAX
     -- Platz für spätere Logik: Preisfaktor, Stationstyp, Ereignisse ...
     return max, max * self.REFILL_SHARE
 end
 
-function DynamicMarket:getStationData(station)
+function LivingMarket:getStationData(station)
     local data = self.stations[station]
     if data == nil then
         data = {}
@@ -203,7 +203,7 @@ function DynamicMarket:getStationData(station)
     return data
 end
 
-function DynamicMarket:getEntry(station, fillTypeIndex)
+function LivingMarket:getEntry(station, fillTypeIndex)
     if fillTypeIndex == nil or not self:isLimitedStation(station) or self:isExcludedFillType(fillTypeIndex) then
         return nil
     end
@@ -221,7 +221,7 @@ function DynamicMarket:getEntry(station, fillTypeIndex)
 end
 
 -- Alle Verkaufsstellen der Map einsammeln
-function DynamicMarket:collectStations()
+function LivingMarket:collectStations()
     local result = {}
     local storageSystem = g_currentMission ~= nil and g_currentMission.storageSystem or nil
     if storageSystem == nil or storageSystem.getUnloadingStations == nil then
@@ -246,23 +246,23 @@ end
 -- damit es auf jeder Karte und mit Mod-Fruchtsorten funktioniert.
 -- Die Warengruppen bleiben für spätere Mengen/Preise erhalten.
 -- ---------------------------------------------------------------------
-DynamicMarket.CATEGORY_ORDER = { "WHOLESALE", "RETAIL" }
+LivingMarket.CATEGORY_ORDER = { "WHOLESALE", "RETAIL" }
 
 -- Rohstoffe lassen sich nicht über Eigenschaften erkennen, sind aber auf allen Karten gleich
-DynamicMarket.RAW_FILLTYPES = { "WOOD", "WOODCHIPS", "MILK", "GOATMILK", "BUFFALOMILK",
+LivingMarket.RAW_FILLTYPES = { "WOOD", "WOODCHIPS", "MILK", "GOATMILK", "BUFFALOMILK",
                              "STRAW", "LIQUIDMANURE", "MANURE", "DIGESTATE" }
 
 -- Betriebsmittel (Dünger, Kalk, Pflanzenschutz, Saatgut, Siliermittel, Mineralfutter):
 -- gehören zum Landhandel. Erkannt über diese Namen und die Füllart-Kategorien des Spiels.
-DynamicMarket.SUPPLY_FILLTYPES = { "FERTILIZER", "LIQUIDFERTILIZER", "LIME", "LIQUIDLIME", "HERBICIDE",
+LivingMarket.SUPPLY_FILLTYPES = { "FERTILIZER", "LIQUIDFERTILIZER", "LIME", "LIQUIDLIME", "HERBICIDE",
                                 "SEEDS", "SILAGE_ADDITIVE", "MINERAL_FEED", "TREESAPLINGS" }
-DynamicMarket.SUPPLY_CATEGORIES = { "SPRAYER", "SOWINGMACHINE", "PLANTER", "FERTILIZERSPREADER" }
+LivingMarket.SUPPLY_CATEGORIES = { "SPRAYER", "SOWINGMACHINE", "PLANTER", "FERTILIZERSPREADER" }
 
-DynamicMarket.bulkCache = {}   -- [fillTypeIndex] = true, wenn es die Ware nur lose gibt
+LivingMarket.bulkCache = {}   -- [fillTypeIndex] = true, wenn es die Ware nur lose gibt
 
 -- Schüttgut = Ware, für die es keine Palette gibt (Getreide, Milch, Gülle, Diesel …).
 -- Trauben, Eier, Brot usw. gibt es als Palette/Kiste und sind daher kein Schüttgut.
-function DynamicMarket:isBulkFillType(fillTypeIndex)
+function LivingMarket:isBulkFillType(fillTypeIndex)
     local cached = self.bulkCache[fillTypeIndex]
     if cached == nil then
         local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
@@ -273,7 +273,7 @@ function DynamicMarket:isBulkFillType(fillTypeIndex)
 end
 
 -- Alle Schüttgut-Waren einer Station (Ausnahmen wie Geld zählen nicht)
-function DynamicMarket:getBulkFillTypes(station)
+function LivingMarket:getBulkFillTypes(station)
     local result = {}
     for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
         if accepted and not self:isExcludedFillType(fillTypeIndex) and self:isBulkFillType(fillTypeIndex) then
@@ -283,8 +283,8 @@ function DynamicMarket:getBulkFillTypes(station)
     return result
 end
 
-DynamicMarket.fillTypeGroup   = {}   -- [fillTypeIndex] = "CROP" | "SUPPLY" | "PRODUCT" | "RAW" | "OTHER"
-DynamicMarket.stationCategory = {}   -- [station] = Kategorie
+LivingMarket.fillTypeGroup   = {}   -- [fillTypeIndex] = "CROP" | "SUPPLY" | "PRODUCT" | "RAW" | "OTHER"
+LivingMarket.stationCategory = {}   -- [station] = Kategorie
 
 local function isInList(name, list)
     for _, entry in ipairs(list) do
@@ -295,7 +295,7 @@ local function isInList(name, list)
     return false
 end
 
-function DynamicMarket:isSupplyFillType(fillTypeIndex, name)
+function LivingMarket:isSupplyFillType(fillTypeIndex, name)
     if name ~= nil and isInList(name, self.SUPPLY_FILLTYPES) then
         return true
     end
@@ -311,7 +311,7 @@ function DynamicMarket:isSupplyFillType(fillTypeIndex, name)
     return false
 end
 
-function DynamicMarket:getFillTypeGroup(fillTypeIndex)
+function LivingMarket:getFillTypeGroup(fillTypeIndex)
     local cached = self.fillTypeGroup[fillTypeIndex]
     if cached ~= nil then
         return cached
@@ -343,7 +343,7 @@ function DynamicMarket:getFillTypeGroup(fillTypeIndex)
 end
 
 -- Zählt die Waren einer Station je Gruppe (Ausnahmen wie Geld zählen nicht)
-function DynamicMarket:countGroups(station)
+function LivingMarket:countGroups(station)
     local count = { CROP = 0, SUPPLY = 0, PRODUCT = 0, RAW = 0, OTHER = 0 }
     local total = 0
     for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
@@ -356,7 +356,7 @@ function DynamicMarket:countGroups(station)
     return count, total
 end
 
-function DynamicMarket:getStationCategory(station)
+function LivingMarket:getStationCategory(station)
     local cached = self.stationCategory[station]
     if cached ~= nil then
         return cached
@@ -375,7 +375,7 @@ function DynamicMarket:getStationCategory(station)
 end
 
 -- Aktueller Verkaufspreis je 1000 Liter an dieser Station (wie im Preise-Menü des Spiels)
-function DynamicMarket:getPricePer1000(station, fillTypeIndex)
+function LivingMarket:getPricePer1000(station, fillTypeIndex)
     if station.getEffectiveFillTypePrice ~= nil then
         local ok, pricePerLiter = pcall(station.getEffectiveFillTypePrice, station, fillTypeIndex)
         if ok and pricePerLiter ~= nil then
@@ -385,7 +385,7 @@ function DynamicMarket:getPricePer1000(station, fillTypeIndex)
     return 0
 end
 
-function DynamicMarket.formatMoney(value)
+function LivingMarket.formatMoney(value)
     if g_i18n ~= nil and g_i18n.formatMoney ~= nil then
         local ok, text = pcall(g_i18n.formatMoney, g_i18n, value, 0, true, true)
         if ok and text ~= nil then
@@ -397,7 +397,7 @@ end
 
 -- Aufbereitete Daten für die Menüseite: eine Zeile pro Ware, darin alle
 -- Stationen mit Preis und Restbedarf, sortiert nach Preis
-function DynamicMarket:getWareData()
+function LivingMarket:getWareData()
     local stations = self:collectStations()   -- nur einmal pro Aufruf einsammeln
 
     -- Einmalig alle Stationen mit Kategorie, Zählung und Füllart-Namen ins Log (zum Nachjustieren)
@@ -443,7 +443,7 @@ function DynamicMarket:getWareData()
                         ware = {
                             fillTypeIndex = fillTypeIndex,
                             title         = title,
-                            searchKey     = DynamicMarket.toLower(title),
+                            searchKey     = LivingMarket.toLower(title),
                             stock         = stock[fillTypeIndex] or 0,
                             stations      = {}
                         }
@@ -452,7 +452,7 @@ function DynamicMarket:getWareData()
                     end
                     table.insert(ware.stations, {
                         name      = stationName,
-                        searchKey = DynamicMarket.toLower(stationName),
+                        searchKey = LivingMarket.toLower(stationName),
                         category  = category,
                         price     = self:getPricePer1000(station, fillTypeIndex),
                         remaining = entry.remaining,
@@ -528,7 +528,7 @@ local function addStorage(stock, storage, farmId, visited)
     end
 end
 
-function DynamicMarket:getFarmId()
+function LivingMarket:getFarmId()
     local mission = g_currentMission
     if mission ~= nil and mission.getFarmId ~= nil then
         return mission:getFarmId()
@@ -536,7 +536,7 @@ function DynamicMarket:getFarmId()
     return mission ~= nil and mission.player ~= nil and mission.player.farmId or nil
 end
 
-function DynamicMarket:getFarmStock()
+function LivingMarket:getFarmStock()
     local stock = {}
     local farmId = self:getFarmId()
     local mission = g_currentMission
@@ -585,7 +585,7 @@ function DynamicMarket:getFarmStock()
     return stock
 end
 
-function DynamicMarket.formatLiters(liters)
+function LivingMarket.formatLiters(liters)
     return formatLiters(liters)
 end
 
@@ -620,7 +620,7 @@ local function missionTargetsStation(mission, station)
     return placeable ~= nil and station.owningPlaceable == placeable
 end
 
-function DynamicMarket:isMissionDelivery(station, fillTypeIndex, farmId)
+function LivingMarket:isMissionDelivery(station, fillTypeIndex, farmId)
     local manager = g_missionManager
     if manager == nil or manager.getMissions == nil or MissionStatus == nil then
         return false
@@ -638,35 +638,35 @@ function DynamicMarket:isMissionDelivery(station, fillTypeIndex, farmId)
     return false
 end
 
-function DynamicMarket.getFreeCapacity(station, superFunc, fillTypeIndex, ...)
+function LivingMarket.getFreeCapacity(station, superFunc, fillTypeIndex, ...)
     local capacity = superFunc(station, fillTypeIndex, ...)
-    local entry = DynamicMarket:getEntry(station, fillTypeIndex)
+    local entry = LivingMarket:getEntry(station, fillTypeIndex)
     if entry == nil then
         return capacity
     end
     -- Hof ist hier nicht sicher bekannt: laufender Auftrag irgendeines Hofs gibt die Ware frei
-    if DynamicMarket:isMissionDelivery(station, fillTypeIndex, nil) then
+    if LivingMarket:isMissionDelivery(station, fillTypeIndex, nil) then
         return capacity
     end
     return math.min(capacity or math.huge, math.max(entry.remaining, 0))
 end
 
 -- Tatsächliche Annahme: Menge auf den Restbedarf kürzen und abziehen
-function DynamicMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFillLevel, fillTypeIndex, ...)
+function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFillLevel, fillTypeIndex, ...)
     if not isServer() or deltaFillLevel == nil or deltaFillLevel <= 0 then
         return superFunc(station, farmId, deltaFillLevel, fillTypeIndex, ...)
     end
 
-    local entry = DynamicMarket:getEntry(station, fillTypeIndex)
+    local entry = LivingMarket:getEntry(station, fillTypeIndex)
     if entry == nil then
         return superFunc(station, farmId, deltaFillLevel, fillTypeIndex, ...)
     end
 
     -- Lieferung für einen laufenden Auftrag dieses Hofs: unbegrenzt, Kontingent bleibt unberührt
-    if DynamicMarket:isMissionDelivery(station, fillTypeIndex, farmId) then
+    if LivingMarket:isMissionDelivery(station, fillTypeIndex, farmId) then
         local key = tostring(station) .. "/" .. tostring(fillTypeIndex)
-        if not DynamicMarket.loggedMissionDeliveries[key] then
-            DynamicMarket.loggedMissionDeliveries[key] = true
+        if not LivingMarket.loggedMissionDeliveries[key] then
+            LivingMarket.loggedMissionDeliveries[key] = true
             log("Auftragslieferung erkannt: '%s', %s - kein Limit", getStationName(station),
                 tostring(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)))
         end
@@ -681,29 +681,29 @@ function DynamicMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFil
     local moved = superFunc(station, farmId, allowed, fillTypeIndex, ...)
     local used = moved or allowed
     entry.remaining = math.max(entry.remaining - used, 0)
-    DynamicMarket:markDirty(entry)
+    LivingMarket:markDirty(entry)
     return moved
 end
 
-function DynamicMarket.onStationDelete(station)
-    DynamicMarket.stations[station] = nil
-    DynamicMarket.stationKind[station] = nil
-    DynamicMarket.stationCategory[station] = nil
-    DynamicMarket.stationNames[station] = nil
+function LivingMarket.onStationDelete(station)
+    LivingMarket.stations[station] = nil
+    LivingMarket.stationKind[station] = nil
+    LivingMarket.stationCategory[station] = nil
+    LivingMarket.stationNames[station] = nil
 end
 
 if SellingStation ~= nil then
-    SellingStation.getFreeCapacity      = Utils.overwrittenFunction(SellingStation.getFreeCapacity, DynamicMarket.getFreeCapacity)
-    SellingStation.addFillLevelFromTool = Utils.overwrittenFunction(SellingStation.addFillLevelFromTool, DynamicMarket.addFillLevelFromTool)
-    SellingStation.delete               = Utils.prependedFunction(SellingStation.delete, DynamicMarket.onStationDelete)
+    SellingStation.getFreeCapacity      = Utils.overwrittenFunction(SellingStation.getFreeCapacity, LivingMarket.getFreeCapacity)
+    SellingStation.addFillLevelFromTool = Utils.overwrittenFunction(SellingStation.addFillLevelFromTool, LivingMarket.addFillLevelFromTool)
+    SellingStation.delete               = Utils.prependedFunction(SellingStation.delete, LivingMarket.onStationDelete)
 else
-    print("[DynamicMarket] WARNUNG: Klasse SellingStation nicht gefunden - Begrenzung inaktiv")
+    print("[LivingMarket] WARNUNG: Klasse SellingStation nicht gefunden - Begrenzung inaktiv")
 end
 
 -- ---------------------------------------------------------------------
 -- Auffüllen jede Spielstunde
 -- ---------------------------------------------------------------------
-function DynamicMarket:onHourChanged()
+function LivingMarket:onHourChanged()
     if not isServer() then
         return
     end
@@ -722,11 +722,11 @@ end
 -- Der Server verwaltet die Kontingente allein und schickt sie an die
 -- Clients. Clients ändern nie selbst etwas, sie zeigen nur an.
 -- ---------------------------------------------------------------------
-DynamicMarket.SYNC_INTERVAL = 1000   -- ms, geänderte Werte höchstens so oft senden
-DynamicMarket.syncTimer     = 0
-DynamicMarket.hasDirty      = false
+LivingMarket.SYNC_INTERVAL = 1000   -- ms, geänderte Werte höchstens so oft senden
+LivingMarket.syncTimer     = 0
+LivingMarket.hasDirty      = false
 
-function DynamicMarket:markDirty(entry)
+function LivingMarket:markDirty(entry)
     if isServer() and isMultiplayer() then
         entry.isDirty = true
         self.hasDirty = true
@@ -734,7 +734,7 @@ function DynamicMarket:markDirty(entry)
 end
 
 -- Station zu einem Placeable finden (Gegenstück für die Clients)
-function DynamicMarket:getStationByPlaceable(placeable)
+function LivingMarket:getStationByPlaceable(placeable)
     if placeable == nil then
         return nil
     end
@@ -752,7 +752,7 @@ end
 
 -- Einträge für das Sync-Event zusammenstellen
 -- onlyDirty = true: nur geänderte, sonst alle (für neue Mitspieler)
-function DynamicMarket:collectSyncEntries(onlyDirty)
+function LivingMarket:collectSyncEntries(onlyDirty)
     local result = {}
 
     if not onlyDirty then
@@ -789,7 +789,7 @@ function DynamicMarket:collectSyncEntries(onlyDirty)
 end
 
 -- Auf dem Client: Werte vom Server übernehmen
-function DynamicMarket:applySyncEntries(entries)
+function LivingMarket:applySyncEntries(entries)
     for _, e in ipairs(entries) do
         local station = self:getStationByPlaceable(e.placeable)
         if station ~= nil then
@@ -804,18 +804,18 @@ function DynamicMarket:applySyncEntries(entries)
 end
 
 -- Neuer Mitspieler: kompletten Stand schicken
-function DynamicMarket.sendInitialClientState(mission, connection, user, farm)
-    local entries = DynamicMarket:collectSyncEntries(false)
+function LivingMarket.sendInitialClientState(mission, connection, user, farm)
+    local entries = LivingMarket:collectSyncEntries(false)
     if #entries > 0 then
-        connection:sendEvent(DynamicMarketSyncEvent.new(entries))
+        connection:sendEvent(LivingMarketSyncEvent.new(entries))
     end
 end
 
 if FSBaseMission ~= nil and FSBaseMission.sendInitialClientState ~= nil then
-    FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState, DynamicMarket.sendInitialClientState)
+    FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState, LivingMarket.sendInitialClientState)
 end
 
-function DynamicMarket:update(dt)
+function LivingMarket:update(dt)
     if not self.hasDirty then
         return
     end
@@ -828,7 +828,7 @@ function DynamicMarket:update(dt)
 
     local entries = self:collectSyncEntries(true)
     if #entries > 0 and g_server ~= nil then
-        g_server:broadcastEvent(DynamicMarketSyncEvent.new(entries))
+        g_server:broadcastEvent(LivingMarketSyncEvent.new(entries))
     end
 end
 
@@ -853,7 +853,7 @@ local function moveTo(list, matchFn, position)
     end
 end
 
-function DynamicMarket:addMenuPage()
+function LivingMarket:addMenuPage()
     local inGameMenu = g_inGameMenu
     if inGameMenu == nil or inGameMenu.pagingElement == nil then
         log("Ingame-Menü nicht gefunden, Seite wird nicht angelegt")
@@ -865,9 +865,9 @@ function DynamicMarket:addMenuPage()
         return   -- schon vorhanden (z. B. zweiter Spielstand in derselben Sitzung)
     end
 
-    local frame = DynamicMarketFrame.new()
+    local frame = LivingMarketFrame.new()
     frame.customEnvironment = self.modName
-    g_gui:loadGui(self.modDir .. "gui/DynamicMarketFrame.xml", "DynamicMarketFrame", frame, true)
+    g_gui:loadGui(self.modDir .. "gui/LivingMarketFrame.xml", "LivingMarketFrame", frame, true)
     frame:initialize()
 
     -- Zielpositionen hinter der "Preise"-Seite ermitteln (vor dem Einfügen)
@@ -907,18 +907,18 @@ end
 -- ---------------------------------------------------------------------
 -- Mod-Event-Listener
 -- ---------------------------------------------------------------------
-function DynamicMarket:loadMap(name)
+function LivingMarket:loadMap(name)
     g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
 
     local ok, err = pcall(self.addMenuPage, self)
     if not ok then
-        print("[DynamicMarket] FEHLER beim Anlegen der Menüseite: " .. tostring(err))
+        print("[LivingMarket] FEHLER beim Anlegen der Menüseite: " .. tostring(err))
     end
 
     log("geladen")
 end
 
-function DynamicMarket:deleteMap()
+function LivingMarket:deleteMap()
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}
     self.stationKind = {}
@@ -933,4 +933,4 @@ function DynamicMarket:deleteMap()
     self.syncTimer = 0
 end
 
-addModEventListener(DynamicMarket)
+addModEventListener(LivingMarket)

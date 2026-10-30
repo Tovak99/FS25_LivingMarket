@@ -1,6 +1,6 @@
-# FS25 Dynamic Market (Dynamischer Markt)
+# FS25 Living Market (Lebendiger Markt)
 
-Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nicht mehr unbegrenzt an: Jede Station hat pro Ware einen **Bedarf**, der beim Verkauf sinkt und sich mit der Zeit langsam wieder auffüllt. Ziel ist ein dynamischer Markt mit Nachfrage, Engpässen, Preisänderungen und Angeboten.
+Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nicht mehr unbegrenzt an: Jede Station hat pro Ware einen **Bedarf**, der beim Verkauf sinkt und sich mit der Zeit langsam wieder auffüllt. Ziel ist ein lebendiger Markt mit Nachfrage, Engpässen, Preisänderungen und Angeboten.
 
 > Status: frühe Entwicklungsversion (0.1.0.x), noch nicht veröffentlicht.
 
@@ -19,7 +19,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 ## Installation
 
 1. Den Inhalt dieses Repositorys als Zip packen, sodass `modDesc.xml` direkt im Zip liegt (nicht in einem Unterordner).
-2. Die Zip **`FS25_DynamicMarket.zip`** nennen und in den Mods-Ordner legen:
+2. Die Zip **`FS25_LivingMarket.zip`** nennen und in den Mods-Ordner legen:
    `Dokumente/My Games/FarmingSimulator2025/mods/`
 3. Beim Laden des Spielstands die Mod in der Mod-Auswahl aktivieren.
 
@@ -28,12 +28,12 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 | Datei | Inhalt |
 |---|---|
 | `modDesc.xml` | Mod-Beschreibung, Version, Skripte, Sprachen |
-| `scripts/DynamicMarket.lua` | Kernlogik: Bedarf, Hooks auf `SellingStation`, Lager, Kategorien, Menüseite einhängen |
-| `scripts/gui/DynamicMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
-| `scripts/events/DynamicMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
-| `gui/DynamicMarketFrame.xml` | Layout und Profile der Menüseite |
+| `scripts/LivingMarket.lua` | Kernlogik: Bedarf, Hooks auf `SellingStation`, Lager, Kategorien, Menüseite einhängen |
+| `scripts/gui/LivingMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
+| `scripts/events/LivingMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
+| `gui/LivingMarketFrame.xml` | Layout und Profile der Menüseite |
 | `languages/l10n_*.xml` | Texte in allen Sprachen |
 
 ## Fehlersuche
 
-Die Mod schreibt Zeilen mit dem Präfix `[DynamicMarket]` in die `log.txt` (`Dokumente/My Games/FarmingSimulator2025/`), u. a. alle Stationen mit Kategorie und Waren beim ersten Öffnen der Seite.
+Die Mod schreibt Zeilen mit dem Präfix `[LivingMarket]` in die `log.txt` (`Dokumente/My Games/FarmingSimulator2025/`), u. a. alle Stationen mit Kategorie und Waren beim ersten Öffnen der Seite.

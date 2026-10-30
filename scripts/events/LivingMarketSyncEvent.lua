@@ -1,5 +1,5 @@
 -- =====================================================================
--- DynamicMarketSyncEvent
+-- LivingMarketSyncEvent
 -- Schickt Kontingente vom Server an die Clients:
 --  - komplett, wenn ein Spieler beitritt
 --  - nur die geänderten Einträge, wenn verkauft oder aufgefüllt wurde
@@ -8,23 +8,23 @@
 -- weil die Lua-Tabelle der Station auf jedem Rechner eine andere ist.
 -- =====================================================================
 
-DynamicMarketSyncEvent = {}
-local DynamicMarketSyncEvent_mt = Class(DynamicMarketSyncEvent, Event)
+LivingMarketSyncEvent = {}
+local LivingMarketSyncEvent_mt = Class(LivingMarketSyncEvent, Event)
 
-InitEventClass(DynamicMarketSyncEvent, "DynamicMarketSyncEvent")
+InitEventClass(LivingMarketSyncEvent, "LivingMarketSyncEvent")
 
-function DynamicMarketSyncEvent.emptyNew()
-    return Event.new(DynamicMarketSyncEvent_mt)
+function LivingMarketSyncEvent.emptyNew()
+    return Event.new(LivingMarketSyncEvent_mt)
 end
 
 -- entries: Liste von { placeable, fillTypeIndex, remaining, max, refill }
-function DynamicMarketSyncEvent.new(entries)
-    local self = DynamicMarketSyncEvent.emptyNew()
+function LivingMarketSyncEvent.new(entries)
+    local self = LivingMarketSyncEvent.emptyNew()
     self.entries = entries or {}
     return self
 end
 
-function DynamicMarketSyncEvent:writeStream(streamId, connection)
+function LivingMarketSyncEvent:writeStream(streamId, connection)
     streamWriteUInt16(streamId, #self.entries)
     for _, e in ipairs(self.entries) do
         NetworkUtil.writeNodeObject(streamId, e.placeable)
@@ -35,7 +35,7 @@ function DynamicMarketSyncEvent:writeStream(streamId, connection)
     end
 end
 
-function DynamicMarketSyncEvent:readStream(streamId, connection)
+function LivingMarketSyncEvent:readStream(streamId, connection)
     self.entries = {}
     local count = streamReadUInt16(streamId)
     for _ = 1, count do
@@ -50,9 +50,9 @@ function DynamicMarketSyncEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
-function DynamicMarketSyncEvent:run(connection)
+function LivingMarketSyncEvent:run(connection)
     -- Nur Daten vom Server übernehmen, nie von einem Client
     if connection:getIsServer() then
-        DynamicMarket:applySyncEntries(self.entries)
+        LivingMarket:applySyncEntries(self.entries)
     end
 end

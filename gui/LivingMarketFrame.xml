@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <!-- Oben: eine Zeile pro Ware mit bester Station. Unten: alle Stationen der gewählten Ware. -->
-<GUI name="DynamicMarketFrame">
+<GUI name="LivingMarketFrame">
     <GuiElement profile="fs25_menuContainer">
         <GuiElement profile="fs25_menuHeaderPanel">
             <Bitmap profile="fs25_menuHeaderIconBg">
                 <Bitmap profile="fs25_menuHeaderIcon" imageSliceId="gui.icon_ingameMenu_options"/>
             </Bitmap>
-            <Text profile="fs25_menuHeaderTitle" text="$l10n_dynamicMarket_title"/>
+            <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
             <!-- Suchfeld rechtsbündig neben dem Titel -->
-            <TextInput profile="dm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">
+            <TextInput profile="lm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">
                 <ThreePartBitmap profile="fs25_textInputBg"/>
                 <Bitmap profile="fs25_textInputIconBox">
                     <Bitmap profile="fs25_textInputIcon"/>
                 </Bitmap>
-                <Text profile="dm_searchHint" id="searchHint" name="ignore" text="$l10n_dynamicMarket_searchHint"/>
+                <Text profile="lm_searchHint" id="searchHint" name="ignore" text="$l10n_livingMarket_searchHint"/>
             </TextInput>
         </GuiElement>
 
         <!-- Hinweistext oben -->
-        <Text profile="dm_infoText" id="infoText" text=""/>
+        <Text profile="lm_infoText" id="infoText" text=""/>
 
         <!-- ============ Obere Liste: Waren ============ -->
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Text profile="fs25_settingsControlsListHeaderTitle" text="$l10n_dynamicMarket_colWare"/>
-            <Text profile="dm_colHeader" position="360px 10px" text="$l10n_dynamicMarket_colStock"/>
-            <Text profile="dm_colHeader" position="560px 10px" text="$l10n_dynamicMarket_colBestStation"/>
-            <Text profile="dm_colHeader" position="900px 10px" text="$l10n_dynamicMarket_colPrice"/>
-            <Text profile="dm_colHeader" position="1100px 10px" text="$l10n_dynamicMarket_colSellable"/>
-            <Text profile="dm_colHeader" position="1320px 10px" text="$l10n_dynamicMarket_colRevenue"/>
+            <Text profile="fs25_settingsControlsListHeaderTitle" text="$l10n_livingMarket_colWare"/>
+            <Text profile="lm_colHeader" position="360px 10px" text="$l10n_livingMarket_colStock"/>
+            <Text profile="lm_colHeader" position="560px 10px" text="$l10n_livingMarket_colBestStation"/>
+            <Text profile="lm_colHeader" position="900px 10px" text="$l10n_livingMarket_colPrice"/>
+            <Text profile="lm_colHeader" position="1100px 10px" text="$l10n_livingMarket_colSellable"/>
+            <Text profile="lm_colHeader" position="1320px 10px" text="$l10n_livingMarket_colRevenue"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
 
-        <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (dm_wareArea).
+        <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (lm_wareArea).
              Die Liste darin verhält sich wie vorher auf der ganzen Seite. -->
-        <GuiElement profile="dm_wareArea">
+        <GuiElement profile="lm_wareArea">
             <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
-                <ListItem profile="dm_listItem" name="ware">
-                    <Text profile="dm_stationTitle" name="title" position="15px 0px"/>
+                <ListItem profile="lm_listItem" name="ware">
+                    <Text profile="lm_stationTitle" name="title" position="15px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="345px 0px"/>
-                    <Text profile="dm_rowText" name="stock" position="360px 0px"/>
+                    <Text profile="lm_rowText" name="stock" position="360px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="545px 0px"/>
-                    <Text profile="dm_rowText" name="station" position="560px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="560px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="885px 0px"/>
-                    <Text profile="dm_rowText" name="price" position="900px 0px"/>
+                    <Text profile="lm_rowText" name="price" position="900px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="1085px 0px"/>
-                    <Text profile="dm_rowText" name="sellable" position="1100px 0px"/>
+                    <Text profile="lm_rowText" name="sellable" position="1100px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="1305px 0px"/>
-                    <Text profile="dm_rowText" name="revenue" position="1320px 0px"/>
+                    <Text profile="lm_rowText" name="revenue" position="1320px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
 
         <!-- Wird angezeigt, wenn die Warenliste leer ist -->
-        <Text profile="dm_emptyText" id="emptyText" text="$l10n_dynamicMarket_none" visible="false"/>
+        <Text profile="lm_emptyText" id="emptyText" text="$l10n_livingMarket_none" visible="false"/>
 
         <!-- ============ Unteres Detailfenster: Stationen der gewählten Ware ============ -->
-        <!-- Rahmen unten (dm_detailArea): gleicher Aufbau wie oben – Kopfzeile + Liste -->
-        <GuiElement profile="dm_detailArea" id="detailPanel">
+        <!-- Rahmen unten (lm_detailArea): gleicher Aufbau wie oben – Kopfzeile + Liste -->
+        <GuiElement profile="lm_detailArea" id="detailPanel">
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
-                <Text profile="fs25_settingsControlsListHeaderTitle" id="detailTitle" text="$l10n_dynamicMarket_detailHint"/>
-                <Text profile="dm_colHeader" position="360px 10px" text="$l10n_dynamicMarket_colCategory"/>
-                <Text profile="dm_colHeader" position="600px 10px" text="$l10n_dynamicMarket_colPrice"/>
-                <Text profile="dm_colHeader" position="820px 10px" text="$l10n_dynamicMarket_colFreeMax"/>
-                <Text profile="dm_colHeader" position="1150px 10px" text="$l10n_dynamicMarket_colShare"/>
+                <Text profile="fs25_settingsControlsListHeaderTitle" id="detailTitle" text="$l10n_livingMarket_detailHint"/>
+                <Text profile="lm_colHeader" position="360px 10px" text="$l10n_livingMarket_colCategory"/>
+                <Text profile="lm_colHeader" position="600px 10px" text="$l10n_livingMarket_colPrice"/>
+                <Text profile="lm_colHeader" position="820px 10px" text="$l10n_livingMarket_colFreeMax"/>
+                <Text profile="lm_colHeader" position="1150px 10px" text="$l10n_livingMarket_colShare"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
             <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
-                <ListItem profile="dm_listItem" name="station">
-                    <Text profile="dm_rowText" name="name" position="15px 0px"/>
+                <ListItem profile="lm_listItem" name="station">
+                    <Text profile="lm_rowText" name="name" position="15px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="345px 0px"/>
-                    <Text profile="dm_itemText" name="category" position="360px 0px"/>
+                    <Text profile="lm_itemText" name="category" position="360px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="585px 0px"/>
-                    <Text profile="dm_rowText" name="price" position="600px 0px"/>
+                    <Text profile="lm_rowText" name="price" position="600px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="805px 0px"/>
-                    <Text profile="dm_rowText" name="amount" position="820px 0px"/>
+                    <Text profile="lm_rowText" name="amount" position="820px 0px"/>
                     <Bitmap profile="fs25_settingsControlsSeparator" position="1135px 0px"/>
-                    <Text profile="dm_rowText" name="share" position="1150px 0px"/>
+                    <Text profile="lm_rowText" name="share" position="1150px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
     </GuiElement>
 
     <GUIProfiles>
-        <Profile name="dm_infoText" extends="fs25_textDefault" with="anchorTopLeft">
+        <Profile name="lm_infoText" extends="fs25_textDefault" with="anchorTopLeft">
             <size value="1200px 30px"/>
             <position value="50px 10px"/>
             <textAlignment value="left"/>
@@ -94,14 +94,14 @@
         </Profile>
 
         <!-- Suchfeld: rechts in der Kopfzeile verankert. Breite/Abstand hier anpassen. -->
-        <Profile name="dm_searchInput" extends="fs25_settingsTextInput">
+        <Profile name="lm_searchInput" extends="fs25_settingsTextInput">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
             <position value="-20px 0px"/>
             <size value="420px 48px"/>
         </Profile>
 
-        <Profile name="dm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
+        <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
             <size value="320px 30px"/>
             <position value="15px 0px"/>
             <textAlignment value="left"/>
@@ -111,8 +111,8 @@
         </Profile>
 
         <!-- Höhe des Detailfensters. Beide Werte unten müssen zusammenpassen:
-             dm_wareArea lässt unten so viel frei, wie dm_detailArea hoch ist. -->
-        <Profile name="dm_wareArea">
+             lm_wareArea lässt unten so viel frei, wie lm_detailArea hoch ist. -->
+        <Profile name="lm_wareArea">
             <anchors value="0 1 1 1"/>
             <pivot value="0 1"/>
             <position value="0px 0px"/>
@@ -120,7 +120,7 @@
             <absoluteSizeOffset value="0px 380px"/>
         </Profile>
 
-        <Profile name="dm_detailArea">
+        <Profile name="lm_detailArea">
             <anchors value="0 1 0 0"/>
             <pivot value="0 0"/>
             <position value="0px 0px"/>
@@ -128,12 +128,12 @@
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
-        <Profile name="dm_colHeader" extends="fs25_settingsControlsListHeaderName">
+        <Profile name="lm_colHeader" extends="fs25_settingsControlsListHeaderName">
             <textAlignment value="left"/>
         </Profile>
 
         <!-- Zeilen: dunkel, beim Auswählen/Überfahren nur leicht aufgehellt -->
-        <Profile name="dm_listItem" extends="fs25_settingsControlsListItem">
+        <Profile name="lm_listItem" extends="fs25_settingsControlsListItem">
             <imageColor value="1 1 1 0.02"/>
             <imageFocusedColor value="1 1 1 0.10"/>
             <imageSelectedColor value="1 1 1 0.10"/>
@@ -142,7 +142,7 @@
         </Profile>
 
         <!-- Schrift: in allen Zuständen hell, damit sie nie auf hellem Grund verschwindet -->
-        <Profile name="dm_rowText" extends="fs25_settingsControlsListName">
+        <Profile name="lm_rowText" extends="fs25_settingsControlsListName">
             <textColor value="1 1 1 1"/>
             <textFocusedColor value="1 1 1 1"/>
             <textSelectedColor value="1 1 1 1"/>
@@ -151,11 +151,11 @@
             <textHighlightedSelectedColor value="1 1 1 1"/>
         </Profile>
 
-        <Profile name="dm_stationTitle" extends="dm_rowText">
+        <Profile name="lm_stationTitle" extends="lm_rowText">
             <textBold value="true"/>
         </Profile>
 
-        <Profile name="dm_itemText" extends="dm_rowText">
+        <Profile name="lm_itemText" extends="lm_rowText">
             <textColor value="0.8 0.8 0.8 1"/>
             <textFocusedColor value="0.8 0.8 0.8 1"/>
             <textSelectedColor value="0.8 0.8 0.8 1"/>
@@ -164,7 +164,7 @@
             <textHighlightedSelectedColor value="0.8 0.8 0.8 1"/>
         </Profile>
 
-        <Profile name="dm_emptyText" extends="fs25_textDefault" with="anchorTopLeft">
+        <Profile name="lm_emptyText" extends="fs25_textDefault" with="anchorTopLeft">
             <size value="1200px 40px"/>
             <position value="50px -120px"/>
             <textAlignment value="left"/>

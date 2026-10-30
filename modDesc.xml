@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="113">
     <author>Tovak99</author>
-    <version>0.1.0.10</version>
+    <version>0.1.0.11</version>
     <title>
-        <en>Dynamic Market</en>
-        <de>Dynamischer Markt</de>
-        <fr>Marché dynamique</fr>
-        <pl>Dynamiczny rynek</pl>
-        <nl>Dynamische markt</nl>
-        <es>Mercado dinámico</es>
-        <it>Mercato dinamico</it>
+        <en>Living Market</en>
+        <de>Lebendiger Markt</de>
+        <fr>Marché vivant</fr>
+        <pl>Żywy rynek</pl>
+        <nl>Levende markt</nl>
+        <es>Mercado vivo</es>
+        <it>Mercato vivo</it>
     </title>
     <description>
-        <en><![CDATA[A dynamic market for selling stations: every station only accepts a limited amount per fill type, and the demand slowly refills over time. Productions and contract deliveries are not affected. An own page in the in-game menu (ESC) shows for each of your goods the best station with free demand, the price per 1000 l, the sellable amount and the revenue, plus all stations in a detail view.]]></en>
-        <de><![CDATA[Ein dynamischer Markt für Verkaufsstellen: Jede Station nimmt pro Ware nur eine begrenzte Menge an, der Bedarf füllt sich mit der Zeit langsam wieder auf. Produktionen und Auftragslieferungen sind nicht betroffen. Eine eigene Seite im Ingame-Menü (ESC) zeigt für jede deiner Waren die beste Station mit freiem Bedarf, den Preis je 1000 l, die verkaufbare Menge und den Erlös, dazu alle Stationen in einer Detailansicht.]]></de>
-        <fr><![CDATA[Un marché dynamique pour les points de vente : chaque point de vente n'accepte qu'une quantité limitée par produit, et la demande se reconstitue lentement. Les productions et les livraisons de contrats ne sont pas concernées. Une page dédiée du menu de jeu (ÉCHAP) affiche pour chaque produit le meilleur point de vente avec demande libre, le prix par 1000 l, la quantité vendable et la recette, ainsi que tous les points de vente dans une vue détaillée.]]></fr>
-        <pl><![CDATA[Dynamiczny rynek dla punktów sprzedaży: każdy punkt przyjmuje tylko ograniczoną ilość danego towaru, a popyt powoli się odnawia. Produkcje i dostawy w ramach zleceń nie są objęte limitem. Osobna strona w menu gry (ESC) pokazuje dla każdego towaru najlepszy punkt z wolnym popytem, cenę za 1000 l, ilość do sprzedania i przychód, a także wszystkie punkty w widoku szczegółowym.]]></pl>
-        <nl><![CDATA[Een dynamische markt voor verkooppunten: elk verkooppunt neemt per product slechts een beperkte hoeveelheid aan en de vraag vult langzaam weer aan. Producties en contractleveringen vallen hier niet onder. Een eigen pagina in het spelmenu (ESC) toont per product het beste verkooppunt met vrije vraag, de prijs per 1000 l, de verkoopbare hoeveelheid en de opbrengst, plus alle verkooppunten in een detailweergave.]]></nl>
-        <es><![CDATA[Un mercado dinámico para los puntos de venta: cada punto solo acepta una cantidad limitada por producto y la demanda se repone lentamente. Las producciones y las entregas de contratos no se ven afectadas. Una página propia del menú del juego (ESC) muestra para cada producto el mejor punto de venta con demanda libre, el precio por 1000 l, la cantidad vendible y los ingresos, además de todos los puntos en una vista detallada.]]></es>
-        <it><![CDATA[Un mercato dinamico per i punti vendita: ogni punto accetta solo una quantità limitata per prodotto e la domanda si ricarica lentamente. Produzioni e consegne dei contratti non sono interessate. Una pagina dedicata del menu di gioco (ESC) mostra per ogni prodotto il miglior punto vendita con domanda libera, il prezzo per 1000 l, la quantità vendibile e il ricavo, oltre a tutti i punti vendita in una vista dettagliata.]]></it>
+        <en><![CDATA[A living market for selling stations: every station only accepts a limited amount per fill type, and the demand slowly refills over time. Productions and contract deliveries are not affected. An own page in the in-game menu (ESC) shows for each of your goods the best station with free demand, the price per 1000 l, the sellable amount and the revenue, plus all stations in a detail view.]]></en>
+        <de><![CDATA[Ein lebendiger Markt für Verkaufsstellen: Jede Station nimmt pro Ware nur eine begrenzte Menge an, der Bedarf füllt sich mit der Zeit langsam wieder auf. Produktionen und Auftragslieferungen sind nicht betroffen. Eine eigene Seite im Ingame-Menü (ESC) zeigt für jede deiner Waren die beste Station mit freiem Bedarf, den Preis je 1000 l, die verkaufbare Menge und den Erlös, dazu alle Stationen in einer Detailansicht.]]></de>
+        <fr><![CDATA[Un marché vivant pour les points de vente : chaque point de vente n'accepte qu'une quantité limitée par produit, et la demande se reconstitue lentement. Les productions et les livraisons de contrats ne sont pas concernées. Une page dédiée du menu de jeu (ÉCHAP) affiche pour chaque produit le meilleur point de vente avec demande libre, le prix par 1000 l, la quantité vendable et la recette, ainsi que tous les points de vente dans une vue détaillée.]]></fr>
+        <pl><![CDATA[Żywy rynek dla punktów sprzedaży: każdy punkt przyjmuje tylko ograniczoną ilość danego towaru, a popyt powoli się odnawia. Produkcje i dostawy w ramach zleceń nie są objęte limitem. Osobna strona w menu gry (ESC) pokazuje dla każdego towaru najlepszy punkt z wolnym popytem, cenę za 1000 l, ilość do sprzedania i przychód, a także wszystkie punkty w widoku szczegółowym.]]></pl>
+        <nl><![CDATA[Een levende markt voor verkooppunten: elk verkooppunt neemt per product slechts een beperkte hoeveelheid aan en de vraag vult langzaam weer aan. Producties en contractleveringen vallen hier niet onder. Een eigen pagina in het spelmenu (ESC) toont per product het beste verkooppunt met vrije vraag, de prijs per 1000 l, de verkoopbare hoeveelheid en de opbrengst, plus alle verkooppunten in een detailweergave.]]></nl>
+        <es><![CDATA[Un mercado vivo para los puntos de venta: cada punto solo acepta una cantidad limitada por producto y la demanda se repone lentamente. Las producciones y las entregas de contratos no se ven afectadas. Una página propia del menú del juego (ESC) muestra para cada producto el mejor punto de venta con demanda libre, el precio por 1000 l, la cantidad vendible y los ingresos, además de todos los puntos en una vista detallada.]]></es>
+        <it><![CDATA[Un mercato vivo per i punti vendita: ogni punto accetta solo una quantità limitata per prodotto e la domanda si ricarica lentamente. Produzioni e consegne dei contratti non sono interessate. Una pagina dedicata del menu di gioco (ESC) mostra per ogni prodotto il miglior punto vendita con domanda libera, il prezzo per 1000 l, la quantità vendibile e il ricavo, oltre a tutti i punti vendita in una vista dettagliata.]]></it>
     </description>
-    <iconFilename>icon_dynamicMarket.dds</iconFilename>
+    <iconFilename>icon_livingMarket.dds</iconFilename>
 
     <!-- Multiplayer: Server verwaltet die Kontingente und synchronisiert sie (noch ungetestet) -->
     <multiplayer supported="true"/>
 
     <extraSourceFiles>
-        <sourceFile filename="scripts/events/DynamicMarketSyncEvent.lua"/>
-        <sourceFile filename="scripts/gui/DynamicMarketFrame.lua"/>
-        <sourceFile filename="scripts/DynamicMarket.lua"/>
+        <sourceFile filename="scripts/events/LivingMarketSyncEvent.lua"/>
+        <sourceFile filename="scripts/gui/LivingMarketFrame.lua"/>
+        <sourceFile filename="scripts/LivingMarket.lua"/>
     </extraSourceFiles>
 
     <l10n filenamePrefix="languages/l10n"/>

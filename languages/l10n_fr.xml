@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
     <texts>
-        <text name="ui_DynamicMarketFrame" text="Marché dynamique"/>
-        <text name="dynamicMarket_title" text="Marché dynamique"/>
-        <text name="dynamicMarket_info" text="Meilleur point de vente = prix le plus élevé avec demande libre. La demande se reconstitue de %d %% par heure de jeu."/>
-        <text name="dynamicMarket_colFillType" text="Point de vente / Produit"/>
-        <text name="dynamicMarket_colAmount" text="Restant / Maximum"/>
-        <text name="dynamicMarket_colShare" text="Libre"/>
-        <text name="dynamicMarket_none" text="Aucun point de vente trouvé"/>
-        <text name="dynamicMarket_unknownStation" text="Point de vente"/>
-        <text name="dynamicMarket_goodsCount" text="%d produits"/>
-        <text name="dynamicMarket_lowCount" text="%d presque saturés"/>
-        <text name="dynamicMarket_expandAll" text="Tout déplier"/>
-        <text name="dynamicMarket_collapseAll" text="Tout replier"/>
-        <text name="dynamicMarket_cat_WHOLESALE" text="Commerce de gros"/>
-        <text name="dynamicMarket_cat_AGRI" text="Négoce agricole"/>
-        <text name="dynamicMarket_cat_RETAIL" text="Commerce de détail"/>
-        <text name="dynamicMarket_cat_INDUSTRY" text="Industrie / Transformation"/>
-        <text name="dynamicMarket_cat_OTHER" text="Autres"/>
-        <text name="dynamicMarket_searchHint" text="Chercher produit ou point de vente …"/>
-        <text name="dynamicMarket_noResults" text="Aucun résultat pour « %s »"/>
-        <text name="dynamicMarket_clearSearch" text="Effacer la recherche"/>
-        <text name="dynamicMarket_stockOnly" text="Stock uniquement"/>
-        <text name="dynamicMarket_showAll" text="Afficher tous les produits"/>
-        <text name="dynamicMarket_stockLabel" text="Stock : %s"/>
-        <text name="dynamicMarket_noStock" text="Vous n'avez rien en stock qui puisse être vendu ici."/>
-        <text name="dynamicMarket_colWare" text="Produit"/>
-        <text name="dynamicMarket_colStock" text="Stock"/>
-        <text name="dynamicMarket_colBestStation" text="Meilleur point de vente"/>
-        <text name="dynamicMarket_colPrice" text="Prix / 1000 l"/>
-        <text name="dynamicMarket_colSellable" text="Vendable"/>
-        <text name="dynamicMarket_colRevenue" text="Recette"/>
-        <text name="dynamicMarket_colCategory" text="Type"/>
-        <text name="dynamicMarket_colFreeMax" text="Libre / Maximum"/>
-        <text name="dynamicMarket_allFull" text="Tous les points de vente sont pleins"/>
-        <text name="dynamicMarket_detailHint" text="Choisir un produit"/>
+        <text name="ui_LivingMarketFrame" text="Marché vivant"/>
+        <text name="livingMarket_title" text="Marché vivant"/>
+        <text name="livingMarket_info" text="Meilleur point de vente = prix le plus élevé avec demande libre. La demande se reconstitue de %d %% par heure de jeu."/>
+        <text name="livingMarket_colFillType" text="Point de vente / Produit"/>
+        <text name="livingMarket_colAmount" text="Restant / Maximum"/>
+        <text name="livingMarket_colShare" text="Libre"/>
+        <text name="livingMarket_none" text="Aucun point de vente trouvé"/>
+        <text name="livingMarket_unknownStation" text="Point de vente"/>
+        <text name="livingMarket_goodsCount" text="%d produits"/>
+        <text name="livingMarket_lowCount" text="%d presque saturés"/>
+        <text name="livingMarket_expandAll" text="Tout déplier"/>
+        <text name="livingMarket_collapseAll" text="Tout replier"/>
+        <text name="livingMarket_cat_WHOLESALE" text="Commerce de gros"/>
+        <text name="livingMarket_cat_AGRI" text="Négoce agricole"/>
+        <text name="livingMarket_cat_RETAIL" text="Commerce de détail"/>
+        <text name="livingMarket_cat_INDUSTRY" text="Industrie / Transformation"/>
+        <text name="livingMarket_cat_OTHER" text="Autres"/>
+        <text name="livingMarket_searchHint" text="Chercher produit ou point de vente …"/>
+        <text name="livingMarket_noResults" text="Aucun résultat pour « %s »"/>
+        <text name="livingMarket_clearSearch" text="Effacer la recherche"/>
+        <text name="livingMarket_stockOnly" text="Stock uniquement"/>
+        <text name="livingMarket_showAll" text="Afficher tous les produits"/>
+        <text name="livingMarket_stockLabel" text="Stock : %s"/>
+        <text name="livingMarket_noStock" text="Vous n'avez rien en stock qui puisse être vendu ici."/>
+        <text name="livingMarket_colWare" text="Produit"/>
+        <text name="livingMarket_colStock" text="Stock"/>
+        <text name="livingMarket_colBestStation" text="Meilleur point de vente"/>
+        <text name="livingMarket_colPrice" text="Prix / 1000 l"/>
+        <text name="livingMarket_colSellable" text="Vendable"/>
+        <text name="livingMarket_colRevenue" text="Recette"/>
+        <text name="livingMarket_colCategory" text="Type"/>
+        <text name="livingMarket_colFreeMax" text="Libre / Maximum"/>
+        <text name="livingMarket_allFull" text="Tous les points de vente sont pleins"/>
+        <text name="livingMarket_detailHint" text="Choisir un produit"/>
     </texts>
 </l10n>

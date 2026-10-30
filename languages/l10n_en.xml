@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
     <texts>
-        <text name="ui_DynamicMarketFrame" text="Dynamic Market"/>
-        <text name="dynamicMarket_title" text="Dynamic Market"/>
-        <text name="dynamicMarket_info" text="Best station = highest price with free demand. Demand refills by %d %% every in-game hour."/>
-        <text name="dynamicMarket_colFillType" text="Selling station / Goods"/>
-        <text name="dynamicMarket_colAmount" text="Remaining / Maximum"/>
-        <text name="dynamicMarket_colShare" text="Free"/>
-        <text name="dynamicMarket_none" text="No selling stations found"/>
-        <text name="dynamicMarket_unknownStation" text="Selling station"/>
-        <text name="dynamicMarket_goodsCount" text="%d goods"/>
-        <text name="dynamicMarket_lowCount" text="%d low"/>
-        <text name="dynamicMarket_expandAll" text="Expand all"/>
-        <text name="dynamicMarket_collapseAll" text="Collapse all"/>
-        <text name="dynamicMarket_cat_WHOLESALE" text="Wholesale"/>
-        <text name="dynamicMarket_cat_AGRI" text="Agricultural trade"/>
-        <text name="dynamicMarket_cat_RETAIL" text="Retail"/>
-        <text name="dynamicMarket_cat_INDUSTRY" text="Industry / Processing"/>
-        <text name="dynamicMarket_cat_OTHER" text="Other"/>
-        <text name="dynamicMarket_searchHint" text="Search goods or station …"/>
-        <text name="dynamicMarket_noResults" text='No results for "%s"'/>
-        <text name="dynamicMarket_clearSearch" text="Clear search"/>
-        <text name="dynamicMarket_stockOnly" text="Stock only"/>
-        <text name="dynamicMarket_showAll" text="Show all goods"/>
-        <text name="dynamicMarket_stockLabel" text="Stock: %s"/>
-        <text name="dynamicMarket_noStock" text="You have nothing in stock that can be sold here."/>
-        <text name="dynamicMarket_colWare" text="Goods"/>
-        <text name="dynamicMarket_colStock" text="Stock"/>
-        <text name="dynamicMarket_colBestStation" text="Best station"/>
-        <text name="dynamicMarket_colPrice" text="Price / 1000 l"/>
-        <text name="dynamicMarket_colSellable" text="Sellable"/>
-        <text name="dynamicMarket_colRevenue" text="Revenue"/>
-        <text name="dynamicMarket_colCategory" text="Type"/>
-        <text name="dynamicMarket_colFreeMax" text="Free / Maximum"/>
-        <text name="dynamicMarket_allFull" text="All stations full"/>
-        <text name="dynamicMarket_detailHint" text="Select goods"/>
+        <text name="ui_LivingMarketFrame" text="Living Market"/>
+        <text name="livingMarket_title" text="Living Market"/>
+        <text name="livingMarket_info" text="Best station = highest price with free demand. Demand refills by %d %% every in-game hour."/>
+        <text name="livingMarket_colFillType" text="Selling station / Goods"/>
+        <text name="livingMarket_colAmount" text="Remaining / Maximum"/>
+        <text name="livingMarket_colShare" text="Free"/>
+        <text name="livingMarket_none" text="No selling stations found"/>
+        <text name="livingMarket_unknownStation" text="Selling station"/>
+        <text name="livingMarket_goodsCount" text="%d goods"/>
+        <text name="livingMarket_lowCount" text="%d low"/>
+        <text name="livingMarket_expandAll" text="Expand all"/>
+        <text name="livingMarket_collapseAll" text="Collapse all"/>
+        <text name="livingMarket_cat_WHOLESALE" text="Wholesale"/>
+        <text name="livingMarket_cat_AGRI" text="Agricultural trade"/>
+        <text name="livingMarket_cat_RETAIL" text="Retail"/>
+        <text name="livingMarket_cat_INDUSTRY" text="Industry / Processing"/>
+        <text name="livingMarket_cat_OTHER" text="Other"/>
+        <text name="livingMarket_searchHint" text="Search goods or station …"/>
+        <text name="livingMarket_noResults" text='No results for "%s"'/>
+        <text name="livingMarket_clearSearch" text="Clear search"/>
+        <text name="livingMarket_stockOnly" text="Stock only"/>
+        <text name="livingMarket_showAll" text="Show all goods"/>
+        <text name="livingMarket_stockLabel" text="Stock: %s"/>
+        <text name="livingMarket_noStock" text="You have nothing in stock that can be sold here."/>
+        <text name="livingMarket_colWare" text="Goods"/>
+        <text name="livingMarket_colStock" text="Stock"/>
+        <text name="livingMarket_colBestStation" text="Best station"/>
+        <text name="livingMarket_colPrice" text="Price / 1000 l"/>
+        <text name="livingMarket_colSellable" text="Sellable"/>
+        <text name="livingMarket_colRevenue" text="Revenue"/>
+        <text name="livingMarket_colCategory" text="Type"/>
+        <text name="livingMarket_colFreeMax" text="Free / Maximum"/>
+        <text name="livingMarket_allFull" text="All stations full"/>
+        <text name="livingMarket_detailHint" text="Select goods"/>
     </texts>
 </l10n>

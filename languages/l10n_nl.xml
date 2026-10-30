@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
     <texts>
-        <text name="ui_DynamicMarketFrame" text="Dynamische markt"/>
-        <text name="dynamicMarket_title" text="Dynamische markt"/>
-        <text name="dynamicMarket_info" text="Beste verkooppunt = hoogste prijs met vrije vraag. De vraag vult elk speluur met %d %% aan."/>
-        <text name="dynamicMarket_colFillType" text="Verkooppunt / Product"/>
-        <text name="dynamicMarket_colAmount" text="Resterend / Maximum"/>
-        <text name="dynamicMarket_colShare" text="Vrij"/>
-        <text name="dynamicMarket_none" text="Geen verkooppunten gevonden"/>
-        <text name="dynamicMarket_unknownStation" text="Verkooppunt"/>
-        <text name="dynamicMarket_goodsCount" text="%d producten"/>
-        <text name="dynamicMarket_lowCount" text="%d bijna vol"/>
-        <text name="dynamicMarket_expandAll" text="Alles uitklappen"/>
-        <text name="dynamicMarket_collapseAll" text="Alles inklappen"/>
-        <text name="dynamicMarket_cat_WHOLESALE" text="Groothandel"/>
-        <text name="dynamicMarket_cat_AGRI" text="Agrarische handel"/>
-        <text name="dynamicMarket_cat_RETAIL" text="Detailhandel"/>
-        <text name="dynamicMarket_cat_INDUSTRY" text="Industrie / Verwerking"/>
-        <text name="dynamicMarket_cat_OTHER" text="Overig"/>
-        <text name="dynamicMarket_searchHint" text="Zoek product of verkooppunt …"/>
-        <text name="dynamicMarket_noResults" text='Geen resultaten voor "%s"'/>
-        <text name="dynamicMarket_clearSearch" text="Zoekopdracht wissen"/>
-        <text name="dynamicMarket_stockOnly" text="Alleen voorraad"/>
-        <text name="dynamicMarket_showAll" text="Alle producten tonen"/>
-        <text name="dynamicMarket_stockLabel" text="Voorraad: %s"/>
-        <text name="dynamicMarket_noStock" text="Je hebt niets op voorraad dat hier verkocht kan worden."/>
-        <text name="dynamicMarket_colWare" text="Product"/>
-        <text name="dynamicMarket_colStock" text="Voorraad"/>
-        <text name="dynamicMarket_colBestStation" text="Beste verkooppunt"/>
-        <text name="dynamicMarket_colPrice" text="Prijs / 1000 l"/>
-        <text name="dynamicMarket_colSellable" text="Verkoopbaar"/>
-        <text name="dynamicMarket_colRevenue" text="Opbrengst"/>
-        <text name="dynamicMarket_colCategory" text="Soort"/>
-        <text name="dynamicMarket_colFreeMax" text="Vrij / Maximum"/>
-        <text name="dynamicMarket_allFull" text="Alle verkooppunten vol"/>
-        <text name="dynamicMarket_detailHint" text="Kies een product"/>
+        <text name="ui_LivingMarketFrame" text="Levende markt"/>
+        <text name="livingMarket_title" text="Levende markt"/>
+        <text name="livingMarket_info" text="Beste verkooppunt = hoogste prijs met vrije vraag. De vraag vult elk speluur met %d %% aan."/>
+        <text name="livingMarket_colFillType" text="Verkooppunt / Product"/>
+        <text name="livingMarket_colAmount" text="Resterend / Maximum"/>
+        <text name="livingMarket_colShare" text="Vrij"/>
+        <text name="livingMarket_none" text="Geen verkooppunten gevonden"/>
+        <text name="livingMarket_unknownStation" text="Verkooppunt"/>
+        <text name="livingMarket_goodsCount" text="%d producten"/>
+        <text name="livingMarket_lowCount" text="%d bijna vol"/>
+        <text name="livingMarket_expandAll" text="Alles uitklappen"/>
+        <text name="livingMarket_collapseAll" text="Alles inklappen"/>
+        <text name="livingMarket_cat_WHOLESALE" text="Groothandel"/>
+        <text name="livingMarket_cat_AGRI" text="Agrarische handel"/>
+        <text name="livingMarket_cat_RETAIL" text="Detailhandel"/>
+        <text name="livingMarket_cat_INDUSTRY" text="Industrie / Verwerking"/>
+        <text name="livingMarket_cat_OTHER" text="Overig"/>
+        <text name="livingMarket_searchHint" text="Zoek product of verkooppunt …"/>
+        <text name="livingMarket_noResults" text='Geen resultaten voor "%s"'/>
+        <text name="livingMarket_clearSearch" text="Zoekopdracht wissen"/>
+        <text name="livingMarket_stockOnly" text="Alleen voorraad"/>
+        <text name="livingMarket_showAll" text="Alle producten tonen"/>
+        <text name="livingMarket_stockLabel" text="Voorraad: %s"/>
+        <text name="livingMarket_noStock" text="Je hebt niets op voorraad dat hier verkocht kan worden."/>
+        <text name="livingMarket_colWare" text="Product"/>
+        <text name="livingMarket_colStock" text="Voorraad"/>
+        <text name="livingMarket_colBestStation" text="Beste verkooppunt"/>
+        <text name="livingMarket_colPrice" text="Prijs / 1000 l"/>
+        <text name="livingMarket_colSellable" text="Verkoopbaar"/>
+        <text name="livingMarket_colRevenue" text="Opbrengst"/>
+        <text name="livingMarket_colCategory" text="Soort"/>
+        <text name="livingMarket_colFreeMax" text="Vrij / Maximum"/>
+        <text name="livingMarket_allFull" text="Alle verkooppunten vol"/>
+        <text name="livingMarket_detailHint" text="Kies een product"/>
     </texts>
 </l10n>
