@@ -58,6 +58,8 @@ function LivingMarketFrame:initialize()
     self.detailList:setDataSource(self)
     self.detailList:setDelegate(self)
 
+    self:setupSortHeaders()
+
     self:updateMenuButtons()
 end
 
@@ -378,6 +380,58 @@ function LivingMarketFrame:onClickSortHeader(element)
         self:rebuildWareList()
     else
         self:updateDetail(self.detailWare)
+    end
+end
+
+-- Die Spaltenköpfe sind laut Spielprofil 450px breit und überlappen sich. Damit ein Klick
+-- beim richtigen Kopf landet, nimmt jeder Kopf nur Klicks auf seinem sichtbaren Text an.
+local HEADER_HIT_PADDING = 0.006   -- Bildschirmanteil, etwas Rand um den Text
+
+local function getHeaderTextWidth(button)
+    local text = button.text or ""
+    if button.getTextWidth ~= nil then
+        local ok, width = pcall(button.getTextWidth, button)
+        if ok and width ~= nil and width > 0 then
+            return width
+        end
+    end
+    if getTextWidth ~= nil and button.textSize ~= nil then
+        return getTextWidth(button.textSize, text)
+    end
+    return button.absSize[1]
+end
+
+local function limitHeaderHitArea(button)
+    if button == nil or button.limitedHitArea then
+        return
+    end
+    button.limitedHitArea = true
+    local originalMouseEvent = button.mouseEvent
+    button.mouseEvent = function(self, posX, posY, isDown, isUp, mouseButton, eventUsed)
+        local width = getHeaderTextWidth(self)
+        local x1, x2
+        if RenderText ~= nil and self.textAlignment == RenderText.ALIGN_RIGHT then
+            x2 = self.absPosition[1] + self.absSize[1]
+            x1 = x2 - width
+        else
+            x1 = self.absPosition[1]
+            x2 = x1 + width
+        end
+        if posX < x1 - HEADER_HIT_PADDING or posX > x2 + HEADER_HIT_PADDING then
+            -- außerhalb des eigenen Textes: wie "Maus woanders" behandeln, Klick nicht verbrauchen
+            return originalMouseEvent(self, -1, -1, isDown, isUp, mouseButton, eventUsed)
+        end
+        return originalMouseEvent(self, posX, posY, isDown, isUp, mouseButton, eventUsed)
+    end
+end
+
+function LivingMarketFrame:setupSortHeaders()
+    limitHeaderHitArea(self.detailTitle)
+    for key in pairs(self.WARE_COLUMNS) do
+        limitHeaderHitArea(self["sortWare_" .. key])
+    end
+    for key in pairs(self.DETAIL_COLUMNS) do
+        limitHeaderHitArea(self["sortDetail_" .. key])
     end
 end
 
