@@ -10,6 +10,7 @@ local LivingMarketFrame_mt = Class(LivingMarketFrame, TabbedMenuFrameElement)
 
 LivingMarketFrame.LOW_SHARE    = 0.15   -- ab hier gilt der Restbedarf als "knapp"
 LivingMarketFrame.SEARCH_DELAY = 250    -- ms nach dem letzten Tastendruck, dann wird gefiltert
+LivingMarketFrame.FRAME_COLOR  = { 0.30, 0.30, 0.30, 1 }   -- Farbe des Tabellenrahmens
 
 -- Farben
 local COLOR_GOOD  = { 0.35, 0.85, 0.35, 1 }
@@ -59,6 +60,14 @@ end
 
 function LivingMarketFrame:onFrameOpen()
     LivingMarketFrame:superClass().onFrameOpen(self)
+
+    -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
+    for _, frame in ipairs({ self.wareFrame, self.detailFrame }) do
+        if frame ~= nil and frame.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
+            local c = LivingMarketFrame.FRAME_COLOR
+            frame:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
+        end
+    end
 
     -- Scrollbalken mit ihren Listen verbinden
     if self.wareSlider ~= nil then

@@ -22,6 +22,9 @@
         <Text profile="lm_infoText" id="infoText" text=""/>
 
         <!-- ============ Obere Liste: Waren ============ -->
+        <!-- Rahmen hinter Kopfzeile und Warenliste -->
+        <ThreePartBitmap profile="lm_tableFrameTop" id="wareFrame"/>
+
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
             <Text profile="lm_colHeader" position="50px 0px" text="$l10n_livingMarket_colWare"/>
             <Text profile="lm_colHeaderRight" position="20px 0px" text="$l10n_livingMarket_colStock"/>
@@ -61,6 +64,9 @@
         <!-- ============ Unteres Detailfenster: Stationen der gewählten Ware ============ -->
         <!-- Rahmen unten (lm_detailArea): gleicher Aufbau wie oben – Kopfzeile + Liste -->
         <GuiElement profile="lm_detailArea" id="detailPanel">
+            <!-- Rahmen hinter Kopfzeile und Detailliste -->
+            <ThreePartBitmap profile="lm_tableFrameBottom" id="detailFrame"/>
+
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
                 <Text profile="lm_colHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint"/>
@@ -132,6 +138,25 @@
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
+        <!-- Tabellenrahmen: etwas hellere Fläche, die rundum ein Stück über Kopfzeile und Liste
+             hinausragt. Maße aus Screenshots: Liste beginnt ca. 21px vom linken Seitenrand, ist
+             Seitenbreite - 90 breit; Kopfzeile beginnt 20px unter der Oberkante. -->
+        <Profile name="lm_tableFrameTop" extends="fs25_settingsControlsListItemBg">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="13px 292px"/>
+            <size value="100% 100%"/>
+            <absoluteSizeOffset value="74px 304px"/>
+        </Profile>
+
+        <Profile name="lm_tableFrameBottom" extends="fs25_settingsControlsListItemBg">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="13px -8px"/>
+            <size value="100% 100%"/>
+            <absoluteSizeOffset value="74px 4px"/>
+        </Profile>
+
         <!-- Scrollbalken rechts im jeweiligen Rahmen -->
         <Profile name="lm_sliderDockedBg" extends="fs25_sliderDockedBg">
             <anchors value="1 1 0.5 0.5"/>
