@@ -10,14 +10,15 @@ local LivingMarketFrame_mt = Class(LivingMarketFrame, TabbedMenuFrameElement)
 
 LivingMarketFrame.LOW_SHARE    = 0.15   -- ab hier gilt der Restbedarf als "knapp"
 LivingMarketFrame.SEARCH_DELAY = 250    -- ms nach dem letzten Tastendruck, dann wird gefiltert
-LivingMarketFrame.FRAME_COLOR  = { 0.30, 0.30, 0.30, 1 }   -- Farbe des Tabellenrahmens
+LivingMarketFrame.FRAME_COLOR  = { 0.040, 0.040, 0.040, 1 }   -- Tabellenrahmen (#383838)
 
--- Farben
-local COLOR_GOOD  = { 0.35, 0.85, 0.35, 1 }
-local COLOR_MID   = { 0.95, 0.8, 0.25, 1 }
-local COLOR_LOW   = { 0.95, 0.35, 0.3, 1 }
+-- Farben: Das Spiel rechnet Farbwerte linear (Gammakorrektur), deshalb sind die
+-- Zielfarben (#hex, wie sie auf dem Bildschirm erscheinen) hier umgerechnet eingetragen.
+local COLOR_GOOD  = { 0.100, 0.692, 0.100, 1 }
+local COLOR_MID   = { 0.890, 0.604, 0.051, 1 }
+local COLOR_LOW   = { 0.890, 0.100, 0.073, 1 }
 local COLOR_TEXT  = { 1, 1, 1, 1 }
-local COLOR_MUTED = { 0.5, 0.5, 0.5, 1 }
+local COLOR_MUTED = { 0.184, 0.184, 0.184, 1 }
 
 function LivingMarketFrame.new(target, customMt)
     local self = TabbedMenuFrameElement.new(target, customMt or LivingMarketFrame_mt)
@@ -98,7 +99,7 @@ end
 -- Farbe für alle Zustände setzen. Die Markierung der gewählten Zeile übernimmt
 -- diese Seite selbst (selectedWareIndex), nicht das Spiel: bei den verwendeten
 -- Profilen teilen sich die Zustände intern dieselbe Farbe.
-local COLOR_ON_GREEN = { 0.12, 0.12, 0.12, 1 }
+local COLOR_ON_GREEN = { 0.013, 0.013, 0.013, 1 }
 
 local function setTextColorAll(textElement, c)
     if textElement == nil then
@@ -411,6 +412,17 @@ local function limitHeaderHitArea(button)
         return
     end
     button.limitedHitArea = true
+
+    -- Button-Hintergrund in allen Zuständen unsichtbar (zusätzlich zum Profil)
+    if button.setImageColor ~= nil and GuiOverlay ~= nil then
+        for _, state in ipairs({ GuiOverlay.STATE_NORMAL, GuiOverlay.STATE_FOCUSED, GuiOverlay.STATE_SELECTED,
+                                 GuiOverlay.STATE_HIGHLIGHTED, GuiOverlay.STATE_PRESSED, GuiOverlay.STATE_DISABLED }) do
+            if state ~= nil then
+                pcall(button.setImageColor, button, state, 0, 0, 0, 0)
+            end
+        end
+    end
+
     local originalMouseEvent = button.mouseEvent
     button.mouseEvent = function(self, posX, posY, isDown, isUp, mouseButton, eventUsed)
         local width = getHeaderTextWidth(self)
@@ -570,9 +582,9 @@ function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
 end
 
 -- Zeilenhintergrund wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün
-local ROW_DARK      = { 0.09, 0.09, 0.09, 1 }
-local ROW_LIGHT     = { 0.14, 0.14, 0.14, 1 }
-local ROW_SELECTED  = { 0.47, 0.64, 0.11, 1 }
+local ROW_DARK      = { 0.023, 0.023, 0.023, 1 }   -- #2a2a2a
+local ROW_LIGHT     = { 0.033, 0.033, 0.033, 1 }   -- #333333
+local ROW_SELECTED  = { 0.212, 0.376, 0.012, 1 }   -- #7fa51c
 
 local function setRowBackground(bg, index, isSelected)
     if bg == nil or bg.setImageColor == nil or GuiOverlay == nil or GuiOverlay.STATE_NORMAL == nil then

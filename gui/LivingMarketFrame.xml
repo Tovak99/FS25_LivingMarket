@@ -179,6 +179,13 @@
 
         <!-- Anklickbare Spaltenköpfe zum Sortieren: wie die Kopfzeilentexte, beim Überfahren weiß -->
         <Profile name="lm_sortHeader" extends="lm_colHeader">
+            <!-- Buttons haben eigenen (weißen) Hintergrund: in allen Zuständen unsichtbar -->
+            <imageColor value="0 0 0 0"/>
+            <imageFocusedColor value="0 0 0 0"/>
+            <imageHighlightedColor value="0 0 0 0"/>
+            <imageSelectedColor value="0 0 0 0"/>
+            <imagePressedColor value="0 0 0 0"/>
+            <imageDisabledColor value="0 0 0 0"/>
             <textHighlightedColor value="1 1 1 1"/>
             <textFocusedColor value="0.85 0.85 0.85 1"/>
             <textSelectedColor value="0.85 0.85 0.85 1"/>
