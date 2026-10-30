@@ -73,20 +73,20 @@ local function trim(text)
     return (string.gsub(text or "", "^%s*(.-)%s*$", "%1"))
 end
 
--- Farbe für normale und überfahrene Zeilen setzen. In der ausgewählten (grünen)
--- Zeile ist die Schrift immer dunkel, sonst wären grüne Werte auf Grün unlesbar.
+-- Farbe für alle Zustände setzen. Die Markierung der gewählten Zeile übernimmt
+-- diese Seite selbst (selectedWareIndex), nicht das Spiel: bei den verwendeten
+-- Profilen teilen sich die Zustände intern dieselbe Farbe.
 local COLOR_ON_GREEN = { 0.12, 0.12, 0.12, 1 }
 
-local function setColor(textElement, c)
-    textElement:setTextColor(c[1], c[2], c[3], c[4])
-    if textElement.setTextHighlightedColor ~= nil then
-        textElement:setTextHighlightedColor(c[1], c[2], c[3], c[4])
+local function setTextColorAll(textElement, c)
+    if textElement == nil then
+        return
     end
-    local d = COLOR_ON_GREEN
-    for _, setter in ipairs({ "setTextSelectedColor", "setTextFocusedColor",
+    textElement:setTextColor(c[1], c[2], c[3], c[4])
+    for _, setter in ipairs({ "setTextHighlightedColor", "setTextSelectedColor", "setTextFocusedColor",
                               "setTextFocusedSelectedColor", "setTextHighlightedSelectedColor" }) do
         if textElement[setter] ~= nil then
-            textElement[setter](textElement, d[1], d[2], d[3], d[4])
+            textElement[setter](textElement, c[1], c[2], c[3], c[4])
         end
     end
 end
@@ -104,6 +104,10 @@ local function setWareIcon(iconElement, fillTypeIndex)
     else
         iconElement:setVisible(false)
     end
+end
+
+local function setColor(textElement, c)
+    setTextColorAll(textElement, c)
 end
 
 local function shareColor(share)
@@ -178,8 +182,6 @@ function LivingMarketFrame:rebuildWareList()
         end
     end
 
-    self.wareList:reloadData(true)
-
     -- Gewählte Ware wieder auswählen, sonst die erste
     local index = 1
     for i, ware in ipairs(self.visibleWares) do
@@ -188,6 +190,9 @@ function LivingMarketFrame:rebuildWareList()
             break
         end
     end
+    self.selectedWareIndex = index
+
+    self.wareList:reloadData(true)
     if #self.visibleWares > 0 then
         self.wareList:setSelectedItem(1, index)
     end
@@ -213,11 +218,22 @@ end
 
 -- Auswahl in der Warenliste geändert (Tastatur, Controller, Maus)
 function LivingMarketFrame:onListSelectionChanged(list, section, index)
-    if list == self.wareList then
-        local ware = self.visibleWares[index]
-        if ware ~= nil and ware ~= self.detailWare then
-            self:updateDetail(ware)
-        end
+    if list ~= self.wareList or self.isRepaintingSelection then
+        return
+    end
+    local ware = self.visibleWares[index]
+    if ware == nil then
+        return
+    end
+    if ware ~= self.detailWare then
+        self:updateDetail(ware)
+    end
+    if index ~= self.selectedWareIndex then
+        -- grüne Markierung umsetzen: sichtbare Zeilen neu befüllen
+        self.selectedWareIndex = index
+        self.isRepaintingSelection = true
+        self.wareList:reloadData()
+        self.isRepaintingSelection = false
     end
 end
 
@@ -332,47 +348,42 @@ end
 -- Zeilenhintergrund wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün
 local ROW_DARK      = { 0.09, 0.09, 0.09, 1 }
 local ROW_LIGHT     = { 0.14, 0.14, 0.14, 1 }
-local ROW_HOVER     = { 0.20, 0.20, 0.20, 1 }
 local ROW_SELECTED  = { 0.47, 0.64, 0.11, 1 }
 
-local function setRowBackground(bg, index)
-    if bg == nil or bg.setImageColor == nil or GuiOverlay == nil then
+local function setRowBackground(bg, index, isSelected)
+    if bg == nil or bg.setImageColor == nil or GuiOverlay == nil or GuiOverlay.STATE_NORMAL == nil then
         return
     end
-    local base = (index % 2 == 0) and ROW_LIGHT or ROW_DARK
-    local states = {
-        { GuiOverlay.STATE_NORMAL,      base },
-        { GuiOverlay.STATE_HIGHLIGHTED, ROW_HOVER },
-        { GuiOverlay.STATE_SELECTED,    ROW_SELECTED },
-        { GuiOverlay.STATE_FOCUSED,     ROW_SELECTED },
-        { GuiOverlay.STATE_PRESSED,     ROW_SELECTED },
-    }
-    for _, entry in ipairs(states) do
-        local state, c = entry[1], entry[2]
-        if state ~= nil then
-            bg:setImageColor(state, c[1], c[2], c[3], c[4])
-        end
-    end
+    local c = isSelected and ROW_SELECTED or ((index % 2 == 0) and ROW_LIGHT or ROW_DARK)
+    bg:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
 end
 
 function LivingMarketFrame:populateCellForItemInSection(list, section, index, cell)
-    setRowBackground(cell:getAttribute("bg"), index)
+    local isSelected = list == self.wareList and index == self.selectedWareIndex
+    setRowBackground(cell:getAttribute("bg"), index, isSelected)
 
     if list == self.wareList then
-        self:populateWareCell(self.visibleWares[index], cell)
+        self:populateWareCell(self.visibleWares[index], cell, isSelected)
     elseif self.detailWare ~= nil then
         self:populateStationCell(self.detailWare.stations[index], cell)
     end
 end
 
-function LivingMarketFrame:populateWareCell(ware, cell)
+function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     if ware == nil or cell:getAttribute("title") == nil then
         return
     end
 
+    -- In der gewählten (grünen) Zeile ist jede Schrift dunkel
+    local function setColor(textElement, c)
+        setTextColorAll(textElement, isSelected and COLOR_ON_GREEN or c)
+    end
+
     setWareIcon(cell:getAttribute("icon"), ware.fillTypeIndex)
     cell:getAttribute("title"):setText(ware.title)
+    setColor(cell:getAttribute("title"), COLOR_TEXT)
     cell:getAttribute("stock"):setText(ware.stock >= 1 and LivingMarket.formatLiters(ware.stock) or "-")
+    setColor(cell:getAttribute("stock"), COLOR_TEXT)
 
     local stationText = cell:getAttribute("station")
     local priceText = cell:getAttribute("price")
@@ -384,7 +395,9 @@ function LivingMarketFrame:populateWareCell(ware, cell)
         stationText:setText(g_i18n:getText("livingMarket_allFull"))
         setColor(stationText, COLOR_LOW)
         priceText:setText("-")
+        setColor(priceText, COLOR_TEXT)
         sellableText:setText("-")
+        setColor(sellableText, COLOR_TEXT)
         revenueText:setText("-")
         setColor(revenueText, COLOR_MUTED)
         return
@@ -393,6 +406,7 @@ function LivingMarketFrame:populateWareCell(ware, cell)
     stationText:setText(ware.best.name)
     setColor(stationText, COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
+    setColor(priceText, COLOR_TEXT)
 
     if ware.sellable >= 1 then
         sellableText:setText(LivingMarket.formatLiters(ware.sellable))
