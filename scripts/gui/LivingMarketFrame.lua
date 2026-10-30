@@ -59,6 +59,14 @@ end
 
 function LivingMarketFrame:onFrameOpen()
     LivingMarketFrame:superClass().onFrameOpen(self)
+
+    -- Scrollbalken mit ihren Listen verbinden
+    if self.wareSlider ~= nil then
+        self.wareSlider:setDataElement(self.wareList)
+    end
+    if self.detailSlider ~= nil then
+        self.detailSlider:setDataElement(self.detailList)
+    end
     self:refreshData()
 end
 

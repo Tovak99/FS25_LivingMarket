@@ -47,6 +47,12 @@
                     <Text profile="lm_rowTextRight" name="revenue" position="940px 0px"/>
                 </ListItem>
             </SmoothList>
+            <!-- Scrollbalken -->
+            <ThreePartBitmap profile="lm_sliderDockedBg">
+                <ThreePartBitmap profile="fs25_sliderDockedBox">
+                    <Slider profile="fs25_sliderDocked" id="wareSlider" dataElementId="wareList"/>
+                </ThreePartBitmap>
+            </ThreePartBitmap>
         </GuiElement>
 
         <!-- Wird angezeigt, wenn die Warenliste leer ist -->
@@ -73,6 +79,12 @@
                     <Text profile="lm_rowTextRight" name="share" position="940px 0px"/>
                 </ListItem>
             </SmoothList>
+            <!-- Scrollbalken -->
+            <ThreePartBitmap profile="lm_sliderDockedBg">
+                <ThreePartBitmap profile="fs25_sliderDockedBox">
+                    <Slider profile="fs25_sliderDocked" id="detailSlider" dataElementId="detailList"/>
+                </ThreePartBitmap>
+            </ThreePartBitmap>
         </GuiElement>
     </GuiElement>
 
@@ -120,6 +132,13 @@
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
+        <!-- Scrollbalken rechts im jeweiligen Rahmen -->
+        <Profile name="lm_sliderDockedBg" extends="fs25_sliderDockedBg">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <position value="75px -30px"/>
+        </Profile>
+
         <!-- Spaltenköpfe mit derselben Geometrie wie die Zeilentexte, damit sie exakt über den Werten stehen -->
         <Profile name="lm_colHeader" extends="fs25_settingsControlsListName">
             <textAlignment value="left"/>
