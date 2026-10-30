@@ -4,20 +4,9 @@
         <text name="ui_LivingMarketFrame" text="Living Market"/>
         <text name="livingMarket_title" text="Living Market"/>
         <text name="livingMarket_info" text="Best station = highest price with free demand. Demand refills by %d %% every in-game hour."/>
-        <text name="livingMarket_colFillType" text="Selling station / Goods"/>
-        <text name="livingMarket_colAmount" text="Remaining / Maximum"/>
         <text name="livingMarket_colShare" text="Free"/>
         <text name="livingMarket_none" text="No selling stations found"/>
         <text name="livingMarket_unknownStation" text="Selling station"/>
-        <text name="livingMarket_goodsCount" text="%d goods"/>
-        <text name="livingMarket_lowCount" text="%d low"/>
-        <text name="livingMarket_expandAll" text="Expand all"/>
-        <text name="livingMarket_collapseAll" text="Collapse all"/>
-        <text name="livingMarket_cat_WHOLESALE" text="Wholesale"/>
-        <text name="livingMarket_cat_AGRI" text="Agricultural trade"/>
-        <text name="livingMarket_cat_RETAIL" text="Retail"/>
-        <text name="livingMarket_cat_INDUSTRY" text="Industry / Processing"/>
-        <text name="livingMarket_cat_OTHER" text="Other"/>
         <text name="livingMarket_searchHint" text="Search goods or station …"/>
         <text name="livingMarket_noResults" text='No results for "%s"'/>
         <text name="livingMarket_clearSearch" text="Clear search"/>
@@ -31,7 +20,6 @@
         <text name="livingMarket_colPrice" text="Price / 1000 l"/>
         <text name="livingMarket_colSellable" text="Sellable"/>
         <text name="livingMarket_colRevenue" text="Revenue"/>
-        <text name="livingMarket_colCategory" text="Type"/>
         <text name="livingMarket_colFreeMax" text="Free / Maximum"/>
         <text name="livingMarket_allFull" text="All stations full"/>
         <text name="livingMarket_detailHint" text="Select goods"/>

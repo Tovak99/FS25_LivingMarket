@@ -73,14 +73,36 @@ local function trim(text)
     return (string.gsub(text or "", "^%s*(.-)%s*$", "%1"))
 end
 
--- Farbe für alle Zustände setzen, sonst überschreibt das Profil sie bei ausgewählter Zeile
+-- Farbe für normale und überfahrene Zeilen setzen. In der ausgewählten (grünen)
+-- Zeile ist die Schrift immer dunkel, sonst wären grüne Werte auf Grün unlesbar.
+local COLOR_ON_GREEN = { 0.12, 0.12, 0.12, 1 }
+
 local function setColor(textElement, c)
     textElement:setTextColor(c[1], c[2], c[3], c[4])
-    for _, setter in ipairs({ "setTextSelectedColor", "setTextFocusedColor", "setTextHighlightedColor",
+    if textElement.setTextHighlightedColor ~= nil then
+        textElement:setTextHighlightedColor(c[1], c[2], c[3], c[4])
+    end
+    local d = COLOR_ON_GREEN
+    for _, setter in ipairs({ "setTextSelectedColor", "setTextFocusedColor",
                               "setTextFocusedSelectedColor", "setTextHighlightedSelectedColor" }) do
         if textElement[setter] ~= nil then
-            textElement[setter](textElement, c[1], c[2], c[3], c[4])
+            textElement[setter](textElement, d[1], d[2], d[3], d[4])
         end
+    end
+end
+
+-- Icon der Ware (dasselbe, das das Spiel in seiner Anzeige nutzt)
+local function setWareIcon(iconElement, fillTypeIndex)
+    if iconElement == nil then
+        return
+    end
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    local filename = fillType ~= nil and fillType.hudOverlayFilename or nil
+    if filename ~= nil and filename ~= "" then
+        iconElement:setImageFilename(filename)
+        iconElement:setVisible(true)
+    else
+        iconElement:setVisible(false)
     end
 end
 
@@ -320,6 +342,7 @@ function LivingMarketFrame:populateWareCell(ware, cell)
         return
     end
 
+    setWareIcon(cell:getAttribute("icon"), ware.fillTypeIndex)
     cell:getAttribute("title"):setText(ware.title)
     cell:getAttribute("stock"):setText(ware.stock >= 1 and LivingMarket.formatLiters(ware.stock) or "-")
 
@@ -368,7 +391,6 @@ function LivingMarketFrame:populateStationCell(station, cell)
     local shareText = cell:getAttribute("share")
 
     nameText:setText(station.name)
-    cell:getAttribute("category"):setText(g_i18n:getText("livingMarket_cat_" .. station.category))
     priceText:setText(formatPrice(station.price))
     amountText:setText(string.format("%s / %s", LivingMarket.formatLiters(station.remaining), LivingMarket.formatLiters(station.max)))
     shareText:setText(string.format("%d %%", math.floor(station.share * 100 + 0.5)))

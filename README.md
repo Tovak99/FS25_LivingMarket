@@ -10,9 +10,8 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 - **Ausgenommen:** Produktionen, Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
 - **Eigene Seite im Ingame-Menü (ESC)**
   - eine Zeile pro Ware: Lager, beste Station (höchster Preis *mit freiem Bedarf*), Preis je 1000 l, verkaufbare Menge, Erlös
-  - Detailfenster mit allen Stationen der gewählten Ware: Art, Preis, Frei / Maximum
+  - Detailfenster mit allen Stationen der gewählten Ware: Preis, Frei / Maximum
   - Filter „Nur Lagerbestand“ und Suche nach Ware oder Station
-- **Einzelhandel / Großhandel:** Einzelhandel nimmt nie Schüttgut (Waren ohne Palette)
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
 - **Multiplayer-fähig aufgebaut:** Der Server verwaltet den Bedarf und synchronisiert ihn (noch ungetestet)
 
@@ -28,7 +27,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 | Datei | Inhalt |
 |---|---|
 | `modDesc.xml` | Mod-Beschreibung, Version, Skripte, Sprachen |
-| `scripts/LivingMarket.lua` | Kernlogik: Bedarf, Hooks auf `SellingStation`, Lager, Kategorien, Menüseite einhängen |
+| `scripts/LivingMarket.lua` | Kernlogik: Bedarf, Hooks auf `SellingStation`, Lager, Preise, Menüseite einhängen |
 | `scripts/gui/LivingMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
 | `scripts/events/LivingMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
 | `gui/LivingMarketFrame.xml` | Layout und Profile der Menüseite |
@@ -36,4 +35,4 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 
 ## Fehlersuche
 
-Die Mod schreibt Zeilen mit dem Präfix `[LivingMarket]` in die `log.txt` (`Dokumente/My Games/FarmingSimulator2025/`), u. a. alle Stationen mit Kategorie und Waren beim ersten Öffnen der Seite.
+Die Mod schreibt Zeilen mit dem Präfix `[LivingMarket]` in die `log.txt` (`Dokumente/My Games/FarmingSimulator2025/`), u. a. alle Stationen mit ihren Waren beim ersten Öffnen der Seite.

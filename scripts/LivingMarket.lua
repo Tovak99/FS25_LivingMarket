@@ -239,141 +239,6 @@ function LivingMarket:collectStations()
     return result
 end
 
--- ---------------------------------------------------------------------
--- Kategorien: Einzelhandel und Großhandel
--- Einzelhandel = überwiegend Produkte (Lebensmittel, Waren für den Laden),
--- alles andere ist Großhandel. Einordnung nur über die angenommenen Waren,
--- damit es auf jeder Karte und mit Mod-Fruchtsorten funktioniert.
--- Die Warengruppen bleiben für spätere Mengen/Preise erhalten.
--- ---------------------------------------------------------------------
-LivingMarket.CATEGORY_ORDER = { "WHOLESALE", "RETAIL" }
-
--- Rohstoffe lassen sich nicht über Eigenschaften erkennen, sind aber auf allen Karten gleich
-LivingMarket.RAW_FILLTYPES = { "WOOD", "WOODCHIPS", "MILK", "GOATMILK", "BUFFALOMILK",
-                             "STRAW", "LIQUIDMANURE", "MANURE", "DIGESTATE" }
-
--- Betriebsmittel (Dünger, Kalk, Pflanzenschutz, Saatgut, Siliermittel, Mineralfutter):
--- gehören zum Landhandel. Erkannt über diese Namen und die Füllart-Kategorien des Spiels.
-LivingMarket.SUPPLY_FILLTYPES = { "FERTILIZER", "LIQUIDFERTILIZER", "LIME", "LIQUIDLIME", "HERBICIDE",
-                                "SEEDS", "SILAGE_ADDITIVE", "MINERAL_FEED", "TREESAPLINGS" }
-LivingMarket.SUPPLY_CATEGORIES = { "SPRAYER", "SOWINGMACHINE", "PLANTER", "FERTILIZERSPREADER" }
-
-LivingMarket.bulkCache = {}   -- [fillTypeIndex] = true, wenn es die Ware nur lose gibt
-
--- Schüttgut = Ware, für die es keine Palette gibt (Getreide, Milch, Gülle, Diesel …).
--- Trauben, Eier, Brot usw. gibt es als Palette/Kiste und sind daher kein Schüttgut.
-function LivingMarket:isBulkFillType(fillTypeIndex)
-    local cached = self.bulkCache[fillTypeIndex]
-    if cached == nil then
-        local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
-        cached = fillType == nil or fillType.palletFilename == nil
-        self.bulkCache[fillTypeIndex] = cached
-    end
-    return cached
-end
-
--- Alle Schüttgut-Waren einer Station (Ausnahmen wie Geld zählen nicht)
-function LivingMarket:getBulkFillTypes(station)
-    local result = {}
-    for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
-        if accepted and not self:isExcludedFillType(fillTypeIndex) and self:isBulkFillType(fillTypeIndex) then
-            table.insert(result, fillTypeIndex)
-        end
-    end
-    return result
-end
-
-LivingMarket.fillTypeGroup   = {}   -- [fillTypeIndex] = "CROP" | "SUPPLY" | "PRODUCT" | "RAW" | "OTHER"
-LivingMarket.stationCategory = {}   -- [station] = Kategorie
-
-local function isInList(name, list)
-    for _, entry in ipairs(list) do
-        if name == entry then
-            return true
-        end
-    end
-    return false
-end
-
-function LivingMarket:isSupplyFillType(fillTypeIndex, name)
-    if name ~= nil and isInList(name, self.SUPPLY_FILLTYPES) then
-        return true
-    end
-    -- Mod-Füllarten: über die Kategorien (was in Spritze, Sämaschine oder Streuer darf)
-    if g_fillTypeManager.getIsFillTypeInCategory ~= nil then
-        for _, category in ipairs(self.SUPPLY_CATEGORIES) do
-            local ok, inCategory = pcall(g_fillTypeManager.getIsFillTypeInCategory, g_fillTypeManager, fillTypeIndex, category)
-            if ok and inCategory then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-function LivingMarket:getFillTypeGroup(fillTypeIndex)
-    local cached = self.fillTypeGroup[fillTypeIndex]
-    if cached ~= nil then
-        return cached
-    end
-
-    local group = "OTHER"
-    local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
-    if isInList(name, self.RAW_FILLTYPES) then
-        -- zuerst: Gülle und Gärrest dürfen auch in die Spritze, sind aber Rohstoffe
-        group = "RAW"
-    elseif self:isSupplyFillType(fillTypeIndex, name) then
-        group = "SUPPLY"
-    end
-
-    if group == "OTHER" then
-        if g_fruitTypeManager ~= nil and g_fruitTypeManager.getFruitTypeByFillTypeIndex ~= nil
-            and g_fruitTypeManager:getFruitTypeByFillTypeIndex(fillTypeIndex) ~= nil then
-            group = "CROP"
-        else
-            local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
-            if fillType ~= nil and fillType.palletFilename ~= nil then
-                group = "PRODUCT"
-            end
-        end
-    end
-
-    self.fillTypeGroup[fillTypeIndex] = group
-    return group
-end
-
--- Zählt die Waren einer Station je Gruppe (Ausnahmen wie Geld zählen nicht)
-function LivingMarket:countGroups(station)
-    local count = { CROP = 0, SUPPLY = 0, PRODUCT = 0, RAW = 0, OTHER = 0 }
-    local total = 0
-    for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
-        if accepted and not self:isExcludedFillType(fillTypeIndex) then
-            local group = self:getFillTypeGroup(fillTypeIndex)
-            count[group] = count[group] + 1
-            total = total + 1
-        end
-    end
-    return count, total
-end
-
-function LivingMarket:getStationCategory(station)
-    local cached = self.stationCategory[station]
-    if cached ~= nil then
-        return cached
-    end
-
-    -- Einzelhandel nimmt nie Schüttgut: sobald eine angenommene Ware nur lose
-    -- (ohne Palette) existiert, ist die Station Großhandel.
-    local _, total = self:countGroups(station)
-    local category = "RETAIL"
-    if total == 0 or #self:getBulkFillTypes(station) > 0 then
-        category = "WHOLESALE"
-    end
-
-    self.stationCategory[station] = category
-    return category
-end
-
 -- Aktueller Verkaufspreis je 1000 Liter an dieser Station (wie im Preise-Menü des Spiels)
 function LivingMarket:getPricePer1000(station, fillTypeIndex)
     if station.getEffectiveFillTypePrice ~= nil then
@@ -400,28 +265,22 @@ end
 function LivingMarket:getWareData()
     local stations = self:collectStations()   -- nur einmal pro Aufruf einsammeln
 
-    -- Einmalig alle Stationen mit Kategorie, Zählung und Füllart-Namen ins Log (zum Nachjustieren)
+    -- Einmalig alle Stationen mit ihren Waren ins Log (Hilfe bei der Fehlersuche)
     if self.DEBUG and not self.hasLoggedStations then
         self.hasLoggedStations = true
         for _, station in ipairs(stations) do
-            local count, total = self:countGroups(station)
             local names = {}
             for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
                 if accepted then
                     local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex) or tostring(fillTypeIndex)
                     if self:isExcludedFillType(fillTypeIndex) then
                         name = name .. "(ausgenommen)"
-                    else
-                        local bulk = self:isBulkFillType(fillTypeIndex) and ",lose" or ""
-                        name = name .. "(" .. self:getFillTypeGroup(fillTypeIndex) .. bulk .. ")"
                     end
                     table.insert(names, name)
                 end
             end
             table.sort(names)
-            log("Station '%s' -> %s | gesamt %d, davon lose (Schüttgut) %d | Feldfrüchte %d, Betriebsmittel %d, Produkte %d, Rohstoffe %d, sonstige %d | %s",
-                getStationName(station), self:getStationCategory(station), total, #self:getBulkFillTypes(station),
-                count.CROP, count.SUPPLY, count.PRODUCT, count.RAW, count.OTHER, table.concat(names, ", "))
+            log("Station '%s' (%d Waren): %s", getStationName(station), #names, table.concat(names, ", "))
         end
     end
 
@@ -432,7 +291,6 @@ function LivingMarket:getWareData()
 
     for _, station in ipairs(stations) do
         local stationName = getStationName(station)
-        local category = self:getStationCategory(station)
         for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
             if accepted then
                 local entry = self:getEntry(station, fillTypeIndex)
@@ -453,7 +311,6 @@ function LivingMarket:getWareData()
                     table.insert(ware.stations, {
                         name      = stationName,
                         searchKey = LivingMarket.toLower(stationName),
-                        category  = category,
                         price     = self:getPricePer1000(station, fillTypeIndex),
                         remaining = entry.remaining,
                         max       = entry.max,
@@ -688,7 +545,6 @@ end
 function LivingMarket.onStationDelete(station)
     LivingMarket.stations[station] = nil
     LivingMarket.stationKind[station] = nil
-    LivingMarket.stationCategory[station] = nil
     LivingMarket.stationNames[station] = nil
 end
 
@@ -922,12 +778,9 @@ function LivingMarket:deleteMap()
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}
     self.stationKind = {}
-    self.stationCategory = {}
     self.stationNames = {}
     self.excludedCache = {}
-    self.bulkCache = {}
     self.loggedMissionDeliveries = {}
-    self.fillTypeGroup = {}
     self.hasLoggedStations = false
     self.hasDirty = false
     self.syncTimer = 0

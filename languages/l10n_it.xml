@@ -4,20 +4,9 @@
         <text name="ui_LivingMarketFrame" text="Mercato vivo"/>
         <text name="livingMarket_title" text="Mercato vivo"/>
         <text name="livingMarket_info" text="Miglior punto vendita = prezzo più alto con domanda libera. La domanda si ricarica del %d %% ogni ora di gioco."/>
-        <text name="livingMarket_colFillType" text="Punto vendita / Prodotto"/>
-        <text name="livingMarket_colAmount" text="Residuo / Massimo"/>
         <text name="livingMarket_colShare" text="Libero"/>
         <text name="livingMarket_none" text="Nessun punto vendita trovato"/>
         <text name="livingMarket_unknownStation" text="Punto vendita"/>
-        <text name="livingMarket_goodsCount" text="%d prodotti"/>
-        <text name="livingMarket_lowCount" text="%d quasi pieni"/>
-        <text name="livingMarket_expandAll" text="Espandi tutto"/>
-        <text name="livingMarket_collapseAll" text="Comprimi tutto"/>
-        <text name="livingMarket_cat_WHOLESALE" text="Ingrosso"/>
-        <text name="livingMarket_cat_AGRI" text="Commercio agricolo"/>
-        <text name="livingMarket_cat_RETAIL" text="Dettaglio"/>
-        <text name="livingMarket_cat_INDUSTRY" text="Industria / Trasformazione"/>
-        <text name="livingMarket_cat_OTHER" text="Altro"/>
         <text name="livingMarket_searchHint" text="Cerca prodotto o punto vendita …"/>
         <text name="livingMarket_noResults" text="Nessun risultato per «%s»"/>
         <text name="livingMarket_clearSearch" text="Cancella ricerca"/>
@@ -31,7 +20,6 @@
         <text name="livingMarket_colPrice" text="Prezzo / 1000 l"/>
         <text name="livingMarket_colSellable" text="Vendibile"/>
         <text name="livingMarket_colRevenue" text="Ricavo"/>
-        <text name="livingMarket_colCategory" text="Tipo"/>
         <text name="livingMarket_colFreeMax" text="Libero / Massimo"/>
         <text name="livingMarket_allFull" text="Tutti i punti vendita pieni"/>
         <text name="livingMarket_detailHint" text="Scegli un prodotto"/>

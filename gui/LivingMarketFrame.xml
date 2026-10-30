@@ -23,12 +23,12 @@
 
         <!-- ============ Obere Liste: Waren ============ -->
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Text profile="fs25_settingsControlsListHeaderTitle" text="$l10n_livingMarket_colWare"/>
-            <Text profile="lm_colHeader" position="360px 10px" text="$l10n_livingMarket_colStock"/>
-            <Text profile="lm_colHeader" position="560px 10px" text="$l10n_livingMarket_colBestStation"/>
-            <Text profile="lm_colHeader" position="900px 10px" text="$l10n_livingMarket_colPrice"/>
-            <Text profile="lm_colHeader" position="1100px 10px" text="$l10n_livingMarket_colSellable"/>
-            <Text profile="lm_colHeader" position="1320px 10px" text="$l10n_livingMarket_colRevenue"/>
+            <Text profile="lm_colHeader" position="50px 10px" text="$l10n_livingMarket_colWare"/>
+            <Text profile="lm_colHeaderRight" position="290px 10px" text="$l10n_livingMarket_colStock"/>
+            <Text profile="lm_colHeader" position="520px 10px" text="$l10n_livingMarket_colBestStation"/>
+            <Text profile="lm_colHeaderRight" position="830px 10px" text="$l10n_livingMarket_colPrice"/>
+            <Text profile="lm_colHeaderRight" position="1050px 10px" text="$l10n_livingMarket_colSellable"/>
+            <Text profile="lm_colHeaderRight" position="1270px 10px" text="$l10n_livingMarket_colRevenue"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
 
@@ -37,17 +37,13 @@
         <GuiElement profile="lm_wareArea">
             <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
-                    <Text profile="lm_stationTitle" name="title" position="15px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="345px 0px"/>
-                    <Text profile="lm_rowText" name="stock" position="360px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="545px 0px"/>
-                    <Text profile="lm_rowText" name="station" position="560px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="885px 0px"/>
-                    <Text profile="lm_rowText" name="price" position="900px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="1085px 0px"/>
-                    <Text profile="lm_rowText" name="sellable" position="1100px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="1305px 0px"/>
-                    <Text profile="lm_rowText" name="revenue" position="1320px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon"/>
+                    <Text profile="lm_rowTextBold" name="title" position="50px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="290px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="520px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="830px 0px"/>
+                    <Text profile="lm_rowTextRight" name="sellable" position="1050px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="1270px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
@@ -60,25 +56,19 @@
         <GuiElement profile="lm_detailArea" id="detailPanel">
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
-                <Text profile="fs25_settingsControlsListHeaderTitle" id="detailTitle" text="$l10n_livingMarket_detailHint"/>
-                <Text profile="lm_colHeader" position="360px 10px" text="$l10n_livingMarket_colCategory"/>
-                <Text profile="lm_colHeader" position="600px 10px" text="$l10n_livingMarket_colPrice"/>
-                <Text profile="lm_colHeader" position="820px 10px" text="$l10n_livingMarket_colFreeMax"/>
-                <Text profile="lm_colHeader" position="1150px 10px" text="$l10n_livingMarket_colShare"/>
+                <Text profile="lm_colHeader" id="detailTitle" position="50px 10px" text="$l10n_livingMarket_detailHint"/>
+                <Text profile="lm_colHeaderRight" position="830px 10px" text="$l10n_livingMarket_colPrice"/>
+                <Text profile="lm_colHeaderRight" position="1050px 10px" text="$l10n_livingMarket_colFreeMax"/>
+                <Text profile="lm_colHeaderRight" position="1270px 10px" text="$l10n_livingMarket_colShare"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
             <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="station">
-                    <Text profile="lm_rowText" name="name" position="15px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="345px 0px"/>
-                    <Text profile="lm_itemText" name="category" position="360px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="585px 0px"/>
-                    <Text profile="lm_rowText" name="price" position="600px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="805px 0px"/>
-                    <Text profile="lm_rowText" name="amount" position="820px 0px"/>
-                    <Bitmap profile="fs25_settingsControlsSeparator" position="1135px 0px"/>
-                    <Text profile="lm_rowText" name="share" position="1150px 0px"/>
+                    <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="830px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="1050px 0px"/>
+                    <Text profile="lm_rowTextRight" name="share" position="1270px 0px"/>
                 </ListItem>
             </SmoothList>
         </GuiElement>
@@ -130,38 +120,61 @@
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
         <Profile name="lm_colHeader" extends="fs25_settingsControlsListHeaderName">
             <textAlignment value="left"/>
+            <size value="400px 20px"/>
         </Profile>
 
-        <!-- Zeilen: dunkel, beim Auswählen/Überfahren nur leicht aufgehellt -->
+        <Profile name="lm_colHeaderRight" extends="fs25_settingsControlsListHeaderName">
+            <textAlignment value="right"/>
+            <size value="180px 20px"/>
+        </Profile>
+
+        <!-- Zeilen wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün -->
         <Profile name="lm_listItem" extends="fs25_settingsControlsListItem">
-            <imageColor value="1 1 1 0.02"/>
-            <imageFocusedColor value="1 1 1 0.10"/>
-            <imageSelectedColor value="1 1 1 0.10"/>
-            <imageHighlightedColor value="1 1 1 0.06"/>
-            <imagePressedColor value="1 1 1 0.10"/>
+            <imageColor value="0.09 0.09 0.09 1"/>
+            <alternateBackgroundColor value="0.14 0.14 0.14 1"/>
+            <imageHighlightedColor value="0.20 0.20 0.20 1"/>
+            <imageFocusedColor value="0.47 0.64 0.11 1"/>
+            <imageSelectedColor value="0.47 0.64 0.11 1"/>
+            <imagePressedColor value="0.47 0.64 0.11 1"/>
         </Profile>
 
-        <!-- Schrift: in allen Zuständen hell, damit sie nie auf hellem Grund verschwindet -->
+        <!-- Icon der Ware links in der Zeile -->
+        <Profile name="lm_wareIcon">
+            <anchors value="0 0 0.5 0.5"/>
+            <pivot value="0 0.5"/>
+            <position value="12px 0px"/>
+            <size value="26px 26px"/>
+            <imageColor value="1 1 1 1"/>
+            <imageSelectedColor value="1 1 1 1"/>
+            <imageFocusedColor value="1 1 1 1"/>
+            <imageHighlightedColor value="1 1 1 1"/>
+        </Profile>
+
+        <!-- Schrift: hell, in der grünen (ausgewählten) Zeile dunkel -->
         <Profile name="lm_rowText" extends="fs25_settingsControlsListName">
-            <textColor value="1 1 1 1"/>
-            <textFocusedColor value="1 1 1 1"/>
-            <textSelectedColor value="1 1 1 1"/>
-            <textHighlightedColor value="1 1 1 1"/>
-            <textFocusedSelectedColor value="1 1 1 1"/>
-            <textHighlightedSelectedColor value="1 1 1 1"/>
+            <textBold value="false"/>
+            <textColor value="0.92 0.92 0.92 1"/>
+            <textHighlightedColor value="0.92 0.92 0.92 1"/>
+            <textFocusedColor value="0.12 0.12 0.12 1"/>
+            <textSelectedColor value="0.12 0.12 0.12 1"/>
+            <textFocusedSelectedColor value="0.12 0.12 0.12 1"/>
+            <textHighlightedSelectedColor value="0.12 0.12 0.12 1"/>
         </Profile>
 
-        <Profile name="lm_stationTitle" extends="lm_rowText">
+        <Profile name="lm_rowTextBold" extends="lm_rowText">
             <textBold value="true"/>
+            <size value="440px 100%"/>
         </Profile>
 
-        <Profile name="lm_itemText" extends="lm_rowText">
-            <textColor value="0.8 0.8 0.8 1"/>
-            <textFocusedColor value="0.8 0.8 0.8 1"/>
-            <textSelectedColor value="0.8 0.8 0.8 1"/>
-            <textHighlightedColor value="0.8 0.8 0.8 1"/>
-            <textFocusedSelectedColor value="0.8 0.8 0.8 1"/>
-            <textHighlightedSelectedColor value="0.8 0.8 0.8 1"/>
+        <Profile name="lm_rowTextMuted" extends="lm_rowText">
+            <textColor value="0.65 0.65 0.65 1"/>
+            <textHighlightedColor value="0.65 0.65 0.65 1"/>
+        </Profile>
+
+        <!-- Zahlen rechtsbündig: position = linker Rand, Breite 180px, rechter Rand = position + 180 -->
+        <Profile name="lm_rowTextRight" extends="lm_rowText">
+            <size value="180px 100%"/>
+            <textAlignment value="right"/>
         </Profile>
 
         <Profile name="lm_emptyText" extends="fs25_textDefault" with="anchorTopLeft">
