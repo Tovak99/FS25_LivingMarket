@@ -27,6 +27,9 @@ function LivingMarketFrame.new(target, customMt)
     self.selectedFillType = nil   -- gewählte Ware (bleibt beim Aktualisieren erhalten)
     self.searchText = ""
     self.stockOnly = true         -- nur Waren zeigen, die der Hof auf Lager hat
+    self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
+    self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
+    self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
 
     self.hasCustomMenuButtons = true
     self.backButtonInfo = {}
@@ -177,6 +180,7 @@ function LivingMarketFrame:getFilteredWares()
             table.insert(result, ware)
         end
     end
+    self:sortWares(result)
     return result
 end
 
@@ -220,15 +224,16 @@ end
 -- Detailfenster für eine Ware befüllen
 function LivingMarketFrame:updateDetail(ware)
     self.detailWare = ware
+    self.detailStations = {}
+    if ware ~= nil then
+        for _, station in ipairs(ware.stations) do
+            table.insert(self.detailStations, station)
+        end
+        self:sortStations(self.detailStations)
+    end
     self.selectedFillType = ware ~= nil and ware.fillTypeIndex or self.selectedFillType
 
-    if self.detailTitle ~= nil then
-        if ware ~= nil then
-            self.detailTitle:setText(ware.title)
-        else
-            self.detailTitle:setText(g_i18n:getText("livingMarket_detailHint"))
-        end
-    end
+    self:updateSortHeaders()
 
     self.detailList:reloadData(true)
 end
@@ -257,6 +262,149 @@ end
 -- Zusätzlich bei Klick, falls die Liste die Auswahländerung nicht meldet
 function LivingMarketFrame:onClickWare(list, section, index)
     self:onListSelectionChanged(self.wareList, section, index)
+end
+
+-- ---------------------------------------------------------------------
+-- Sortieren per Klick auf die Spaltenköpfe
+-- ---------------------------------------------------------------------
+LivingMarketFrame.ARROW_UP   = "▲"
+LivingMarketFrame.ARROW_DOWN = "▼"
+
+-- Spalten: Text der Überschrift und ob es eine Textspalte ist (erster Klick A→Z, sonst groß→klein)
+LivingMarketFrame.WARE_COLUMNS = {
+    title    = { label = "livingMarket_colWare",        isText = true  },
+    stock    = { label = "livingMarket_colStock",       isText = false },
+    station  = { label = "livingMarket_colBestStation", isText = true  },
+    price    = { label = "livingMarket_colPrice",       isText = false },
+    sellable = { label = "livingMarket_colSellable",    isText = false },
+    revenue  = { label = "livingMarket_colRevenue",     isText = false },
+}
+LivingMarketFrame.DETAIL_COLUMNS = {
+    name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
+    price  = { label = "livingMarket_colPrice",     isText = false },
+    amount = { label = "livingMarket_colFreeMax",   isText = false },
+    share  = { label = "livingMarket_colShare",     isText = false },
+}
+
+local function wareValue(ware, key)
+    if key == "title" then
+        return ware.searchKey
+    elseif key == "stock" then
+        return ware.stock
+    elseif key == "station" then
+        return ware.best ~= nil and LivingMarket.toLower(ware.best.name) or nil
+    elseif key == "price" then
+        return ware.best ~= nil and ware.best.price or nil
+    elseif key == "sellable" then
+        return ware.sellable
+    elseif key == "revenue" then
+        return ware.revenue
+    end
+end
+
+local function stationValue(station, key)
+    if key == "name" then
+        return station.searchKey
+    elseif key == "price" then
+        return station.price
+    elseif key == "amount" then
+        return station.remaining
+    elseif key == "share" then
+        return station.share
+    end
+end
+
+-- Vergleich mit Richtung; fehlende Werte (z. B. "alle voll") immer ans Ende
+local function compare(a, b, asc, tieA, tieB)
+    if a == nil and b == nil then
+        return tieA < tieB
+    elseif a == nil then
+        return false
+    elseif b == nil then
+        return true
+    elseif a == b then
+        return tieA < tieB
+    end
+    if asc then
+        return a < b
+    end
+    return a > b
+end
+
+function LivingMarketFrame:sortWares(wares)
+    local key, asc = self.wareSort.key, self.wareSort.asc
+    table.sort(wares, function(a, b)
+        return compare(wareValue(a, key), wareValue(b, key), asc, a.searchKey, b.searchKey)
+    end)
+end
+
+function LivingMarketFrame:sortStations(stations)
+    local key, asc = self.detailSort.key, self.detailSort.asc
+    table.sort(stations, function(a, b)
+        return compare(stationValue(a, key), stationValue(b, key), asc, a.searchKey, b.searchKey)
+    end)
+end
+
+-- Klick auf einen Spaltenkopf: gleiche Spalte = Richtung umdrehen, neue Spalte = Standardrichtung
+function LivingMarketFrame:onClickSortHeader(element)
+    local id = element ~= nil and element.id or nil
+    if id == nil then
+        return
+    end
+
+    local sortState, columns, key
+    if id == "detailTitle" then
+        sortState, columns, key = self.detailSort, self.DETAIL_COLUMNS, "name"
+    else
+        local table_, column = string.match(id, "^sort(%a+)_(%a+)$")
+        if table_ == "Ware" then
+            sortState, columns, key = self.wareSort, self.WARE_COLUMNS, column
+        elseif table_ == "Detail" then
+            sortState, columns, key = self.detailSort, self.DETAIL_COLUMNS, column
+        end
+    end
+    if sortState == nil or columns[key] == nil then
+        return
+    end
+
+    if sortState.key == key then
+        sortState.asc = not sortState.asc
+    else
+        sortState.key = key
+        sortState.asc = columns[key].isText
+    end
+
+    if sortState == self.wareSort then
+        self:rebuildWareList()
+    else
+        self:updateDetail(self.detailWare)
+    end
+end
+
+-- Pfeil vor die Überschrift der sortierten Spalte setzen
+function LivingMarketFrame:updateSortHeaders()
+    local function apply(prefix, columns, sortState)
+        for key, column in pairs(columns) do
+            local element = prefix == "Detail" and key == "name" and self.detailTitle or self["sort" .. prefix .. "_" .. key]
+            if element ~= nil then
+                local label
+                if column.label ~= nil then
+                    label = g_i18n:getText(column.label)
+                elseif self.detailWare ~= nil then
+                    label = self.detailWare.title
+                else
+                    label = g_i18n:getText("livingMarket_detailHint")
+                end
+                if sortState.key == key then
+                    local arrow = sortState.asc and self.ARROW_UP or self.ARROW_DOWN
+                    label = arrow .. " " .. label
+                end
+                element:setText(label)
+            end
+        end
+    end
+    apply("Ware", self.WARE_COLUMNS, self.wareSort)
+    apply("Detail", self.DETAIL_COLUMNS, self.detailSort)
 end
 
 -- ---------------------------------------------------------------------
@@ -355,7 +503,7 @@ function LivingMarketFrame:getNumberOfItemsInSection(list, section)
     if list == self.wareList then
         return #self.visibleWares
     end
-    return self.detailWare ~= nil and #self.detailWare.stations or 0
+    return #self.detailStations
 end
 
 function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
@@ -382,7 +530,7 @@ function LivingMarketFrame:populateCellForItemInSection(list, section, index, ce
     if list == self.wareList then
         self:populateWareCell(self.visibleWares[index], cell, isSelected)
     elseif self.detailWare ~= nil then
-        self:populateStationCell(self.detailWare.stations[index], cell)
+        self:populateStationCell(self.detailStations[index], cell)
     end
 end
 
