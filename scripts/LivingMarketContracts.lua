@@ -32,9 +32,9 @@ LivingMarket.CONTRACT_SETTINGS = {
     penaltyRate      = 0.50,   -- Strafe auf den Wert der fehlenden Menge
     maxActivePerFarm = 3,      -- laufende Verträge je Hof
     repStart         = 50,
-    repFulfilled     = 10,
+    repFulfilled     = 4,
     repFailed        = 20,
-    repDriftPerMonth = 2,
+    repDriftPerMonth = 1,
     repMinStars      = 2,      -- darunter keine Angebote dieser Station
 }
 
