@@ -16,8 +16,8 @@
 
 LivingMarket.CONTRACT_SETTINGS = {
     enabled          = true,
-    minOffers        = 3,      -- nicht mehr verwendet (Anzahl = maxOffers bzw. Option)
-    maxOffers        = 6,      -- offene Ausschreibungen gleichzeitig (Standard der Option)
+    minOffers        = 3,      -- nicht mehr verwendet (Anzahl = Option "Anzahl der Verträge", Standard 6)
+    maxOffers        = 6,      -- nicht mehr verwendet
     offerMonths      = 1,      -- nicht angenommene Ausschreibung verfällt nach ...
     minMonths        = 1,      -- Frist ab Annahme
     maxMonths        = 3,
@@ -54,8 +54,9 @@ LivingMarket.contractOverride = nil  -- während einer Vertragslieferung: { stat
 
 -- Option "Anzahl der Verträge" (Optionsseite, gilt für das ganze Spiel, im Spielstand):
 -- so viele Ausschreibungen gibt es gleichzeitig; fehlende werden innerhalb eines Spieltags ersetzt
-LivingMarket.MAX_CONTRACTS_LIMIT = 20    -- höchster einstellbarer Wert
-LivingMarket.maxContractsSetting = nil   -- nil = Standard aus der Konfiguration (maxOffers)
+LivingMarket.MAX_CONTRACTS_LIMIT = 15    -- höchster einstellbarer Wert
+LivingMarket.DEFAULT_CONTRACTS   = 6     -- Standard (nichts im Spielstand)
+LivingMarket.maxContractsSetting = nil   -- nil = Standard
 LivingMarket.CONTRACT_REFILL_HOURS = 24  -- fehlende Ausschreibungen spätestens nach so vielen Spielstunden ersetzt
 LivingMarket.contractSpawnHours = {}     -- geplante Zeitpunkte (Spielstunde) für neue Ausschreibungen
 
@@ -299,9 +300,9 @@ function LivingMarket:getMaxActiveContracts()
     return self.CONTRACT_SETTINGS.maxActivePerFarm
 end
 
--- Ausschreibungen gleichzeitig (Option oder Standard aus der Konfiguration)
+-- Ausschreibungen gleichzeitig (Option oder Standard)
 function LivingMarket:getDefaultContractCount()
-    return self.CONTRACT_SETTINGS.maxOffers
+    return self.DEFAULT_CONTRACTS
 end
 
 function LivingMarket:getContractOfferTarget()
@@ -309,7 +310,7 @@ function LivingMarket:getContractOfferTarget()
 end
 
 function LivingMarket:getMaxContractsLimit()
-    return math.max(self.MAX_CONTRACTS_LIMIT, self:getDefaultContractCount())
+    return self.MAX_CONTRACTS_LIMIT
 end
 
 -- Darf dieser Spieler die Spiel-Optionen ändern? (Einzelspieler/Host oder Admin)

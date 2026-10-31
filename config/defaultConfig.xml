@@ -63,7 +63,7 @@
 
     <!-- Lieferverträge (Ausschreibungen der Stationen)
          enabled            = false schaltet neue Ausschreibungen ab
-         maxOffers          = so viele offene Ausschreibungen gleichzeitig (Standard der Option "Anzahl der Verträge"; fehlende werden innerhalb eines Spieltags ersetzt), minOffers wird nicht mehr verwendet
+         minOffers/maxOffers = nicht mehr verwendet (Anzahl der Ausschreibungen: Option "Anzahl der Verträge" auf der Optionsseite, Standard 6, höchstens 15)
          offerMonths        = nicht angenommene Ausschreibung verfällt nach so vielen Monaten (spätestens zur Frist)
          minMonths/maxMonths = Frist in Monaten, gerechnet ab Erscheinen der Ausschreibung
          minShare/maxShare  = Menge als Anteil vom Maximum der Station (auf 1000 l abgerundet)
