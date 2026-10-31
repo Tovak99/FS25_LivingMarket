@@ -290,6 +290,7 @@ function LivingMarketContractListEvent:writeStream(streamId, connection)
         streamWriteFloat32(streamId, e.delivered or 0)
         streamWriteFloat32(streamId, e.price or 0)
         streamWriteFloat32(streamId, e.money or 0)
+        streamWriteInt32(streamId, math.floor(e.repChange or 0))
         streamWriteInt32(streamId, math.floor((e.endHour or now) - now))
     end
 end
@@ -343,6 +344,7 @@ function LivingMarketContractListEvent:readStream(streamId, connection)
         e.delivered     = streamReadFloat32(streamId)
         e.price         = streamReadFloat32(streamId)
         e.money         = streamReadFloat32(streamId)
+        e.repChange     = streamReadInt32(streamId)
         e.endHour       = now + streamReadInt32(streamId)
         table.insert(self.history, e)
     end

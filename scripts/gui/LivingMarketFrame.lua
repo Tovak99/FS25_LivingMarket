@@ -1427,10 +1427,11 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         put("stock", "", muted)
         put("repValue", string.format("(%d)", math.floor((row.reputation or 50) + 0.5)), muted)
         local cs = LivingMarket.CONTRACT_SETTINGS
-        if done then
-            put("repGain", string.format("+%d", cs.repFulfilled), COLOR_GOOD)
+        local change = row.repChange or (done and cs.repFulfilled or -cs.repFailed)
+        if change >= 0 then
+            put("repGain", string.format("(+%d)", change), COLOR_GOOD)
         else
-            put("repGain", string.format("−%d", cs.repFailed), COLOR_LOW)
+            put("repGain", string.format("(−%d)", -change), COLOR_LOW)
         end
         setStarsIcon(cell:getAttribute("stars"), row.stars)
         setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
@@ -1453,7 +1454,7 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
     -- mögliche Änderung des Ansehens: + bei Erfüllung / − bei Nichterfüllung
     local cs = LivingMarket.CONTRACT_SETTINGS
     put("repValue", string.format("(%d)", math.floor((row.reputation or 50) + 0.5)), base)
-    put("repGain", string.format("+%d / −%d", cs.repFulfilled, cs.repFailed), isSelected and COLOR_ON_GREEN or COLOR_MUTED_LIGHT)
+    put("repGain", string.format("(+%d / −%d)", row.repGain or cs.repFulfilled, cs.repFailed), isSelected and COLOR_ON_GREEN or COLOR_MUTED_LIGHT)
     if row.isActive then
         put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
         put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)),
@@ -1510,7 +1511,7 @@ function LivingMarketFrame:onContractAction()
         LivingMarket.formatLiters(row.amount), row.wareTitle, row.stationName, deadline,
         formatPrice(row.price), LivingMarket.formatMoney(value), LivingMarket.formatMoney(row.bonus),
         math.floor(s.penaltyRate * 100 + 0.5), LivingMarket.formatMoney(value * s.penaltyRate), row.stationName)
-    text = text .. "\n" .. string.format(g_i18n:getText("livingMarket_ctRepInfo"), row.stationName, s.repFulfilled, s.repFailed)
+    text = text .. "\n" .. string.format(g_i18n:getText("livingMarket_ctRepInfo"), row.stationName, row.repGain or s.repFulfilled, s.repFailed)
     if (row.stock or 0) < 1 then
         text = text .. "\n\n" .. g_i18n:getText("livingMarket_ctNoStock")
     end

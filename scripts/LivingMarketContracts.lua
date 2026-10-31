@@ -32,7 +32,11 @@ LivingMarket.CONTRACT_SETTINGS = {
     penaltyRate      = 0.50,   -- Strafe auf den Wert der fehlenden Menge
     maxActivePerFarm = 3,      -- laufende Verträge je Hof
     repStart         = 50,
-    repFulfilled     = 2,
+    repFulfilled     = 2,      -- mittlerer Auftragswert
+    repFulfilledSmall = 1,     -- Vertragswert unter repSmallValue
+    repFulfilledLarge = 3,     -- Vertragswert ab repLargeValue
+    repSmallValue    = 15000,  -- €
+    repLargeValue    = 60000,  -- €
     repFailed        = 10,
     repDriftPerMonth = 1,
     repMinStars      = 2,      -- darunter keine Angebote dieser Station
@@ -99,6 +103,18 @@ function LivingMarket:driftReputation()
             end
         end
     end
+end
+
+-- Ansehen bei Erfüllung je nach Vertragswert (Menge × Marktpreis): klein +1, mittel +2, groß +3
+function LivingMarket:getContractRepGain(contract)
+    local s = self.CONTRACT_SETTINGS
+    local value = (contract.amount or 0) / 1000 * (contract.basePrice or contract.price or 0)
+    if value >= s.repLargeValue then
+        return s.repFulfilledLarge
+    elseif value < s.repSmallValue then
+        return s.repFulfilledSmall
+    end
+    return s.repFulfilled
 end
 
 -- Ansehen-Anteil am Aufschlag (0 bei 50 und darunter, voll bei 100)
@@ -344,6 +360,7 @@ local function addToHistory(contract, result, money)
         delivered     = contract.delivered or 0,
         price         = contract.price or 0,
         money         = money or 0,
+        repChange     = contract.repChange or 0,
         endHour       = LivingMarket.getNowHour(),
     })
     local count = 0
@@ -403,6 +420,7 @@ function LivingMarket:failContract(contract, cancelled)
     local penalty = self:getContractPenalty(contract, contract.farmId)
     addFarmMoney(contract.farmId, -penalty)
     self:changeReputation(contract.farmId, contract.stationKey, -self.CONTRACT_SETTINGS.repFailed)
+    contract.repChange = -self.CONTRACT_SETTINGS.repFailed
     self:announceContract(contract.farmId, cancelled and "livingMarket_ctCancelled" or "livingMarket_ctFailed", contract, penalty)
     addToHistory(contract, cancelled and "cancelled" or "failed", -penalty)
     removeContract(contract)
@@ -423,7 +441,8 @@ end
 
 function LivingMarket:completeContract(contract)
     addFarmMoney(contract.farmId, contract.bonus or 0)
-    self:changeReputation(contract.farmId, contract.stationKey, self.CONTRACT_SETTINGS.repFulfilled)
+    contract.repChange = self:getContractRepGain(contract)
+    self:changeReputation(contract.farmId, contract.stationKey, contract.repChange)
     self:announceContract(contract.farmId, "livingMarket_ctDone", contract, contract.bonus or 0)
     addToHistory(contract, "done", contract.bonus or 0)
     removeContract(contract)
@@ -596,6 +615,7 @@ function LivingMarket:getContractRows(farmId)
                 offerEndHour  = contract.offerEndHour,
                 stars         = self.getReputationStars(reputation),
                 reputation    = reputation,
+                repGain       = self:getContractRepGain(contract),
                 sortKey       = own and (contract.deadlineHour or 0) or (1e9 + (contract.offerEndHour or 0)),
             })
         end
@@ -619,6 +639,7 @@ function LivingMarket:getContractRows(farmId)
                 endHour       = entry.endHour,
                 stars         = self.getReputationStars(self:getReputation(farmId, entry.stationKey)),
                 reputation    = self:getReputation(farmId, entry.stationKey),
+                repChange     = entry.repChange,
                 sortKey       = 3e9 - (entry.endHour or 0),
             })
         end
@@ -692,6 +713,7 @@ function LivingMarket:saveContractsToXML(xmlFile, baseKey)
             setXMLFloat(xmlFile, key .. "#delivered", entry.delivered)
             setXMLFloat(xmlFile, key .. "#price", entry.price)
             setXMLFloat(xmlFile, key .. "#money", entry.money)
+            setXMLInt(xmlFile, key .. "#repChange", entry.repChange or 0)
             setXMLInt(xmlFile, key .. "#hoursAgo", math.max(0, math.floor(now2 - (entry.endHour or now2))))
         end
     end
@@ -774,6 +796,7 @@ function LivingMarket:loadContractsFromXML(xmlFile, baseKey)
                 delivered     = getXMLFloat(xmlFile, key .. "#delivered") or 0,
                 price         = getXMLFloat(xmlFile, key .. "#price") or 0,
                 money         = getXMLFloat(xmlFile, key .. "#money") or 0,
+                repChange     = getXMLInt(xmlFile, key .. "#repChange"),
                 endHour       = now - (getXMLInt(xmlFile, key .. "#hoursAgo") or 0),
             })
         end
@@ -842,6 +865,10 @@ function LivingMarket:loadContractSettings(xmlFile)
     num("penaltyRate", 0, 5)
     num("maxActivePerFarm", 1, 50)
     num("repFulfilled", 0, 100)
+    num("repFulfilledSmall", 0, 100)
+    num("repFulfilledLarge", 0, 100)
+    num("repSmallValue", 0, 1e9)
+    num("repLargeValue", 0, 1e9)
     num("repFailed", 0, 100)
     num("repDriftPerMonth", 0, 100)
     num("repMinStars", 1, 5)
