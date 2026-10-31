@@ -195,6 +195,9 @@ function LivingMarket:broadcastEventList()
 end
 
 function LivingMarket:announceEvent(event, phase)
+    if self.silentEvents then
+        return
+    end
     local isRefillEvent = event.type == self.EVENT_DEMAND or event.type == self.EVENT_SLOW
     local percent = math.floor(math.abs((isRefillEvent and (event.refillFactor or 1) or event.price) - 1) * 100 + 0.5)
     local key
@@ -495,14 +498,22 @@ end
 function LivingMarket:initEvents()
     self:normalizeEvents()
     self:rollEventTarget()
-    if #self.events == 0 then
-        self:spawnEvent()   -- eins sofort, der Rest kommt verteilt über die nächsten Stunden
+    if #self.events == 0 and self.EVENT_SETTINGS.enabled then
+        -- Neues Spiel bzw. erster Start mit dem Mod: sofort die Mindestanzahl erzeugen (ohne Meldungsflut),
+        -- weitere bis zum Monatsziel kommen verteilt über den Monat
+        local wanted = math.max(1, math.min(self.EVENT_SETTINGS.minActive, self.eventTarget))
+        self.silentEvents = true
+        local attempts = 0
+        while #self.events < wanted and attempts < wanted * 3 do
+            self:spawnEvent()
+            attempts = attempts + 1
+        end
         for _, event in ipairs(self.events) do
             if not event.active and event.startHour <= self.getNowHour() then
                 event.active = true
-                self:announceEvent(event, "start")
             end
         end
+        self.silentEvents = false
     end
     self:applyEventsToAll()
     self:broadcastEventList()
