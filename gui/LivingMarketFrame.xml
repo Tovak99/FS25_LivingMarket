@@ -32,7 +32,7 @@
             <!-- Reihenfolge: * · Ware · Lager · Verkaufbar · Preis / 1000 l · Markt · Erlös · Beste Station · Bester Preis · Bester Monat -->
             <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-80px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="55px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="200px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="180px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_deviation" position="295px 0px" text="$l10n_livingMarket_colDeviation" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="405px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortWare_station" position="885px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
@@ -53,8 +53,9 @@
                     <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="-80px 0px"/>
                     <Text profile="lm_rowTextRight" name="sellable" position="55px 0px"/>
-                    <Bitmap profile="lm_trendIcon" name="trend" position="540px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="200px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="180px 0px"/>
+                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630) -->
+                    <Bitmap profile="lm_trendIcon" name="trend" position="635px 0px"/>
                     <Text profile="lm_rowTextRight" name="deviation" position="295px 0px"/>
                     <Text profile="lm_rowTextRight" name="revenue" position="405px 0px"/>
                     <Text profile="lm_rowText" name="station" position="885px 0px"/>
@@ -82,7 +83,7 @@
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
                 <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="410px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="390px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="530px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="770px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
@@ -94,8 +95,9 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
-                    <Bitmap profile="lm_trendIcon" name="trend" position="764px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="410px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="390px 0px"/>
+                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 390 + 450 = 840) -->
+                    <Bitmap profile="lm_trendIcon" name="trend" position="845px 0px"/>
                     <Text profile="lm_rowTextRight" name="market" position="530px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="770px 0px"/>
                     <Text profile="lm_rowTextRight" name="share" position="940px 0px"/>
