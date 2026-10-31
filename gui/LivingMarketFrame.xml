@@ -100,7 +100,7 @@
                 <!-- Spalten bündig unter der Warenliste: Liefermenge, Preis, Marktlage (unter Markt), Erlös -->
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="175px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="300px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderCenter" id="sortDetail_market" position="590px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderCenter" id="sortDetail_market" position="620px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="525px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="660px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="755px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
@@ -122,7 +122,7 @@
                     <Text profile="lm_rowTextRight" name="price" position="300px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
                     <Bitmap profile="lm_trendIcon" name="trend" position="755px 0px"/>
-                    <Text profile="lm_rowTextCenter" name="market" position="590px 0px"/>
+                    <Text profile="lm_rowTextCenter" name="market" position="620px 0px"/>
                     <Text profile="lm_rowTextRight" name="revenue" position="525px 0px"/>
                     <Text profile="lm_rowTextRight" name="max" position="660px 0px"/>
                     <Text profile="lm_rowTextRight" name="share" position="755px 0px"/>
