@@ -1624,10 +1624,15 @@ function LivingMarket:addMenuPage()
 end
 
 -- ---------------------------------------------------------------------
--- Favoriten (je Spieler, gelten für alle Spielstände)
+-- Favoriten: je Spieler (lokal, nie auf dem Server) und je Spielstand getrennt
 -- Datei: <Benutzerprofil>/modSettings/FS25_LivingMarket.xml
+--   <savegame id="..."> <fillType name="WHEAT"/> ... </savegame>
+--   <favorites> ... </favorites>  = alte globale Liste (bis 0.2.0.3), wird von
+--                                   Spielständen ohne eigene Liste einmalig übernommen
 -- ---------------------------------------------------------------------
-LivingMarket.favorites = nil   -- [fillTypeName] = true; wird beim ersten Zugriff geladen
+LivingMarket.favorites    = nil   -- [fillTypeName] = true; Favoriten des aktuellen Spielstands (beim ersten Zugriff geladen)
+LivingMarket.favoriteSets = nil   -- [savegameId] = { [fillTypeName] = true } aller Spielstände (zum Zurückschreiben)
+LivingMarket.legacyFavorites = nil
 
 function LivingMarket:getSettingsPath()
     local dir = g_modSettingsDirectory
@@ -1646,30 +1651,79 @@ function LivingMarket:getSettingsPath()
     return dir .. "FS25_LivingMarket.xml"
 end
 
-function LivingMarket:loadFavorites()
-    self.favorites = {}
-    local path = self:getSettingsPath()
-    if path == nil or not fileExists(path) then
-        return
+-- Kennung des Spielstands aus Sicht dieses Spielers
+-- Einzelspieler/Host: Spielstand-Nr. + Karte + Name; Mitspieler: Server + Karte + Name
+function LivingMarket:getSavegameId()
+    local mission = g_currentMission
+    local info = mission ~= nil and mission.missionInfo or nil
+    if info == nil then
+        return "unknown"
     end
-    local xmlFile = loadXMLFile("LivingMarketSettings", path)
-    if xmlFile == nil or xmlFile == 0 then
-        return
+    local mapId = tostring(info.mapId or (info.map ~= nil and info.map.id) or "map")
+    local name = tostring(info.savegameName or "")
+    local dynamic = mission.missionDynamicInfo
+    if g_server == nil and dynamic ~= nil and dynamic.isMultiplayer then
+        local server = tostring(dynamic.serverName or (dynamic.serverAddress or "server"))
+        return string.format("mp|%s|%s|%s", server, mapId, name)
     end
+    return string.format("sg%s|%s|%s", tostring(info.savegameIndex or 0), mapId, name)
+end
+
+local function readFillTypeNames(xmlFile, baseKey)
+    local names = {}
     local i = 0
     while true do
-        local key = string.format("livingMarket.favorites.fillType(%d)", i)
+        local key = string.format("%s.fillType(%d)", baseKey, i)
         if not hasXMLProperty(xmlFile, key) then
             break
         end
         local name = getXMLString(xmlFile, key .. "#name")
         if name ~= nil and name ~= "" then
-            self.favorites[name] = true
+            names[name] = true
         end
         i = i + 1
     end
-    delete(xmlFile)
-    log("Favoriten geladen: %d", i)
+    return names
+end
+
+function LivingMarket:loadFavorites()
+    self.favoriteSets = {}
+    self.legacyFavorites = nil
+    local id = self:getSavegameId()
+    local path = self:getSettingsPath()
+    if path ~= nil and fileExists(path) then
+        local xmlFile = loadXMLFile("LivingMarketSettings", path)
+        if xmlFile ~= nil and xmlFile ~= 0 then
+            if hasXMLProperty(xmlFile, "livingMarket.favorites") then
+                self.legacyFavorites = readFillTypeNames(xmlFile, "livingMarket.favorites")
+            end
+            local i = 0
+            while true do
+                local key = string.format("livingMarket.savegame(%d)", i)
+                if not hasXMLProperty(xmlFile, key) then
+                    break
+                end
+                local setId = getXMLString(xmlFile, key .. "#id")
+                if setId ~= nil then
+                    self.favoriteSets[setId] = readFillTypeNames(xmlFile, key)
+                end
+                i = i + 1
+            end
+            delete(xmlFile)
+        end
+    end
+
+    if self.favoriteSets[id] == nil then
+        -- erster Start dieses Spielstands: alte globale Favoriten übernehmen (Kopie)
+        local set = {}
+        for name in pairs(self.legacyFavorites or {}) do
+            set[name] = true
+        end
+        self.favoriteSets[id] = set
+    end
+    self.favorites = self.favoriteSets[id]
+    self.favoritesId = id
+    log("Favoriten geladen für %s", id)
 end
 
 function LivingMarket:saveFavorites()
@@ -1682,13 +1736,33 @@ function LivingMarket:saveFavorites()
         log("WARNUNG: %s konnte nicht geschrieben werden", path)
         return
     end
-    local names = {}
-    for name in pairs(self.favorites or {}) do
-        table.insert(names, name)
+    setXMLInt(xmlFile, "livingMarket#version", 2)
+
+    local function writeNames(baseKey, set)
+        local names = {}
+        for name in pairs(set or {}) do
+            table.insert(names, name)
+        end
+        table.sort(names)
+        for i, name in ipairs(names) do
+            setXMLString(xmlFile, string.format("%s.fillType(%d)#name", baseKey, i - 1), name)
+        end
     end
-    table.sort(names)
-    for i, name in ipairs(names) do
-        setXMLString(xmlFile, string.format("livingMarket.favorites.fillType(%d)#name", i - 1), name)
+
+    -- alte globale Liste behalten, damit andere Spielstände sie noch übernehmen können
+    if self.legacyFavorites ~= nil then
+        setXMLString(xmlFile, "livingMarket.favorites#info", "global (bis 0.2.0.3)")
+        writeNames("livingMarket.favorites", self.legacyFavorites)
+    end
+    local ids = {}
+    for setId in pairs(self.favoriteSets or {}) do
+        table.insert(ids, setId)
+    end
+    table.sort(ids)
+    for i, setId in ipairs(ids) do
+        local key = string.format("livingMarket.savegame(%d)", i - 1)
+        setXMLString(xmlFile, key .. "#id", setId)
+        writeNames(key, self.favoriteSets[setId])
     end
     saveXMLFile(xmlFile)
     delete(xmlFile)
@@ -1985,6 +2059,7 @@ function LivingMarket:loadMap(name)
 end
 
 function LivingMarket:deleteMap()
+    self.favorites, self.favoriteSets, self.legacyFavorites, self.favoritesId = nil, nil, nil, nil
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}
     self.savedData = {}
