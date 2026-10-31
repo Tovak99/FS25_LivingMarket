@@ -16,7 +16,7 @@ LivingMarket.modDir  = g_currentModDirectory
 -- ---------------------------------------------------------------------
 LivingMarket.MENU_PAGE_NAME = "pageLivingMarket"
 LivingMarket.MENU_AFTER     = "pagePrices"   -- Reiter hinter "Preise" einsortieren (falls vorhanden)
-LivingMarket.DEBUG          = true
+LivingMarket.DEBUG          = false   -- true: Testknöpfe im Menü und ausführliche Log-Einträge
 
 -- Bedarf je Ware: kommt aus der Konfigurationsdatei (config/defaultConfig.xml bzw. die Kopie
 -- in modSettings). Diese Werte gelten nur, falls keine Datei gelesen werden kann.
