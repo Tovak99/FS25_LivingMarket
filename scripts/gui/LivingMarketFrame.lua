@@ -1383,6 +1383,13 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         return
     end
     local base = isSelected and COLOR_ON_GREEN or COLOR_TEXT
+    -- Frist gelb, wenn weniger als ein Monat bleibt
+    local function deadlineColor(hour)
+        if hour ~= nil and hour - LivingMarket.getNowHour() < LivingMarket.getHoursPerMonth() then
+            return COLOR_MID
+        end
+        return base
+    end
     local function put(name, text, color)
         local element = cell:getAttribute(name)
         if element ~= nil then
@@ -1412,12 +1419,13 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
     put("station", row.stationName, base)
     if row.isActive then
         put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
-        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)), base)
+        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)),
+            deadlineColor(row.deadlineHour))
     else
         put("amount", LivingMarket.formatLiters(row.amount), base)
         -- feste Frist ab Erscheinen der Ausschreibung (ältere Angebote: ab jetzt)
         local deadline = row.deadlineHour or (LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth())
-        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(deadline)), base)
+        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(deadline)), deadlineColor(deadline))
     end
     put("price", formatPrice(row.price), base)
     put("bonus", LivingMarket.formatMoney(row.bonus), COLOR_GOOD)
