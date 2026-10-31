@@ -380,7 +380,7 @@ function LivingMarketFrame:rebuildWareList()
         elseif #self.visibleWares == 0 then
             text = g_i18n:getText("livingMarket_noStock")
         end
-        self.emptyText:setVisible(text ~= nil)
+        self.emptyText:setVisible(text ~= nil and self.viewMode == "market")
         if text ~= nil then
             self.emptyText:setText(text)
         end
@@ -849,6 +849,9 @@ function LivingMarketFrame:applySearch()
     self.pendingSearchText = nil
     self:updateSearchHint()
     self:rebuildWareList()
+    if self.viewMode == "sales" then
+        self:refreshSales()
+    end
 end
 
 function LivingMarketFrame:clearSearch()
@@ -860,6 +863,9 @@ function LivingMarketFrame:clearSearch()
     self.searchTimer = nil
     self:updateSearchHint()
     self:rebuildWareList()
+    if self.viewMode == "sales" then
+        self:refreshSales()
+    end
 end
 
 function LivingMarketFrame:updateSearchHint()
@@ -887,8 +893,8 @@ function LivingMarketFrame:update(dt)
         self:refreshSales()
     end
 
-    -- Uhr in den Marktnachrichten und Verkäufen
-    if self.viewMode == "events" or self.viewMode == "sales" then
+    -- Uhr in den Marktnachrichten
+    if self.viewMode == "events" then
         self.clockTimer = (self.clockTimer or 0) - dt
         if self.clockTimer <= 0 then
             self.clockTimer = 250
@@ -984,17 +990,21 @@ function LivingMarketFrame:setViewMode(mode)
     local showSales = mode == "sales"
 
     for _, element in ipairs({ self.wareFrame, self.wareHeader, self.wareArea, self.detailPanel,
-                               self.filterButton, self.searchInput }) do
+                               self.filterButton }) do
         if element ~= nil then
             element:setVisible(showMarket)
         end
+    end
+    -- Suche gilt für Markt und Verkäufe (gleicher Suchtext)
+    if self.searchInput ~= nil then
+        self.searchInput:setVisible(showMarket or showSales)
     end
     if self.emptyText ~= nil and not showMarket then
         self.emptyText:setVisible(false)
     end
     if self.clockText ~= nil then
-        self.clockText:setVisible(not showMarket)
-        if not showMarket then
+        self.clockText:setVisible(showEvents)
+        if showEvents then
             self.clockTimer = 0
             self:updateClock()
         end
@@ -1131,13 +1141,19 @@ function LivingMarketFrame:refreshSales()
     self.shownSalesVersion = LivingMarket.salesVersion
     local farmId = g_currentMission ~= nil and g_currentMission.getFarmId ~= nil and g_currentMission:getFarmId() or 0
     local rows = {}
+    local needle = self:isSearching() and LivingMarket.toLower(self.searchText) or nil
     for _, sale in ipairs(LivingMarket:getSalesForFarm(farmId)) do
         local fillType = g_fillTypeManager:getFillTypeByIndex(sale.fillTypeIndex)
         local label = EVENT_LABELS[sale.eventType or 0]
+        local wareTitle = fillType ~= nil and (fillType.title or fillType.name) or "?"
+        local matches = needle == nil
+            or string.find(LivingMarket.toLower(wareTitle), needle, 1, true) ~= nil
+            or string.find(LivingMarket.toLower(sale.stationName or ""), needle, 1, true) ~= nil
+        if matches then
         table.insert(rows, {
             id            = sale.id,
             fillTypeIndex = sale.fillTypeIndex,
-            wareTitle     = fillType ~= nil and (fillType.title or fillType.name) or "?",
+            wareTitle     = wareTitle,
             stationName   = sale.stationName,
             liters        = sale.liters,
             money         = sale.money,
@@ -1147,6 +1163,7 @@ function LivingMarketFrame:refreshSales()
             eventLabel    = label ~= nil and g_i18n:getText(label) or nil,
             timeText      = LivingMarket:formatSaleTime(sale.minute or 0),
         })
+        end
     end
     local key, asc = self.saleSort.key, self.saleSort.asc
     table.sort(rows, function(a, b)
@@ -1155,6 +1172,11 @@ function LivingMarketFrame:refreshSales()
     self.saleRows = rows
     self:updateSortHeaders()
     if self.saleEmptyText ~= nil then
+        if needle ~= nil then
+            self.saleEmptyText:setText(string.format(g_i18n:getText("livingMarket_noResults"), self.searchText))
+        else
+            self.saleEmptyText:setText(g_i18n:getText("livingMarket_noSales"))
+        end
         self.saleEmptyText:setVisible(self.viewMode == "sales" and #rows == 0)
     end
     if self.saleList ~= nil then
@@ -1202,7 +1224,7 @@ function LivingMarketFrame:updateMenuButtons()
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
         table.insert(self.menuButtonInfo, self.favButtonInfo)
     end
-    if self:isSearching() and self.viewMode == "market" then
+    if self:isSearching() and (self.viewMode == "market" or self.viewMode == "sales") then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
     end
     self:setMenuButtonInfoDirty()
