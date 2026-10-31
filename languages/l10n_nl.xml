@@ -59,6 +59,7 @@
         <text name="livingMarket_colDeadline" text="Termijn"/>
         <text name="livingMarket_colReputation" text="Aanzien"/>
         <text name="livingMarket_ctOffer" text="Aanbod"/>
+        <text name="livingMarket_ctFixedPrice" text="Vaste prijs %s"/>
         <text name="livingMarket_ctActive" text="Loopt"/>
         <text name="livingMarket_ctMonths" text="%d maand(en)"/>
         <text name="livingMarket_ctFilterAll" text="Alle aanbiedingen"/>

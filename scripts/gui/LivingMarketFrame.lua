@@ -1843,6 +1843,19 @@ function LivingMarketFrame:populateStationCell(station, cell)
     local eventText = cell:getAttribute("event")
     if eventText ~= nil then
         local text, color, effect = getEventText(station.eventType, station.eventPrice, station.eventRefill, station.eventMax)
+        -- Vertragsangebot (bzw. eigener laufender Vertrag) dieser Station für die Ware
+        if station.contractState ~= nil then
+            local label = g_i18n:getText(station.contractState == "active" and "livingMarket_contractLabel" or "livingMarket_ctOffer")
+            if text == nil then
+                -- kein Ereignis: Spalte Ereignis "Angebot", Auswirkung zeigt den Festpreis
+                text, color = label, COLOR_TEXT
+                if station.contractPrice ~= nil then
+                    effect = string.format(g_i18n:getText("livingMarket_ctFixedPrice"), formatPrice(station.contractPrice))
+                end
+            else
+                effect = (effect ~= nil and (effect .. " · ") or "") .. label
+            end
+        end
         eventText:setText(text or "")
         setColor(eventText, isFull and COLOR_MUTED or color or COLOR_TEXT)
         local effectText = cell:getAttribute("eventEffect")

@@ -59,6 +59,7 @@
         <text name="livingMarket_colDeadline" text="Termin"/>
         <text name="livingMarket_colReputation" text="Renoma"/>
         <text name="livingMarket_ctOffer" text="Oferta"/>
+        <text name="livingMarket_ctFixedPrice" text="Stała cena %s"/>
         <text name="livingMarket_ctActive" text="Trwa"/>
         <text name="livingMarket_ctMonths" text="%d mies."/>
         <text name="livingMarket_ctFilterAll" text="Wszystkie oferty"/>

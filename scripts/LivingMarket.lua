@@ -899,6 +899,10 @@ function LivingMarket:getWareData()
                         stars     = self.getStationStars ~= nil and self:getStationStars(self:getFarmId(), station) or 3,   -- Ansehen des eigenen Hofs
                         reputation = self.getStationReputation ~= nil and self:getStationReputation(self:getFarmId(), station) or 50,
                     })
+                    if self.getStationContractInfo ~= nil then
+                        local row = ware.stations[#ware.stations]
+                        row.contractState, row.contractPrice = self:getStationContractInfo(self:getFarmId(), station, fillTypeIndex)
+                    end
                 end
             end
         end

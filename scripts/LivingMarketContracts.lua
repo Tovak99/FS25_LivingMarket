@@ -704,6 +704,28 @@ function LivingMarket:getContractRows(farmId)
 end
 
 -- Ansehen-Wert (0..100) für das Detailfenster
+-- Vertrag dieser Station für die Ware: "active" (eigener laufender Vertrag) bzw. "offer" (offenes Angebot), dazu der Festpreis je 1000 l
+function LivingMarket:getStationContractInfo(farmId, station, fillTypeIndex)
+    if #self.contracts == 0 or station == nil then
+        return nil
+    end
+    local stationKey = self:getStationKey(station)
+    local offer = nil
+    for _, contract in ipairs(self.contracts) do
+        if contract.stationKey == stationKey and contract.fillTypeIndex == fillTypeIndex then
+            if contract.state == "active" and contract.farmId == farmId then
+                return "active", contract.price
+            elseif contract.state == "offer" and offer == nil and self:isStationOpenForFarm(farmId, stationKey) then
+                offer = contract
+            end
+        end
+    end
+    if offer ~= nil then
+        return "offer", self:getContractPrice(offer, farmId)
+    end
+    return nil
+end
+
 function LivingMarket:getStationReputation(farmId, station)
     return self:getReputation(farmId, self:getStationKey(station))
 end

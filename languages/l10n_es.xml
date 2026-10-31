@@ -59,6 +59,7 @@
         <text name="livingMarket_colDeadline" text="Plazo"/>
         <text name="livingMarket_colReputation" text="Reputación"/>
         <text name="livingMarket_ctOffer" text="Oferta"/>
+        <text name="livingMarket_ctFixedPrice" text="Precio fijo %s"/>
         <text name="livingMarket_ctActive" text="En curso"/>
         <text name="livingMarket_ctMonths" text="%d mes(es)"/>
         <text name="livingMarket_ctFilterAll" text="Todas las ofertas"/>
