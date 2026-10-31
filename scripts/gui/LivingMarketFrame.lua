@@ -31,6 +31,7 @@ function LivingMarketFrame.new(target, customMt)
     self.filterMode = "stock"     -- Filter: "all" = alle Waren, "stock" = lagernd, "fav" = Favoriten
     self.viewMode = "market"      -- Ansicht: "market" = Warenliste + Details, "events" = Marktnachrichten
     self.eventFilter = "stock"    -- Marktnachrichten: "all" = alle, "stock" = nur Waren, die man liefern kann
+    self.eventSort = { key = "status", asc = true }   -- Sortierung Marktnachrichten (laufende zuerst)
     self.eventRows = {}
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
@@ -414,6 +415,17 @@ LivingMarketFrame.WARE_COLUMNS = {
     sellable = { label = "livingMarket_colSellable",    isText = false },
     revenue  = { label = "livingMarket_colRevenue",     isText = false },
 }
+LivingMarketFrame.EVENT_COLUMNS = {
+    scope   = { label = "livingMarket_colScope",     isText = true  },
+    type    = { label = "livingMarket_colEvent",     isText = true  },
+    ware    = { label = "livingMarket_colWare",      isText = true  },
+    station = { label = "livingMarket_colStationEv", isText = true  },
+    price   = { label = "livingMarket_colPrice",     isText = false },
+    demand  = { label = "livingMarket_colDemand",    isText = false },
+    start   = { label = "livingMarket_colStart",     isText = true  },   -- früheste zuerst
+    finish  = { label = "livingMarket_colEnd",       isText = true  },
+    status  = { label = "livingMarket_colStatus",    isText = true  },   -- laufende zuerst
+}
 LivingMarketFrame.DETAIL_COLUMNS = {
     name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
     price  = { label = "livingMarket_colPrice",     isText = false },
@@ -455,6 +467,28 @@ local function wareValue(ware, key)
         return ware.sellable
     elseif key == "revenue" then
         return ware.revenue
+    end
+end
+
+local function eventValue(row, key)
+    if key == "scope" then
+        return row.isGlobal and 1 or 0
+    elseif key == "type" then
+        return row.typeLabel
+    elseif key == "ware" then
+        return LivingMarket.toLower(row.wareTitle or "")
+    elseif key == "station" then
+        return LivingMarket.toLower(row.stationName or "")
+    elseif key == "price" then
+        return row.pricePercent
+    elseif key == "demand" then
+        return row.maxFactor
+    elseif key == "start" then
+        return row.startHour
+    elseif key == "finish" then
+        return row.endHour
+    elseif key == "status" then
+        return row.pending and 1 or 0
     end
 end
 
@@ -530,6 +564,8 @@ function LivingMarketFrame:onClickSortHeader(element)
             sortState, columns, key = self.wareSort, self.WARE_COLUMNS, column
         elseif table_ == "Detail" then
             sortState, columns, key = self.detailSort, self.DETAIL_COLUMNS, column
+        elseif table_ == "Event" then
+            sortState, columns, key = self.eventSort, self.EVENT_COLUMNS, column
         end
     end
     if sortState == nil or columns[key] == nil then
@@ -545,6 +581,8 @@ function LivingMarketFrame:onClickSortHeader(element)
 
     if sortState == self.wareSort then
         self:rebuildWareList()
+    elseif sortState == self.eventSort then
+        self:refreshEvents()
     else
         self:updateDetail(self.detailWare)
     end
@@ -615,6 +653,9 @@ function LivingMarketFrame:setupSortHeaders()
     for key in pairs(self.DETAIL_COLUMNS) do
         limitHeaderHitArea(self["sortDetail_" .. key])
     end
+    for key in pairs(self.EVENT_COLUMNS) do
+        limitHeaderHitArea(self["sortEvent_" .. key])
+    end
 end
 
 -- Pfeil vor die Überschrift der sortierten Spalte setzen
@@ -642,6 +683,9 @@ function LivingMarketFrame:updateSortHeaders()
     end
     self:placeSortArrow(self.wareSortArrow, apply("Ware", self.WARE_COLUMNS, self.wareSort), self.wareSort.asc)
     self:placeSortArrow(self.detailSortArrow, apply("Detail", self.DETAIL_COLUMNS, self.detailSort), self.detailSort.asc)
+    if self.eventSortArrow ~= nil then
+        self:placeSortArrow(self.eventSortArrow, apply("Event", self.EVENT_COLUMNS, self.eventSort), self.eventSort.asc)
+    end
 end
 
 -- Pfeil-Grafik links neben den sichtbaren Text der sortierten Spalte setzen.
@@ -833,6 +877,9 @@ function LivingMarketFrame:setViewMode(mode)
     self:updateMenuButtons()
 end
 
+local EVENT_TYPE_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
+                            [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
+
 function LivingMarketFrame:onClickEventFilter()
     self.eventFilter = self.eventFilter == "stock" and "all" or "stock"
     self:refreshEvents()
@@ -854,7 +901,16 @@ function LivingMarketFrame:refreshEvents()
         end
         rows = filtered
     end
+    -- sortieren nach gewählter Spalte (bei Gleichstand: laufende zuerst, die bald enden)
+    local key, asc = self.eventSort.key, self.eventSort.asc
+    for _, row in ipairs(rows) do
+        row.typeLabel = g_i18n:getText(EVENT_TYPE_LABELS[row.type] or "livingMarket_evLabelShortage")
+    end
+    table.sort(rows, function(a, b)
+        return compare(eventValue(a, key), eventValue(b, key), asc, a.sortKey, b.sortKey)
+    end)
     self.eventRows = rows
+    self:updateSortHeaders()
 
     if self.eventFilterButton ~= nil then
         self.eventFilterButton:setText(g_i18n:getText(self.eventFilter == "stock" and "livingMarket_evFilterStock" or "livingMarket_filterAll"))
@@ -869,8 +925,6 @@ function LivingMarketFrame:refreshEvents()
 end
 
 -- Eine Zeile der Marktnachrichten
-local EVENT_TYPE_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
-                            [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
 
 function LivingMarketFrame:populateEventCell(row, cell)
     if row == nil or cell:getAttribute("type") == nil then

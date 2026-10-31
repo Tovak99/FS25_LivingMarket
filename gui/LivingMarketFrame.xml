@@ -129,15 +129,16 @@
         <ThreePartBitmap profile="lm_tableFrameFull" id="eventFrame" visible="false"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" id="eventHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
-            <Text profile="lm_colHeader" position="20px 0px" text="$l10n_livingMarket_colScope"/>
-            <Text profile="lm_colHeader" position="120px 0px" text="$l10n_livingMarket_colEvent"/>
-            <Text profile="lm_colHeader" position="274px 0px" text="$l10n_livingMarket_colWare"/>
-            <Text profile="lm_colHeader" position="500px 0px" text="$l10n_livingMarket_colStationEv"/>
-            <Text profile="lm_colHeaderRight" position="340px 0px" text="$l10n_livingMarket_colPrice"/>
-            <Text profile="lm_colHeaderRight" position="450px 0px" text="$l10n_livingMarket_colDemand"/>
-            <Text profile="lm_colHeader" position="940px 0px" text="$l10n_livingMarket_colStart"/>
-            <Text profile="lm_colHeader" position="1070px 0px" text="$l10n_livingMarket_colEnd"/>
-            <Text profile="lm_colHeader" position="1200px 0px" text="$l10n_livingMarket_colStatus"/>
+            <Button profile="lm_sortHeader" id="sortEvent_scope" position="20px 0px" text="$l10n_livingMarket_colScope" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_type" position="120px 0px" text="$l10n_livingMarket_colEvent" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_ware" position="274px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_station" position="500px 0px" text="$l10n_livingMarket_colStationEv" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortEvent_price" position="340px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortEvent_demand" position="450px 0px" text="$l10n_livingMarket_colDemand" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_start" position="940px 0px" text="$l10n_livingMarket_colStart" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_finish" position="1070px 0px" text="$l10n_livingMarket_colEnd" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_status" position="1200px 0px" text="$l10n_livingMarket_colStatus" onClick="onClickSortHeader"/>
+            <Bitmap profile="lm_sortArrow" id="eventSortArrow"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
 
