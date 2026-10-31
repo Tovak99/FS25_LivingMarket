@@ -16,7 +16,6 @@
         <text name="livingMarket_clearSearch" text="Cancella ricerca"/>
         <text name="livingMarket_favAdd" text="Aggiungi ai preferiti"/>
         <text name="livingMarket_favRemove" text="Rimuovi dai preferiti"/>
-        <text name="livingMarket_testRefill" text="Test: ricarica 1 ora di gioco"/>
         <text name="livingMarket_evShortage" text="Carenza: %s ha urgente bisogno di %s – prezzo +%d %% per %d mese/i"/>
         <text name="livingMarket_evSurplus" text="Eccedenza: %s ha abbastanza %s – prezzo −%d %% per %d mese/i"/>
         <text name="livingMarket_evBoomAnnounce" text="Notizie: dal prossimo mese %s è richiesto ovunque (+%d %% per %d mese/i)"/>
@@ -29,7 +28,6 @@
         <text name="livingMarket_evLabelSurplus" text="Eccedenza"/>
         <text name="livingMarket_evLabelBoom" text="Richiesto"/>
         <text name="livingMarket_evLabelSlump" text="Calo"/>
-        <text name="livingMarket_testMonth" text="Test: cambio mese"/>
         <text name="livingMarket_eventsTitle" text="Notizie di mercato"/>
         <text name="livingMarket_viewMarket" text="Mercato"/>
         <text name="livingMarket_locButton" text="Magazzini"/>

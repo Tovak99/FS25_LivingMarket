@@ -244,15 +244,13 @@ end
 -- Zeit: Ereignisse laufen in Spielstunden, damit Beginn und Ende über den
 -- Monat verteilt sind (nicht alle um 00:00 des Monatswechsels)
 -- ---------------------------------------------------------------------
-LivingMarket.testHourOffset = 0   -- Testknöpfe spulen hiermit vor
-
 function LivingMarket.getNowHour()
     local env = g_currentMission ~= nil and g_currentMission.environment or nil
     if env == nil then
-        return LivingMarket.testHourOffset
+        return 0
     end
     local day = env.currentMonotonicDay or env.currentDay or 0
-    return day * 24 + (env.currentHour or 0) + LivingMarket.testHourOffset
+    return day * 24 + (env.currentHour or 0)
 end
 
 -- Zeitpunkt (absolute Stunde) als "Okt 14:00" bzw. "Okt 2. 14:00" bei mehreren Tagen je Monat
@@ -261,7 +259,7 @@ function LivingMarket:formatEventTime(absHour)
     local daysPerMonth = math.max(1, math.floor(self.getHoursPerMonth() / 24 + 0.5))
     local hoursPerMonth = daysPerMonth * 24
     local now = self.getNowHour()
-    local nowHourOfDay = (env ~= nil and env.currentHour or 0) + self.testHourOffset
+    local nowHourOfDay = env ~= nil and env.currentHour or 0
     local dayInMonth = env ~= nil and env.currentDayInPeriod or 1
     local month = self.getCurrentMonth() or 1
     -- Stunden seit Beginn des aktuellen Monats bis zum Zeitpunkt
@@ -441,19 +439,6 @@ function LivingMarket:onPeriodChanged()
     self:rollEventTarget()
     self:applyEventsToAll()
     log("Monatswechsel: Schwankungen neu, Ziel %d Marktereignisse", self.eventTarget)
-end
-
--- Testknöpfe: Stunden vorspulen (Auffüllen + Ereignisse), Monat = so viele Stunden + Monatswechsel
-function LivingMarket:simulateHours(hours)
-    for _ = 1, hours do
-        self.testHourOffset = self.testHourOffset + 1
-        self:onHourChanged()
-    end
-end
-
-function LivingMarket:simulateMonth()
-    self:simulateHours(self.getHoursPerMonth())
-    self:onPeriodChanged()
 end
 
 -- ---------------------------------------------------------------------

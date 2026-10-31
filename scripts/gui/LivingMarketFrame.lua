@@ -41,8 +41,6 @@ function LivingMarketFrame.new(target, customMt)
     self.backButtonInfo = {}
     self.clearSearchButtonInfo = {}
     self.favButtonInfo = {}
-    self.testRefillButtonInfo = {}
-    self.testMonthButtonInfo = {}
     self.locationButtonInfo = {}
 
     return self
@@ -50,21 +48,10 @@ end
 
 function LivingMarketFrame:initialize()
     self.backButtonInfo = { inputAction = InputAction.MENU_BACK }
-    -- Nur zum Testen (DEBUG): eine Spielstunde Auffüllen sofort ausführen
-    self.testRefillButtonInfo = {
-        inputAction = InputAction.MENU_EXTRA_2,
-        text = g_i18n:getText("livingMarket_testRefill"),
-        callback = function() self:onTestRefill() end
-    }
     self.locationButtonInfo = {
         inputAction = InputAction.MENU_ACTIVATE,
         text = g_i18n:getText("livingMarket_locButton"),
         callback = function() self:onShowLocations() end
-    }
-    self.testMonthButtonInfo = {
-        inputAction = InputAction.MENU_ACCEPT,
-        text = g_i18n:getText("livingMarket_testMonth"),
-        callback = function() self:onTestMonth() end
     }
     self.favButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
@@ -862,11 +849,6 @@ function LivingMarketFrame:onShowLocations()
     end
 end
 
-function LivingMarketFrame:onTestMonth()
-    LivingMarket:simulateMonth()
-    self:refreshData()
-end
-
 -- ---------------------------------------------------------------------
 -- Ansicht umschalten: Markt / Marktnachrichten
 -- ---------------------------------------------------------------------
@@ -1005,11 +987,6 @@ function LivingMarketFrame:populateEventCell(row, cell)
     setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
 end
 
-function LivingMarketFrame:onTestRefill()
-    LivingMarket:simulateHours(1)
-    self:refreshData()
-end
-
 function LivingMarketFrame:updateMenuButtons()
     self:updateFilterButton()
 
@@ -1025,13 +1002,6 @@ function LivingMarketFrame:updateMenuButtons()
     end
     if self:isSearching() and self.viewMode ~= "events" then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
-    end
-    -- Testknopf nur im Debug-Modus und nur, wo der Bedarf verwaltet wird (Server/Einzelspieler)
-    if LivingMarket.DEBUG and g_server ~= nil then
-        table.insert(self.menuButtonInfo, self.testRefillButtonInfo)
-        if InputAction.MENU_ACCEPT ~= nil then
-            table.insert(self.menuButtonInfo, self.testMonthButtonInfo)
-        end
     end
     self:setMenuButtonInfoDirty()
 end
