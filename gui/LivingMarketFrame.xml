@@ -21,8 +21,6 @@
             </TextInput>
         </GuiElement>
 
-        <!-- Hinweistext oben -->
-        <Text profile="lm_infoText" id="infoText" text=""/>
 
         <!-- ============ Obere Liste: Waren ============ -->
         <!-- Rahmen hinter Kopfzeile und Warenliste -->
@@ -106,14 +104,6 @@
     </GuiElement>
 
     <GUIProfiles>
-        <Profile name="lm_infoText" extends="fs25_textDefault" with="anchorTopLeft">
-            <size value="1200px 30px"/>
-            <position value="50px 10px"/>
-            <textAlignment value="left"/>
-            <textSize value="16px"/>
-            <textColor value="0.8 0.8 0.8 1"/>
-        </Profile>
-
         <!-- Suchfeld: rechts in der Kopfzeile verankert. Breite/Abstand hier anpassen. -->
         <Profile name="lm_searchInput" extends="fs25_settingsTextInput">
             <anchors value="1 1 0.5 0.5"/>

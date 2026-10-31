@@ -36,12 +36,19 @@ function LivingMarketFrame.new(target, customMt)
     self.backButtonInfo = {}
     self.clearSearchButtonInfo = {}
     self.favButtonInfo = {}
+    self.testRefillButtonInfo = {}
 
     return self
 end
 
 function LivingMarketFrame:initialize()
     self.backButtonInfo = { inputAction = InputAction.MENU_BACK }
+    -- Nur zum Testen (DEBUG): eine Spielstunde Auffüllen sofort ausführen
+    self.testRefillButtonInfo = {
+        inputAction = InputAction.MENU_EXTRA_2,
+        text = g_i18n:getText("livingMarket_testRefill"),
+        callback = function() self:onTestRefill() end
+    }
     self.favButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText("livingMarket_favAdd"),
@@ -160,11 +167,6 @@ end
 -- ---------------------------------------------------------------------
 function LivingMarketFrame:refreshData()
     self.wares = LivingMarket:getWareData()
-
-    if self.infoText ~= nil then
-        local percent = math.floor(LivingMarket.REFILL_SHARE * 100 + 0.5)
-        self.infoText:setText(string.format(g_i18n:getText("livingMarket_info"), percent))
-    end
 
     self:updateSearchHint()
     self:rebuildWareList()
@@ -618,6 +620,11 @@ function LivingMarketFrame:onToggleFavorite()
     self:rebuildWareList()
 end
 
+function LivingMarketFrame:onTestRefill()
+    LivingMarket:onHourChanged()
+    self:refreshData()
+end
+
 function LivingMarketFrame:updateMenuButtons()
     self:updateFilterButton()
 
@@ -629,6 +636,10 @@ function LivingMarketFrame:updateMenuButtons()
     end
     if self:isSearching() then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
+    end
+    -- Testknopf nur im Debug-Modus und nur, wo der Bedarf verwaltet wird (Server/Einzelspieler)
+    if LivingMarket.DEBUG and g_server ~= nil then
+        table.insert(self.menuButtonInfo, self.testRefillButtonInfo)
     end
     self:setMenuButtonInfoDirty()
 end

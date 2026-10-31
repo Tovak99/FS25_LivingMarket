@@ -3,7 +3,6 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Living Market"/>
         <text name="livingMarket_title" text="Living Market"/>
-        <text name="livingMarket_info" text="Best station = highest price with free demand. Demand refills by %d %% every in-game hour. Below 50 %% demand the price drops, down to -50 %%."/>
         <text name="livingMarket_colShare" text="Free"/>
         <text name="livingMarket_colMarket" text="Market"/>
         <text name="livingMarket_none" text="No selling stations found"/>
@@ -13,6 +12,7 @@
         <text name="livingMarket_clearSearch" text="Clear search"/>
         <text name="livingMarket_favAdd" text="Add to favorites"/>
         <text name="livingMarket_favRemove" text="Remove from favorites"/>
+        <text name="livingMarket_testRefill" text="Test: refill 1 in-game hour"/>
         <text name="livingMarket_filterAll" text="All goods"/>
         <text name="livingMarket_filterStock" text="In stock"/>
         <text name="livingMarket_filterFav" text="Favorites"/>

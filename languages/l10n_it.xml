@@ -3,7 +3,6 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Mercato vivo"/>
         <text name="livingMarket_title" text="Mercato vivo"/>
-        <text name="livingMarket_info" text="Miglior punto vendita = prezzo più alto con domanda libera. La domanda si ricarica del %d %% ogni ora di gioco. Sotto il 50 %% di domanda il prezzo scende, fino a -50 %%."/>
         <text name="livingMarket_colShare" text="Libero"/>
         <text name="livingMarket_colMarket" text="Mercato"/>
         <text name="livingMarket_none" text="Nessun punto vendita trovato"/>
@@ -13,6 +12,7 @@
         <text name="livingMarket_clearSearch" text="Cancella ricerca"/>
         <text name="livingMarket_favAdd" text="Aggiungi ai preferiti"/>
         <text name="livingMarket_favRemove" text="Rimuovi dai preferiti"/>
+        <text name="livingMarket_testRefill" text="Test: ricarica 1 ora di gioco"/>
         <text name="livingMarket_filterAll" text="Tutte le merci"/>
         <text name="livingMarket_filterStock" text="In magazzino"/>
         <text name="livingMarket_filterFav" text="Preferiti"/>
