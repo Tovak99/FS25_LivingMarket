@@ -27,7 +27,7 @@
         <text name="livingMarket_colStock" text="Scorte"/>
         <text name="livingMarket_colBestStation" text="Miglior punto vendita"/>
         <text name="livingMarket_colPrice" text="Prezzo"/>
-        <text name="livingMarket_colSellable" text="Vendibile"/>
+        <text name="livingMarket_colSellable" text="Consegnabile"/>
         <text name="livingMarket_colRevenue" text="Ricavo"/>
         <text name="livingMarket_colFreeMax" text="Libero / Massimo"/>
         <text name="livingMarket_allFull" text="Tutti i punti vendita pieni"/>

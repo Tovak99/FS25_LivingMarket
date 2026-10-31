@@ -27,7 +27,7 @@
         <text name="livingMarket_colStock" text="Voorraad"/>
         <text name="livingMarket_colBestStation" text="Beste verkooppunt"/>
         <text name="livingMarket_colPrice" text="Prijs"/>
-        <text name="livingMarket_colSellable" text="Verkoopbaar"/>
+        <text name="livingMarket_colSellable" text="Leverbaar"/>
         <text name="livingMarket_colRevenue" text="Opbrengst"/>
         <text name="livingMarket_colFreeMax" text="Vrij / Maximum"/>
         <text name="livingMarket_allFull" text="Alle verkooppunten vol"/>
