@@ -299,7 +299,7 @@ end
 -- Grundpreis der Ware aus dem Basisspiel (je 1000 l), unabhängig von Station, Monat und Marktlage.
 -- Grundwert der Ware × Faktor des Schwierigkeitsgrads (Schwer 1,0 / Normal 1,8 / Einfach 3,0).
 -- Ausnahme Verbrauchsgüter (Diesel, Dünger, Saatgut ...): immer Faktor 1,0.
-LivingMarket.PRICE_DEBUG_FILLTYPES = { "DIESEL", "WHEAT", "CANOLA", "WOODBEAM", "APPLE" }
+LivingMarket.PRICE_DEBUG_FILLTYPES = { "DIESEL", "FERTILIZER", "METHANE", "MINERAL_FEED", "WHEAT", "WOODBEAM" }
 
 local function getRawPriceValues(fillTypeIndex)
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
@@ -332,11 +332,12 @@ function LivingMarket:logPriceDebug()
     end
 end
 
--- Verbrauchsgüter (kaufbar): Grundpreis ohne Faktor des Schwierigkeitsgrads (immer 1,0).
--- Feste Liste + alles, was auf der Karte an Kaufstationen angeboten wird.
+-- Verbrauchsgüter: Grundpreis ohne Faktor des Schwierigkeitsgrads (immer 1,0).
+-- Nur feste Liste: Eine automatische Erkennung über Kaufstationen erwischt auf Karten
+-- mit Einkaufsstellen auch normale Waren (Holzbalken, Mist ...), die den Faktor haben.
 LivingMarket.CONSUMABLE_FILLTYPES = {
     "DIESEL", "DEF", "ELECTRICCHARGE", "METHANE",
-    "FERTILIZER", "LIQUIDFERTILIZER", "SEEDS", "HERBICIDE", "LIME",
+    "FERTILIZER", "LIQUIDFERTILIZER", "SEEDS", "HERBICIDE", "LIME", "LIQUIDLIME",
     "MINERAL_FEED", "SILAGE_ADDITIVE", "ROADSALT", "TREESAPLINGS"
 }
 
@@ -345,52 +346,11 @@ function LivingMarket:getConsumables()
         return self.consumables
     end
     local consumables = {}
-    local sources = {}
-
     for _, name in ipairs(self.CONSUMABLE_FILLTYPES) do
         local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(name)
         if fillTypeIndex ~= nil then
             consumables[fillTypeIndex] = true
         end
-    end
-
-    local function addBuyable(fillTypeIndex, accepted)
-        if accepted and fillTypeIndex ~= nil and not consumables[fillTypeIndex] then
-            consumables[fillTypeIndex] = true
-            table.insert(sources, tostring(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)))
-        end
-    end
-
-    -- Kaufstationen (Tankstelle, Einkauf am Bahnhof ...): Waren, die dort verkauft werden
-    local storageSystem = g_currentMission ~= nil and g_currentMission.storageSystem or nil
-    if storageSystem ~= nil and storageSystem.getLoadingStations ~= nil and BuyingStation ~= nil then
-        local ok, loadingStations = pcall(storageSystem.getLoadingStations, storageSystem)
-        if ok and loadingStations ~= nil then
-            for _, station in pairs(loadingStations) do
-                if station ~= nil and station.isa ~= nil and station:isa(BuyingStation) then
-                    for fillTypeIndex, value in pairs(station.fillTypePrices or {}) do
-                        addBuyable(fillTypeIndex, value ~= nil)
-                    end
-                    for fillTypeIndex, value in pairs(station.supportedFillTypes or {}) do
-                        addBuyable(fillTypeIndex, value)
-                    end
-                end
-            end
-        end
-    end
-    -- Paletten-Kaufstationen (z. B. Big Bags)
-    if storageSystem ~= nil and storageSystem.palletBuyingStations ~= nil then
-        for _, placeable in pairs(storageSystem.palletBuyingStations) do
-            local spec = placeable ~= nil and placeable.spec_palletBuyingStation or nil
-            for fillTypeIndex in pairs(spec ~= nil and spec.fillTypeIndexToPallet or {}) do
-                addBuyable(fillTypeIndex, true)
-            end
-        end
-    end
-
-    if #sources > 0 then
-        table.sort(sources)
-        log("Verbrauchsgüter von Kaufstationen (Grundpreis ohne Schwierigkeitsfaktor): %s", table.concat(sources, ", "))
     end
     self.consumables = consumables
     return consumables
