@@ -112,6 +112,10 @@
             <pivot value="1 0.5"/>
             <position value="-20px 0px"/>
             <size value="420px 48px"/>
+            <!-- Text linksbündig wie der Hinweistext; mittig gesetzt zeichnet das Spiel
+                 den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
+            <textAlignment value="left"/>
+            <textOffset value="15px 0px"/>
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
