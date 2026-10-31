@@ -715,7 +715,7 @@ end
 -- Nur feste Liste: Eine automatische Erkennung über Kaufstationen erwischt auf Karten
 -- mit Einkaufsstellen auch normale Waren (Holzbalken, Mist ...), die den Faktor haben.
 LivingMarket.CONSUMABLE_FILLTYPES = {
-    "DIESEL", "DEF", "ELECTRICCHARGE", "METHANE",
+    "DIESEL", "DEF", "METHANE",   -- ELECTRICCHARGE (Elektrische Energie) bekommt den Schwierigkeitsfaktor wie andere Waren
     "FERTILIZER", "LIQUIDFERTILIZER", "SEEDS", "HERBICIDE", "LIME", "LIQUIDLIME",
     "MINERAL_FEED", "SILAGE_ADDITIVE", "ROADSALT", "TREESAPLINGS"
 }
