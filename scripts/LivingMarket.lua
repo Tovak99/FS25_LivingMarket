@@ -296,27 +296,51 @@ function LivingMarket:estimateRevenue(basePricePerLiter, remaining, max, amount)
     return revenue
 end
 
--- Grundpreis der Ware aus dem Basisspiel (je 1000 l), inkl. Schwierigkeitsgrad,
--- unabhängig von Station, Monat und Marktlage
-function LivingMarket:getBasePricePer1000(fillTypeIndex)
-    -- Grundwert der Ware × Faktor des Schwierigkeitsgrads (Schwer 1,0 / Normal 1,8 / Einfach 3,0).
-    -- Bewusst selbst gerechnet, damit der Faktor sicher enthalten ist.
+-- Grundpreis der Ware aus dem Basisspiel (je 1000 l), unabhängig von Station, Monat und Marktlage.
+-- Quelle: economyManager:getPricePerLiter - die Wertberechnung des Spiels (z. B. Ballenwert).
+-- Achtung: Der Faktor des Schwierigkeitsgrads gilt nicht für alle Waren (z. B. Diesel nicht),
+-- deshalb nicht selbst mit EconomyManager.getPriceMultiplier multiplizieren.
+LivingMarket.PRICE_DEBUG_FILLTYPES = { "DIESEL", "WHEAT", "CANOLA", "WOODBEAM", "APPLE" }
+
+local function getRawPriceValues(fillTypeIndex)
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
-    if fillType == nil or fillType.pricePerLiter == nil then
-        return nil
-    end
-    local multiplier = 1
+    local raw = fillType ~= nil and fillType.pricePerLiter or nil
+    local multiplier, managerPrice = nil, nil
     if EconomyManager ~= nil and EconomyManager.getPriceMultiplier ~= nil then
         local ok, value = pcall(EconomyManager.getPriceMultiplier, fillTypeIndex)
-        if ok and value ~= nil then
-            multiplier = value
+        multiplier = ok and value or nil
+    end
+    local economyManager = g_currentMission ~= nil and g_currentMission.economyManager or nil
+    if economyManager ~= nil and economyManager.getPricePerLiter ~= nil then
+        local ok, value = pcall(economyManager.getPricePerLiter, economyManager, fillTypeIndex)
+        managerPrice = ok and value or nil
+    end
+    return raw, multiplier, managerPrice
+end
+
+function LivingMarket:logPriceDebug()
+    if not self.DEBUG or self.hasLoggedPriceDebug then
+        return
+    end
+    self.hasLoggedPriceDebug = true
+    for _, name in ipairs(self.PRICE_DEBUG_FILLTYPES) do
+        local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(name)
+        if fillTypeIndex ~= nil then
+            local raw, multiplier, managerPrice = getRawPriceValues(fillTypeIndex)
+            log("Preisdaten %s: Grundwert/l=%s Faktor=%s economyManager/l=%s", name,
+                tostring(raw), tostring(multiplier), tostring(managerPrice))
         end
     end
-    if not self.hasLoggedPriceMultiplier then
-        self.hasLoggedPriceMultiplier = true
-        log("Preisfaktor Schwierigkeitsgrad: %.2f", multiplier)
+end
+
+function LivingMarket:getBasePricePer1000(fillTypeIndex)
+    self:logPriceDebug()
+    local raw, _, managerPrice = getRawPriceValues(fillTypeIndex)
+    local pricePerLiter = managerPrice or raw
+    if pricePerLiter == nil then
+        return nil
     end
-    return fillType.pricePerLiter * multiplier * 1000
+    return pricePerLiter * 1000
 end
 
 function LivingMarket:getPricePer1000(station, fillTypeIndex)
