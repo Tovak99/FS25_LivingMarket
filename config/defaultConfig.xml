@@ -35,8 +35,7 @@
 
     <!-- Marktereignisse
          enabled            = false schaltet neue Ereignisse ab
-         minActive          = mindestens so viele Ereignisse laufen immer (fehlende kommen sofort)
-         maxActive          = Ziel bis zu so vielen Ereignissen inkl. angekündigter (verteilt über den Monat)
+         minActive/maxActive = so viele Ereignisse laufen etwa gleichzeitig (jeden Monat neu gewählt)
          minMonths/maxMonths = Dauer eines Ereignisses in Monaten
          announceMonths     = marktweite Ereignisse (Gefragt, Flaute) so viele Monate vorher ankündigen
 

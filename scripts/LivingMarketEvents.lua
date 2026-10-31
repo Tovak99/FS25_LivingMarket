@@ -349,13 +349,10 @@ end
 -- Würfeln
 -- ---------------------------------------------------------------------
 -- Ereignistyp nach Gewicht auswählen
--- onlyLocal = true: nur Stationsereignisse (beginnen sofort)
-function LivingMarket:pickEventType(onlyLocal)
+function LivingMarket:pickEventType()
     local total = 0
-    for eventType, settings in pairs(self.EVENT_SETTINGS.types) do
-        if not (onlyLocal and self.EVENT_GLOBAL[eventType]) then
-            total = total + math.max(0, settings.weight or 0)
-        end
+    for _, settings in pairs(self.EVENT_SETTINGS.types) do
+        total = total + math.max(0, settings.weight or 0)
     end
     if total <= 0 then
         return nil
@@ -363,7 +360,7 @@ function LivingMarket:pickEventType(onlyLocal)
     local roll = math.random() * total
     for eventType = 1, 6 do
         local settings = self.EVENT_SETTINGS.types[eventType]
-        if settings ~= nil and (settings.weight or 0) > 0 and not (onlyLocal and self.EVENT_GLOBAL[eventType]) then
+        if settings ~= nil and (settings.weight or 0) > 0 then
             roll = roll - settings.weight
             if roll <= 0 then
                 return eventType, settings
@@ -382,9 +379,9 @@ local function rollChange(eventType, minValue, maxValue)
     return LivingMarket.EVENT_POSITIVE[eventType] and (1 + change) or math.max(0.05, 1 - change)
 end
 
-function LivingMarket:createRandomEvent(onlyLocal)
+function LivingMarket:createRandomEvent()
     local s = self.EVENT_SETTINGS
-    local eventType, settings = self:pickEventType(onlyLocal)
+    local eventType, settings = self:pickEventType()
     if eventType == nil then
         return nil
     end
@@ -427,8 +424,8 @@ function LivingMarket:rollEventTarget()
 end
 
 -- Ein neues Ereignis würfeln und melden (angekündigt oder sofort gestartet)
-function LivingMarket:spawnEvent(onlyLocal)
-    local event = self:createRandomEvent(onlyLocal)
+function LivingMarket:spawnEvent()
+    local event = self:createRandomEvent()
     if event == nil then
         return false
     end
@@ -437,34 +434,6 @@ function LivingMarket:spawnEvent(onlyLocal)
         self:announceEvent(event, "announce")
     end
     return true
-end
-
--- Anzahl laufender (nicht nur angekündigter) Ereignisse
-function LivingMarket:countActiveEvents()
-    local now, count = self.getNowHour(), 0
-    for _, event in ipairs(self.events) do
-        if event.active or event.startHour <= now then
-            count = count + 1
-        end
-    end
-    return count
-end
-
--- Immer mindestens minActive laufende Ereignisse: fehlende sofort als Stationsereignisse erzeugen
--- (die beginnen sofort). Gibt true zurück, wenn etwas hinzukam.
-function LivingMarket:fillToMinimumEvents()
-    local s = self.EVENT_SETTINGS
-    if not s.enabled or s.minActive <= 0 then
-        return false
-    end
-    local added, attempts = false, 0
-    while self:countActiveEvents() < s.minActive and attempts < s.minActive * 3 do
-        if self:spawnEvent(true) then
-            added = true
-        end
-        attempts = attempts + 1
-    end
-    return added
 end
 
 -- Jede Spielstunde: fällige Ereignisse starten/beenden, gelegentlich neue würfeln.
@@ -492,11 +461,6 @@ function LivingMarket:tickEvents()
         end
     end
     self.events = kept
-
-    -- Untergrenze sofort wieder auffüllen (Meldungen kommen unten beim Starten)
-    if self:fillToMinimumEvents() then
-        changed = true
-    end
 
     if self.eventTarget == nil then
         self:rollEventTarget()
@@ -534,11 +498,16 @@ end
 function LivingMarket:initEvents()
     self:normalizeEvents()
     self:rollEventTarget()
-    do
-        -- Beim Laden (auch neues Spiel / erster Start mit dem Mod): sofort auf die Mindestanzahl
-        -- laufender Ereignisse auffüllen (ohne Meldungsflut), weitere bis zum Monatsziel kommen verteilt
+    if #self.events == 0 and self.EVENT_SETTINGS.enabled then
+        -- Neues Spiel bzw. erster Start mit dem Mod: sofort die Mindestanzahl erzeugen (ohne Meldungsflut),
+        -- weitere bis zum Monatsziel kommen verteilt über den Monat
+        local wanted = math.max(1, math.min(self.EVENT_SETTINGS.minActive, self.eventTarget))
         self.silentEvents = true
-        self:fillToMinimumEvents()
+        local attempts = 0
+        while #self.events < wanted and attempts < wanted * 3 do
+            self:spawnEvent()
+            attempts = attempts + 1
+        end
         for _, event in ipairs(self.events) do
             if not event.active and event.startHour <= self.getNowHour() then
                 event.active = true
