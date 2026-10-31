@@ -10,10 +10,12 @@
         <text name="livingMarket_searchHint" text="Zoek product of verkooppunt …"/>
         <text name="livingMarket_noResults" text='Geen resultaten voor "%s"'/>
         <text name="livingMarket_clearSearch" text="Zoekopdracht wissen"/>
-        <text name="livingMarket_stockOnly" text="Alleen voorraad"/>
         <text name="livingMarket_favAdd" text="Toevoegen aan favorieten"/>
         <text name="livingMarket_favRemove" text="Verwijderen uit favorieten"/>
-        <text name="livingMarket_showAll" text="Alle producten tonen"/>
+        <text name="livingMarket_filterAll" text="Alle goederen"/>
+        <text name="livingMarket_filterStock" text="Op voorraad"/>
+        <text name="livingMarket_filterFav" text="Favorieten"/>
+        <text name="livingMarket_noFavorites" text="Je hebt nog geen favorieten gemarkeerd."/>
         <text name="livingMarket_stockLabel" text="Voorraad: %s"/>
         <text name="livingMarket_noStock" text="Je hebt niets op voorraad dat hier verkocht kan worden."/>
         <text name="livingMarket_colWare" text="Product"/>

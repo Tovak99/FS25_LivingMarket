@@ -10,10 +10,12 @@
         <text name="livingMarket_searchHint" text="Cerca prodotto o punto vendita …"/>
         <text name="livingMarket_noResults" text="Nessun risultato per «%s»"/>
         <text name="livingMarket_clearSearch" text="Cancella ricerca"/>
-        <text name="livingMarket_stockOnly" text="Solo scorte"/>
         <text name="livingMarket_favAdd" text="Aggiungi ai preferiti"/>
         <text name="livingMarket_favRemove" text="Rimuovi dai preferiti"/>
-        <text name="livingMarket_showAll" text="Mostra tutti i prodotti"/>
+        <text name="livingMarket_filterAll" text="Tutte le merci"/>
+        <text name="livingMarket_filterStock" text="In magazzino"/>
+        <text name="livingMarket_filterFav" text="Preferiti"/>
+        <text name="livingMarket_noFavorites" text="Non hai ancora segnato nessun preferito."/>
         <text name="livingMarket_stockLabel" text="Scorte: %s"/>
         <text name="livingMarket_noStock" text="Non hai nulla in magazzino che si possa vendere qui."/>
         <text name="livingMarket_colWare" text="Prodotto"/>

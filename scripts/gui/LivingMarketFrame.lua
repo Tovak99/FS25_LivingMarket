@@ -27,14 +27,13 @@ function LivingMarketFrame.new(target, customMt)
     self.visibleWares = {}        -- nach Lager/Suche gefiltert
     self.selectedFillType = nil   -- gewählte Ware (bleibt beim Aktualisieren erhalten)
     self.searchText = ""
-    self.stockOnly = true         -- nur Waren zeigen, die der Hof auf Lager hat
+    self.filterMode = "stock"     -- Filter: "all" = alle Waren, "stock" = lagernd, "fav" = Favoriten
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
     self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
 
     self.hasCustomMenuButtons = true
     self.backButtonInfo = {}
-    self.stockButtonInfo = {}
     self.clearSearchButtonInfo = {}
     self.favButtonInfo = {}
 
@@ -43,11 +42,6 @@ end
 
 function LivingMarketFrame:initialize()
     self.backButtonInfo = { inputAction = InputAction.MENU_BACK }
-    self.stockButtonInfo = {
-        inputAction = InputAction.MENU_EXTRA_2,
-        text = g_i18n:getText("livingMarket_showAll"),
-        callback = function() self:onToggleStockOnly() end
-    }
     self.favButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText("livingMarket_favAdd"),
@@ -175,8 +169,12 @@ function LivingMarketFrame:getFilteredWares()
     local result = {}
 
     for _, ware in ipairs(self.wares) do
-        -- Favoriten bleiben auch bei „Nur Lagerbestand“ sichtbar
-        local stockOk = not self.stockOnly or ware.stock >= 1 or LivingMarket:isFavorite(ware.fillTypeIndex)
+        local stockOk = true
+        if self.filterMode == "stock" then
+            stockOk = ware.stock >= 1
+        elseif self.filterMode == "fav" then
+            stockOk = LivingMarket:isFavorite(ware.fillTypeIndex)
+        end
         local searchOk = not searching or string.find(ware.searchKey, query, 1, true) ~= nil
         if stockOk and searching and not searchOk then
             for _, station in ipairs(ware.stations) do
@@ -204,6 +202,8 @@ function LivingMarketFrame:rebuildWareList()
             text = g_i18n:getText("livingMarket_none")
         elseif #self.visibleWares == 0 and self:isSearching() then
             text = string.format(g_i18n:getText("livingMarket_noResults"), self.searchText)
+        elseif #self.visibleWares == 0 and self.filterMode == "fav" then
+            text = g_i18n:getText("livingMarket_noFavorites")
         elseif #self.visibleWares == 0 then
             text = g_i18n:getText("livingMarket_noStock")
         end
@@ -449,6 +449,7 @@ local function limitHeaderHitArea(button)
 end
 
 function LivingMarketFrame:setupSortHeaders()
+    limitHeaderHitArea(self.filterButton)
     limitHeaderHitArea(self.detailTitle)
     for key in pairs(self.WARE_COLUMNS) do
         limitHeaderHitArea(self["sortWare_" .. key])
@@ -576,9 +577,19 @@ end
 -- ---------------------------------------------------------------------
 -- Tastenleiste
 -- ---------------------------------------------------------------------
-function LivingMarketFrame:onToggleStockOnly()
-    self.stockOnly = not self.stockOnly
+-- Klick auf den Filter: Alle → Lagernd → Favoriten → Alle
+LivingMarketFrame.FILTER_NEXT  = { all = "stock", stock = "fav", fav = "all" }
+LivingMarketFrame.FILTER_LABEL = { all = "livingMarket_filterAll", stock = "livingMarket_filterStock", fav = "livingMarket_filterFav" }
+
+function LivingMarketFrame:onClickFilter()
+    self.filterMode = self.FILTER_NEXT[self.filterMode] or "all"
     self:rebuildWareList()
+end
+
+function LivingMarketFrame:updateFilterButton()
+    if self.filterButton ~= nil then
+        self.filterButton:setText(g_i18n:getText(self.FILTER_LABEL[self.filterMode] or "livingMarket_filterAll"))
+    end
 end
 
 -- Gewählte Ware als Favorit markieren bzw. Markierung entfernen
@@ -593,14 +604,9 @@ function LivingMarketFrame:onToggleFavorite()
 end
 
 function LivingMarketFrame:updateMenuButtons()
-    -- Text zeigt, wohin umgeschaltet wird
-    if self.stockOnly then
-        self.stockButtonInfo.text = g_i18n:getText("livingMarket_showAll")
-    else
-        self.stockButtonInfo.text = g_i18n:getText("livingMarket_stockOnly")
-    end
+    self:updateFilterButton()
 
-    self.menuButtonInfo = { self.backButtonInfo, self.stockButtonInfo }
+    self.menuButtonInfo = { self.backButtonInfo }
     local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
     if ware ~= nil then
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")

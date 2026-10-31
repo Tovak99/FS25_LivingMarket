@@ -8,6 +8,9 @@
             </Bitmap>
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
+            <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
+            <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
+
             <!-- Suchfeld rechtsbündig neben dem Titel -->
             <TextInput profile="lm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">
                 <ThreePartBitmap profile="fs25_textInputBg"/>
@@ -226,6 +229,19 @@
             <position value="0px 0px"/>
             <size value="11px 11px"/>
             <imageColor value="0.69 0.69 0.69 1"/>
+        </Profile>
+
+        <!-- Filter-Schalter oben rechts: grüner Text, beim Überfahren weiß -->
+        <Profile name="lm_filterButton" extends="lm_sortHeader">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <position value="-465px 0px"/>
+            <textAlignment value="right"/>
+            <textSize value="17px"/>
+            <textColor value="0.212 0.376 0.012 1"/>
+            <textFocusedColor value="0.212 0.376 0.012 1"/>
+            <textSelectedColor value="0.212 0.376 0.012 1"/>
+            <textHighlightedColor value="1 1 1 1"/>
         </Profile>
 
         <Profile name="lm_sortHeaderRight" extends="lm_sortHeader">

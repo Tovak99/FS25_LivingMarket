@@ -11,7 +11,8 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 - **Eigene Seite im Ingame-Menü (ESC)**
   - eine Zeile pro Ware: Lager, beste Station (höchster Preis *mit freiem Bedarf*), Preis je 1000 l, verkaufbare Menge, Erlös
   - Detailfenster mit allen Stationen der gewählten Ware: Preis, Frei / Maximum
-  - Filter „Nur Lagerbestand“ und Suche nach Ware oder Station
+  - Filter per Klick: Alle Waren · Lagernd · Favoriten; Suche nach Ware oder Station
+  - Favoriten (Stern-Spalte), je Spieler gespeichert
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
 - **Speichert den Bedarf im Spielstand** (`livingMarket.xml` im Savegame-Ordner)
 - **Multiplayer-fähig aufgebaut:** Der Server verwaltet den Bedarf und synchronisiert ihn (noch ungetestet)

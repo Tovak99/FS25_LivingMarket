@@ -10,10 +10,12 @@
         <text name="livingMarket_searchHint" text="Search goods or station …"/>
         <text name="livingMarket_noResults" text='No results for "%s"'/>
         <text name="livingMarket_clearSearch" text="Clear search"/>
-        <text name="livingMarket_stockOnly" text="Stock only"/>
         <text name="livingMarket_favAdd" text="Add to favorites"/>
         <text name="livingMarket_favRemove" text="Remove from favorites"/>
-        <text name="livingMarket_showAll" text="Show all goods"/>
+        <text name="livingMarket_filterAll" text="All goods"/>
+        <text name="livingMarket_filterStock" text="In stock"/>
+        <text name="livingMarket_filterFav" text="Favorites"/>
+        <text name="livingMarket_noFavorites" text="You have not marked any favorites yet."/>
         <text name="livingMarket_stockLabel" text="Stock: %s"/>
         <text name="livingMarket_noStock" text="You have nothing in stock that can be sold here."/>
         <text name="livingMarket_colWare" text="Goods"/>
