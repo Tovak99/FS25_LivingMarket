@@ -14,27 +14,16 @@ LivingMarket.modDir  = g_currentModDirectory
 -- ---------------------------------------------------------------------
 -- Einstellungen
 -- ---------------------------------------------------------------------
-LivingMarket.DEFAULT_MAX    = 30000   -- Liter, wenn Fruchtsorte nicht in der Liste
-LivingMarket.REFILL_SHARE   = 0.05    -- Anteil vom Maximum, der pro Spielstunde zurückkommt
 LivingMarket.MENU_PAGE_NAME = "pageLivingMarket"
 LivingMarket.MENU_AFTER     = "pagePrices"   -- Reiter hinter "Preise" einsortieren (falls vorhanden)
 LivingMarket.DEBUG          = true
 
--- Grundmengen pro Fruchtsorte (Name wie in fillTypes.xml)
-LivingMarket.BASE_AMOUNTS = {
-    WHEAT     = 60000,
-    BARLEY    = 60000,
-    OAT       = 30000,
-    MAIZE     = 60000,
-    SORGHUM   = 30000,
-    CANOLA    = 25000,
-    SUNFLOWER = 25000,
-    SOYBEAN   = 25000,
-    POTATO    = 40000,
-    SUGARBEET = 40000,
-    RICE      = 30000,
-    MILK      = 20000,
-}
+-- Bedarf je Ware: kommt aus der Konfigurationsdatei (config/defaultConfig.xml bzw. die Kopie
+-- in modSettings). Diese Werte gelten nur, falls keine Datei gelesen werden kann.
+LivingMarket.CONFIG_FILENAME  = "FS25_LivingMarket_config.xml"
+LivingMarket.FALLBACK_MAX     = 30000   -- Liter
+LivingMarket.FALLBACK_REFILL  = 0.30    -- Anteil vom Maximum je Spielmonat
+LivingMarket.config           = nil     -- { default = {max, refillPerMonth}, byFillType = {[index] = {max, refillPerMonth, group}} }
 
 -- Fruchtsorten, die nie begrenzt und nicht angezeigt werden (Name wie in fillTypes.xml).
 -- Geld/Bargeld: die Bank begrenzt auch nicht.
@@ -187,11 +176,128 @@ function LivingMarket:isExcludedFillType(fillTypeIndex)
 end
 
 -- Maximum + Auffüllrate für eine Station/Fruchtsorte
+-- ---------------------------------------------------------------------
+-- Konfiguration: Bedarf und Auffüllung je Warengruppe
+-- ---------------------------------------------------------------------
+function LivingMarket:getModSettingsDir()
+    local dir = g_modSettingsDirectory
+    if dir == nil and getUserProfileAppPath ~= nil then
+        dir = getUserProfileAppPath() .. "modSettings/"
+    end
+    if dir == nil then
+        return nil
+    end
+    if string.sub(dir, -1) ~= "/" then
+        dir = dir .. "/"
+    end
+    if createFolder ~= nil then
+        pcall(createFolder, dir)
+    end
+    return dir
+end
+
+function LivingMarket:loadConfig()
+    local config = {
+        default    = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL },
+        byFillType = {}
+    }
+    self.config = config
+
+    local defaultPath = Utils.getFilename("config/defaultConfig.xml", self.modDir)
+    local dir = self:getModSettingsDir()
+    local userPath = dir ~= nil and (dir .. self.CONFIG_FILENAME) or nil
+
+    -- Beim ersten Start die Standarddatei nach modSettings kopieren, damit man sie anpassen kann
+    if userPath ~= nil and not fileExists(userPath) and copyFile ~= nil then
+        local ok = pcall(copyFile, defaultPath, userPath, false)
+        if ok and fileExists(userPath) then
+            log("Konfiguration angelegt: %s", userPath)
+        end
+    end
+    local path = (userPath ~= nil and fileExists(userPath)) and userPath or defaultPath
+    if not fileExists(path) then
+        log("WARNUNG: keine Konfiguration gefunden - Standardwerte (%d l, %d %% je Monat)",
+            self.FALLBACK_MAX, math.floor(self.FALLBACK_REFILL * 100 + 0.5))
+        return
+    end
+
+    local xmlFile = loadXMLFile("LivingMarketConfig", path)
+    if xmlFile == nil or xmlFile == 0 then
+        log("WARNUNG: %s konnte nicht gelesen werden", path)
+        return
+    end
+
+    config.default.max = getXMLFloat(xmlFile, "livingMarket.default#max") or config.default.max
+    config.default.refillPerMonth = getXMLFloat(xmlFile, "livingMarket.default#refillPerMonth") or config.default.refillPerMonth
+
+    local groupCount, fillTypeCount, unknown = 0, 0, {}
+    local g = 0
+    while true do
+        local groupKey = string.format("livingMarket.groups.group(%d)", g)
+        if not hasXMLProperty(xmlFile, groupKey) then
+            break
+        end
+        local group = {
+            name           = getXMLString(xmlFile, groupKey .. "#name") or tostring(g),
+            max            = getXMLFloat(xmlFile, groupKey .. "#max") or config.default.max,
+            refillPerMonth = getXMLFloat(xmlFile, groupKey .. "#refillPerMonth") or config.default.refillPerMonth
+        }
+        groupCount = groupCount + 1
+        local f = 0
+        while true do
+            local fillTypeKey = string.format("%s.fillType(%d)", groupKey, f)
+            if not hasXMLProperty(xmlFile, fillTypeKey) then
+                break
+            end
+            local name = getXMLString(xmlFile, fillTypeKey .. "#name")
+            local fillTypeIndex = name ~= nil and g_fillTypeManager:getFillTypeIndexByName(name) or nil
+            if fillTypeIndex ~= nil then
+                config.byFillType[fillTypeIndex] = group
+                fillTypeCount = fillTypeCount + 1
+            elseif name ~= nil then
+                table.insert(unknown, name)
+            end
+            f = f + 1
+        end
+        g = g + 1
+    end
+    delete(xmlFile)
+
+    log("Konfiguration gelesen (%s): %d Gruppen, %d Waren zugeordnet, Rest %d l / %d %% je Monat",
+        path, groupCount, fillTypeCount, config.default.max, math.floor(config.default.refillPerMonth * 100 + 0.5))
+    if #unknown > 0 then
+        log("Konfiguration: auf dieser Karte unbekannte Waren übersprungen: %s", table.concat(unknown, ", "))
+    end
+end
+
+-- Maximum (Liter) und Auffüllung (Liter je Spielmonat) für eine Ware
 function LivingMarket:getLimitFor(station, fillTypeIndex)
-    local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
-    local max = self.BASE_AMOUNTS[name] or self.DEFAULT_MAX
-    -- Platz für spätere Logik: Preisfaktor, Stationstyp, Ereignisse ...
-    return max, max * self.REFILL_SHARE
+    if self.config == nil then
+        local ok, err = pcall(self.loadConfig, self)
+        if not ok then
+            print("[LivingMarket] FEHLER beim Lesen der Konfiguration: " .. tostring(err))
+            self.config = self.config or { default = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL }, byFillType = {} }
+        end
+    end
+    local values = self.config.byFillType[fillTypeIndex] or self.config.default
+    -- Platz für spätere Logik: Stationstyp, Ereignisse ...
+    return values.max, values.max * values.refillPerMonth
+end
+
+-- Spielstunden je Monat (Tage je Monat aus den Spieleinstellungen × 24)
+function LivingMarket.getHoursPerMonth()
+    local mission = g_currentMission
+    local days = nil
+    if mission ~= nil and mission.environment ~= nil then
+        days = mission.environment.daysPerPeriod
+    end
+    if (days == nil or days <= 0) and mission ~= nil and mission.missionInfo ~= nil then
+        days = mission.missionInfo.plannedDaysPerPeriod
+    end
+    if days == nil or days <= 0 then
+        days = 1
+    end
+    return days * 24
 end
 
 function LivingMarket:getStationData(station)
@@ -924,10 +1030,11 @@ function LivingMarket:onHourChanged()
     if not isServer() then
         return
     end
+    local hoursPerMonth = LivingMarket.getHoursPerMonth()   -- refill ist je Spielmonat angegeben
     for _, data in pairs(self.stations) do
         for _, entry in pairs(data) do
             if entry.remaining < entry.max then
-                entry.remaining = math.min(entry.remaining + entry.refill, entry.max)
+                entry.remaining = math.min(entry.remaining + entry.refill / hoursPerMonth, entry.max)
                 self:markDirty(entry)
             end
         end
@@ -1227,7 +1334,7 @@ end
 -- Je Eintrag: Restbedarf, Maximum, Auffüllrate. Gespeichert wird nur, was vom Standard abweicht.
 -- ---------------------------------------------------------------------
 LivingMarket.SAVE_FILENAME = "livingMarket.xml"
-LivingMarket.SAVE_VERSION  = 2
+LivingMarket.SAVE_VERSION  = 3   -- 3: refill je Spielmonat, Maxima aus der Konfiguration
 LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { [fillTypeName] = { remaining, max, refill } } }
 
 -- Dauerhafte Kennung einer Station: uniqueId ihres Gebäudes (vom Spiel im Spielstand geführt).
@@ -1276,6 +1383,10 @@ function LivingMarket:loadFromSavegame()
         return
     end
 
+    -- Vor Version 3 galten feste Maxima und Auffüllung je Stunde: dann nur den Restbedarf übernehmen
+    local version = getXMLInt(xmlFile, "livingMarket#version") or 1
+    local keepLimits = version >= 3
+
     local stationCount, entryCount = 0, 0
     local i = 0
     while true do
@@ -1297,8 +1408,8 @@ function LivingMarket:loadFromSavegame()
                 if name ~= nil and remaining ~= nil then
                     stationData.fillTypes[name] = {
                         remaining = remaining,
-                        max       = getXMLFloat(xmlFile, fillTypeKey .. "#max"),      -- ab Version 2
-                        refill    = getXMLFloat(xmlFile, fillTypeKey .. "#refill"),   -- ab Version 2
+                        max       = keepLimits and getXMLFloat(xmlFile, fillTypeKey .. "#max") or nil,
+                        refill    = keepLimits and getXMLFloat(xmlFile, fillTypeKey .. "#refill") or nil,
                     }
                     entryCount = entryCount + 1
                 end
@@ -1403,6 +1514,12 @@ end
 function LivingMarket:loadMap(name)
     g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
 
+    self.config = nil
+    local okConfig, errConfig = pcall(self.loadConfig, self)
+    if not okConfig then
+        print("[LivingMarket] FEHLER beim Lesen der Konfiguration: " .. tostring(errConfig))
+    end
+
     local okLoad, errLoad = pcall(self.loadFromSavegame, self)
     if not okLoad then
         print("[LivingMarket] FEHLER beim Laden des Spielstands: " .. tostring(errLoad))
@@ -1428,6 +1545,7 @@ function LivingMarket:deleteMap()
     self.hasLoggedStations = false
     self.hasLoggedPriceDebug = false
     self.consumables = nil
+    self.config = nil
     self.hasDirty = false
     self.syncTimer = 0
 end

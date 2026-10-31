@@ -6,7 +6,8 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 
 ## Funktionen
 
-- **Begrenzter Bedarf** pro Verkaufsstelle und Ware, Auffüllen jede Spielstunde
+- **Begrenzter Bedarf** pro Verkaufsstelle und Ware nach Warengruppen, z. B. Getreide 250.000 l (40 % Auffüllung je Monat), Lebensmittel 30.000 l (30 %), hochwertige Endprodukte 10.000 l (20 %)
+  - einstellbar in `modSettings/FS25_LivingMarket_config.xml` (wird beim ersten Start aus `config/defaultConfig.xml` angelegt)
 - **Preis folgt dem Bedarf:** ab 50 % freiem Bedarf Normalpreis, darunter immer stärker fallend bis −50 % (bei 10 % und weniger)
 - **Ausgenommen:** Produktionen, Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
 - **Eigene Seite im Ingame-Menü (ESC)**
@@ -35,6 +36,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 | `scripts/gui/LivingMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
 | `scripts/events/LivingMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
 | `gui/LivingMarketFrame.xml` | Layout und Profile der Menüseite |
+| `config/defaultConfig.xml` | Standardwerte: Warengruppen, Maximum und Auffüllung je Monat |
 | `languages/l10n_*.xml` | Texte in allen Sprachen |
 
 ## Fehlersuche

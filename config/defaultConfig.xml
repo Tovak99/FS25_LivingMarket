@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!--
+  Living Market - Grundwerte für den Bedarf der Verkaufsstationen
+
+  Beim ersten Start wird diese Datei nach
+      Dokumente/My Games/FarmingSimulator2025/modSettings/FS25_LivingMarket_config.xml
+  kopiert. Dort kannst du die Werte ändern; die Kopie wird nicht überschrieben.
+  Um auf die Standardwerte zurückzugehen: die Kopie löschen.
+
+  max            = höchster Bedarf je Station und Ware in Litern
+  refillPerMonth = Anteil vom Maximum, der sich je Spielmonat wieder auffüllt (0.40 = 40 %)
+                   (wird gleichmäßig auf die Spielstunden des Monats verteilt)
+  fillType name  = interner Name der Ware (wie in fillTypes.xml). Unbekannte Namen werden übersprungen.
+  Waren ohne Gruppe bekommen die Werte von <default>.
+-->
+<livingMarket version="1">
+    <default max="30000" refillPerMonth="0.30"/>
+
+    <groups>
+        <group name="grain" title="Getreide &amp; Ölsaaten" max="250000" refillPerMonth="0.40">
+            <fillType name="WHEAT"/> <fillType name="BARLEY"/> <fillType name="OAT"/> <fillType name="RYE"/>
+            <fillType name="TRITICALE"/> <fillType name="SPELT"/> <fillType name="SUMMERWHEAT"/> <fillType name="SUMMERBARLEY"/>
+            <fillType name="CANOLA"/> <fillType name="SUNFLOWER"/> <fillType name="SOYBEAN"/> <fillType name="MAIZE"/>
+            <fillType name="SORGHUM"/> <fillType name="RICE"/> <fillType name="RICELONGGRAIN"/> <fillType name="BUCKWHEAT"/>
+            <fillType name="HEMP"/> <fillType name="LINSEED"/> <fillType name="MUSTARD"/> <fillType name="POPPY"/>
+            <fillType name="LENTILS"/> <fillType name="PEA"/> <fillType name="CHICKPEAS"/> <fillType name="BROADBEAN"/>
+            <fillType name="MILLET"/> <fillType name="QUINOA"/>
+        </group>
+
+        <group name="roots" title="Hackfrüchte" max="200000" refillPerMonth="0.40">
+            <fillType name="POTATO"/> <fillType name="SUGARBEET"/> <fillType name="SUGARBEET_CUT"/> <fillType name="BEETROOT"/>
+            <fillType name="CARROT"/> <fillType name="PARSNIP"/> <fillType name="ONION"/> <fillType name="SUGARCANE"/>
+        </group>
+
+        <group name="forage" title="Futter &amp; Halmgut" max="80000" refillPerMonth="0.30">
+            <fillType name="GRASS_WINDROW"/> <fillType name="DRYGRASS_WINDROW"/> <fillType name="SILAGE"/> <fillType name="STRAW"/>
+            <fillType name="CHAFF"/> <fillType name="FIELDGRASS"/> <fillType name="ALFALFA_WINDROW"/> <fillType name="DRYALFALFA_WINDROW"/>
+            <fillType name="CLOVER_WINDROW"/> <fillType name="DRYCLOVER_WINDROW"/> <fillType name="FORAGE"/> <fillType name="FORAGE_MIXING"/>
+            <fillType name="HAY_PELLETS"/> <fillType name="STRAW_PELLETS"/> <fillType name="SOYBEANSTRAW"/> <fillType name="FLAX_WINDROW"/>
+            <fillType name="HEMP_WINDROW"/> <fillType name="PIGFOOD"/>
+        </group>
+
+        <group name="wood" title="Holz" max="100000" refillPerMonth="0.30">
+            <fillType name="WOODCHIPS"/> <fillType name="WOOD"/> <fillType name="ROUNDBALE_WOOD"/> <fillType name="BARKMULCH"/>
+        </group>
+
+        <group name="milk" title="Milch" max="60000" refillPerMonth="0.60">
+            <fillType name="MILK"/> <fillType name="GOATMILK"/> <fillType name="BUFFALOMILK"/>
+        </group>
+
+        <group name="intermediate" title="Zwischenprodukte" max="40000" refillPerMonth="0.35">
+            <fillType name="FLOUR"/> <fillType name="SUGAR"/> <fillType name="SUNFLOWER_OIL"/> <fillType name="CANOLA_OIL"/>
+            <fillType name="OLIVE_OIL"/> <fillType name="RICE_OIL"/> <fillType name="BUTTER"/> <fillType name="CREAM"/>
+            <fillType name="BRAN"/> <fillType name="RICEFLOUR"/> <fillType name="BOARDS"/> <fillType name="PLANKS"/>
+            <fillType name="WOODBEAM"/> <fillType name="CEMENT"/> <fillType name="CEMENTBRICKS"/> <fillType name="ROOFPLATES"/>
+            <fillType name="PAPERROLL"/> <fillType name="CARTONROLL"/> <fillType name="FABRIC"/> <fillType name="THREAD"/>
+        </group>
+
+        <group name="food" title="Lebensmittel" max="30000" refillPerMonth="0.30">
+            <fillType name="BREAD"/> <fillType name="CAKE"/> <fillType name="CHEESE"/> <fillType name="GRAPEJUICE"/>
+            <fillType name="CEREAL"/> <fillType name="NOODLESOUP"/> <fillType name="POTATOCHIPS"/> <fillType name="RAISINS"/>
+            <fillType name="SUGARBEET_SYRUP"/>
+        </group>
+
+        <group name="special" title="Tierprodukte &amp; Spezielles" max="15000" refillPerMonth="0.25">
+            <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/> <fillType name="GRAPE"/>
+            <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/> <fillType name="LETTUCE"/>
+            <fillType name="STRAWBERRY"/>
+        </group>
+
+        <group name="premium" title="Hochwertige Endprodukte" max="10000" refillPerMonth="0.20">
+            <fillType name="CHOCOLATE"/> <fillType name="CLOTHES"/> <fillType name="FURNITURE"/> <fillType name="PREFABWALL"/>
+            <fillType name="BATHTUB"/> <fillType name="BARREL"/> <fillType name="BUCKET"/>
+        </group>
+    </groups>
+</livingMarket>
