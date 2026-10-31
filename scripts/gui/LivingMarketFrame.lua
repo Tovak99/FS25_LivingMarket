@@ -671,7 +671,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
 
     if ware.sellable >= 1 then
         sellableText:setText(LivingMarket.formatLiters(ware.sellable))
-        setColor(sellableText, ware.sellable < ware.stock and COLOR_MID or COLOR_TEXT)   -- gelb: nicht alles passt rein
+        setColor(sellableText, COLOR_TEXT)
         revenueText:setText(LivingMarket.formatMoney(ware.revenue))
         setColor(revenueText, COLOR_GOOD)
     else
