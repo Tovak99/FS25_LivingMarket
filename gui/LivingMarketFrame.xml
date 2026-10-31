@@ -29,14 +29,15 @@
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
             <Button profile="lm_sortHeader" id="favHeader" position="14px 0px" text="*"/>
             <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-90px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="40px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortWare_bestMonth" position="515px 0px" text="$l10n_livingMarket_colBestMonth" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="330px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_deviation" position="420px 0px" text="$l10n_livingMarket_colDeviation" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortWare_station" position="900px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="750px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <!-- Reihenfolge: * · Ware · Lager · Verkaufbar · Preis / 1000 l · Markt · Erlös · Beste Station · Bester Preis · Bester Monat -->
+            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-80px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="55px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="200px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_deviation" position="295px 0px" text="$l10n_livingMarket_colDeviation" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="405px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_station" position="885px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="735px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_bestMonth" position="1215px 0px" text="$l10n_livingMarket_colBestMonth" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
@@ -50,15 +51,15 @@
                     <Text profile="lm_rowTextBold" name="fav" position="14px 0px"/>
                     <Bitmap profile="lm_wareIcon" name="icon" position="32px 0px"/>
                     <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
-                    <Text profile="lm_rowTextRight" name="stock" position="-90px 0px"/>
-                    <Text profile="lm_rowTextRight" name="highPrice" position="40px 0px"/>
-                    <Text profile="lm_rowText" name="bestMonth" position="515px 0px"/>
-                    <Bitmap profile="lm_trendIcon" name="trend" position="684px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="330px 0px"/>
-                    <Text profile="lm_rowTextRight" name="deviation" position="420px 0px"/>
-                    <Text profile="lm_rowText" name="station" position="900px 0px"/>
-                    <Text profile="lm_rowTextRight" name="sellable" position="750px 0px"/>
-                    <Text profile="lm_rowTextRight" name="revenue" position="940px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="-80px 0px"/>
+                    <Text profile="lm_rowTextRight" name="sellable" position="55px 0px"/>
+                    <Bitmap profile="lm_trendIcon" name="trend" position="540px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="200px 0px"/>
+                    <Text profile="lm_rowTextRight" name="deviation" position="295px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="405px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="885px 0px"/>
+                    <Text profile="lm_rowTextRight" name="highPrice" position="735px 0px"/>
+                    <Text profile="lm_rowText" name="bestMonth" position="1215px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
