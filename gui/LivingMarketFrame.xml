@@ -9,9 +9,9 @@
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
             <!-- Ansicht umschalten: Markt / Marktnachrichten / Verkäufe (aktive Ansicht grün; Position = rechte Textkante) -->
-            <Button profile="lm_viewButton" id="viewMarketButton" position="-1030px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
-            <Button profile="lm_viewButton" id="viewEventsButton" position="-760px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
-            <Button profile="lm_viewButton" id="viewSalesButton" position="-620px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
+            <Button profile="lm_viewButton" id="viewMarketButton" position="-880px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
+            <Button profile="lm_viewButton" id="viewEventsButton" position="-645px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
+            <Button profile="lm_viewButton" id="viewSalesButton" position="-510px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
 
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
@@ -221,7 +221,7 @@
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
             <position value="-20px 0px"/>
-            <size value="420px 48px"/>
+            <size value="320px 48px"/>
             <!-- Text linksbündig wie der Hinweistext; mittig gesetzt zeichnet das Spiel
                  den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
             <textAlignment value="left"/>
@@ -241,7 +241,7 @@
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
-            <size value="320px 30px"/>
+            <size value="280px 30px"/>
             <position value="15px 0px"/>
             <textAlignment value="left"/>
             <textVerticalAlignment value="middle"/>
@@ -371,7 +371,7 @@
         <Profile name="lm_filterButton" extends="lm_sortHeader">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-465px 0px"/>
+            <position value="-365px 0px"/>
             <textAlignment value="right"/>
             <textSize value="17px"/>
             <textColor value="0.212 0.376 0.012 1"/>
