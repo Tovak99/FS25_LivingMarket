@@ -469,14 +469,19 @@ function LivingMarket:getEntry(station, fillTypeIndex)
             baseMax    = baseMax,       -- aus der Konfiguration
             baseRefill = baseRefill,    -- Liter je Spielmonat
             noise      = self:rollNoise(),   -- kleine Schwankung des Bedarfs (±10 %), neu zu jedem Monat
+            refillNoise = self:rollRefillNoise(),   -- Schwankung der Auffüllung (±25 %), neu zu jedem Monat
             eventPrice = 1,             -- Preisfaktor durch Marktereignisse
             eventMax   = 1,             -- Bedarfsfaktor durch Marktereignisse
+            eventRefill = 1,            -- Auffüllfaktor durch Marktereignisse
             eventType  = 0,             -- 0 kein Ereignis, sonst LivingMarket.EVENT_*
         }
         -- Stand aus dem Spielstand übernehmen (falls vorhanden): Schwankung, Restbedarf
         local saved = self:takeSavedEntry(station, fillTypeIndex)
         if saved ~= nil and saved.noise ~= nil and saved.noise > 0 then
             entry.noise = saved.noise
+        end
+        if saved ~= nil and saved.refillNoise ~= nil and saved.refillNoise > 0 then
+            entry.refillNoise = saved.refillNoise
         end
         self:applyEventsToEntry(station, fillTypeIndex, entry)
         self:recalcEntryLimits(entry, false)
@@ -1727,6 +1732,7 @@ function LivingMarket:loadFromSavegame()
                     stationData.fillTypes[name] = {
                         remaining = remaining,
                         noise     = version >= 4 and getXMLFloat(xmlFile, fillTypeKey .. "#noise") or nil,
+                        refillNoise = getXMLFloat(xmlFile, fillTypeKey .. "#refillNoise"),
                     }
                     entryCount = entryCount + 1
                 end
@@ -1787,8 +1793,9 @@ function LivingMarket.saveToSavegame(missionInfo)
             if name ~= nil then
                 -- Gespeichert wird, was vom Standard abweicht: Restbedarf unter Maximum oder eine Schwankung
                 local differs = entry.remaining < entry.max or math.abs((entry.noise or 1) - 1) > 0.0005
+                    or math.abs((entry.refillNoise or 1) - 1) > 0.0005
                 if differs then
-                    toSave[key].fillTypes[name] = { remaining = entry.remaining, noise = entry.noise }
+                    toSave[key].fillTypes[name] = { remaining = entry.remaining, noise = entry.noise, refillNoise = entry.refillNoise }
                 else
                     toSave[key].fillTypes[name] = nil   -- alles Standard, muss nicht gespeichert werden
                 end
@@ -1818,6 +1825,9 @@ function LivingMarket.saveToSavegame(missionInfo)
                 setXMLFloat(xmlFile, fillTypeKey .. "#remaining", saved.remaining)
                 if saved.noise ~= nil then
                     setXMLFloat(xmlFile, fillTypeKey .. "#noise", saved.noise)
+                end
+                if saved.refillNoise ~= nil then
+                    setXMLFloat(xmlFile, fillTypeKey .. "#refillNoise", saved.refillNoise)
                 end
                 j = j + 1
                 entryCount = entryCount + 1

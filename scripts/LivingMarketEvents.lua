@@ -26,6 +26,7 @@ LivingMarket.EVENT_SETTINGS = {
     minMonths      = 1,
     maxMonths      = 2,
     noise          = 0.10,   -- kleine Schwankung des Bedarfs ±10 %
+    refillNoise    = 0.25,   -- eigene Schwankung der Auffüllung ±25 %
     weightShortage = 0.40,
     weightSurplus  = 0.35,   -- Rest: marktweit
     maxFactor = {
@@ -33,6 +34,13 @@ LivingMarket.EVENT_SETTINGS = {
         [2] = 0.6,   -- Überangebot
         [3] = 1.3,   -- Boom
         [4] = 0.7,   -- Flaute
+    },
+    -- zusätzlicher Faktor auf die Auffüllgeschwindigkeit (Anteil je Monat)
+    refillFactor = {
+        [1] = 1.5,   -- Engpass: Station verbraucht schneller
+        [2] = 0.5,   -- Überangebot: Lager leert sich kaum
+        [3] = 1.25,  -- Boom
+        [4] = 0.75,  -- Flaute
     },
 }
 
@@ -54,14 +62,22 @@ function LivingMarket:rollNoise()
     return 1 + randomRange(-n, n)
 end
 
+-- Schwankung der Auffüllgeschwindigkeit
+function LivingMarket:rollRefillNoise()
+    local n = self.EVENT_SETTINGS.refillNoise
+    return 1 + randomRange(-n, n)
+end
+
 -- Maximum/Auffüllung aus Grundwert × Schwankung × Ereignis.
+-- Die Auffüllung wächst mit dem Maximum und hat zusätzlich eigene Schwankung und Ereignisfaktor.
 -- keepShare = true: wächst das Maximum, wächst der freie Bedarf mit (Station braucht plötzlich mehr)
 function LivingMarket:recalcEntryLimits(entry, keepShare)
     local factor = (entry.noise or 1) * (entry.eventMax or 1)
     local oldMax = entry.max
     -- auf volle 100 Liter abrunden (28.171 l -> 28.100 l)
     entry.max = math.max(100, math.floor((entry.baseMax or entry.max or 0) * factor / 100) * 100)
-    entry.refill = (entry.baseRefill or entry.refill or 0) * factor
+    local refillFactor = factor * (entry.refillNoise or 1) * (entry.eventRefill or 1)
+    entry.refill = (entry.baseRefill or entry.refill or 0) * refillFactor
     if entry.remaining ~= nil then
         if keepShare and oldMax ~= nil and entry.max > oldMax then
             entry.remaining = entry.remaining + (entry.max - oldMax)
@@ -72,7 +88,7 @@ end
 
 -- Aktive Ereignisse auf einen Eintrag anwenden (Station + marktweit, Effekte werden multipliziert)
 function LivingMarket:applyEventsToEntry(station, fillTypeIndex, entry)
-    entry.eventPrice, entry.eventMax, entry.eventType = 1, 1, self.EVENT_NONE
+    entry.eventPrice, entry.eventMax, entry.eventRefill, entry.eventType = 1, 1, 1, self.EVENT_NONE
     if self.events == nil or #self.events == 0 then
         return
     end
@@ -87,6 +103,7 @@ function LivingMarket:applyEventsToEntry(station, fillTypeIndex, entry)
             if matches then
                 entry.eventPrice = entry.eventPrice * event.price
                 entry.eventMax = entry.eventMax * event.maxFactor
+                entry.eventRefill = entry.eventRefill * (self.EVENT_SETTINGS.refillFactor[event.type] or 1)
                 -- Stationsereignis hat Vorrang bei der Anzeige
                 if entry.eventType == self.EVENT_NONE or event.stationKey ~= nil then
                     entry.eventType = event.type
@@ -456,6 +473,7 @@ function LivingMarket:onPeriodChanged()
     for _, data in pairs(self.stations) do
         for _, entry in pairs(data) do
             entry.noise = self:rollNoise()
+            entry.refillNoise = self:rollRefillNoise()
         end
     end
     self:rollEventTarget()
