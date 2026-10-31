@@ -13,6 +13,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
   - Detailfenster mit allen Stationen der gewählten Ware: Preis, Frei / Maximum
   - Filter „Nur Lagerbestand“ und Suche nach Ware oder Station
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
+- **Speichert den Bedarf im Spielstand** (`livingMarket.xml` im Savegame-Ordner)
 - **Multiplayer-fähig aufgebaut:** Der Server verwaltet den Bedarf und synchronisiert ihn (noch ungetestet)
 
 ## Installation

@@ -215,6 +215,11 @@ function LivingMarket:getEntry(station, fillTypeIndex)
     if entry == nil then
         local max, refill = self:getLimitFor(station, fillTypeIndex)
         entry = { remaining = max, max = max, refill = refill }
+        -- Stand aus dem Spielstand übernehmen (falls vorhanden)
+        local saved = self:takeSavedRemaining(station, fillTypeIndex)
+        if saved ~= nil then
+            entry.remaining = math.max(0, math.min(saved, max))
+        end
         data[fillTypeIndex] = entry
     end
     return entry
@@ -845,10 +850,175 @@ function LivingMarket:addMenuPage()
 end
 
 -- ---------------------------------------------------------------------
+-- Spielstand: Restbedarf speichern und laden
+-- Datei: <Spielstand-Ordner>/livingMarket.xml
+-- Gespeichert wird nur, was vom Maximum abweicht (volle Einträge = Standard).
+-- ---------------------------------------------------------------------
+LivingMarket.SAVE_FILENAME = "livingMarket.xml"
+LivingMarket.SAVE_VERSION  = 1
+LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { [fillTypeName] = remaining } }
+
+-- Dauerhafte Kennung einer Station: uniqueId ihres Gebäudes (vom Spiel im Spielstand geführt).
+-- Rückfall für Stationen ohne Gebäude: Name der Station.
+function LivingMarket:getStationKey(station)
+    local placeable = station.owningPlaceable
+    if placeable ~= nil and placeable.getUniqueId ~= nil then
+        local ok, uniqueId = pcall(placeable.getUniqueId, placeable)
+        if ok and uniqueId ~= nil and uniqueId ~= "" then
+            return tostring(uniqueId)
+        end
+    end
+    return "name:" .. getStationName(station)
+end
+
+-- Gespeicherten Restbedarf abholen (und aus dem Zwischenspeicher entfernen)
+function LivingMarket:takeSavedRemaining(station, fillTypeIndex)
+    local stationData = self.savedData[self:getStationKey(station)]
+    if stationData == nil then
+        return nil
+    end
+    local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+    local remaining = fillTypeName ~= nil and stationData.fillTypes[fillTypeName] or nil
+    if remaining ~= nil then
+        stationData.fillTypes[fillTypeName] = nil
+    end
+    return remaining
+end
+
+function LivingMarket:loadFromSavegame()
+    self.savedData = {}
+    local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+    if not isServer() or missionInfo == nil or missionInfo.savegameDirectory == nil then
+        return
+    end
+
+    local path = missionInfo.savegameDirectory .. "/" .. self.SAVE_FILENAME
+    if not fileExists(path) then
+        log("kein gespeicherter Stand (%s) - alle Stationen starten voll", self.SAVE_FILENAME)
+        return
+    end
+
+    local xmlFile = loadXMLFile("LivingMarketSave", path)
+    if xmlFile == nil or xmlFile == 0 then
+        log("WARNUNG: %s konnte nicht gelesen werden", path)
+        return
+    end
+
+    local stationCount, entryCount = 0, 0
+    local i = 0
+    while true do
+        local stationKey = string.format("livingMarket.stations.station(%d)", i)
+        if not hasXMLProperty(xmlFile, stationKey) then
+            break
+        end
+        local id = getXMLString(xmlFile, stationKey .. "#id")
+        if id ~= nil then
+            local stationData = { name = getXMLString(xmlFile, stationKey .. "#name"), fillTypes = {} }
+            local j = 0
+            while true do
+                local fillTypeKey = string.format("%s.fillType(%d)", stationKey, j)
+                if not hasXMLProperty(xmlFile, fillTypeKey) then
+                    break
+                end
+                local name = getXMLString(xmlFile, fillTypeKey .. "#name")
+                local remaining = getXMLFloat(xmlFile, fillTypeKey .. "#remaining")
+                if name ~= nil and remaining ~= nil then
+                    stationData.fillTypes[name] = remaining
+                    entryCount = entryCount + 1
+                end
+                j = j + 1
+            end
+            self.savedData[id] = stationData
+            stationCount = stationCount + 1
+        end
+        i = i + 1
+    end
+    delete(xmlFile)
+    log("Spielstand geladen: %d Stationen, %d Einträge", stationCount, entryCount)
+end
+
+function LivingMarket.saveToSavegame(missionInfo)
+    local self = LivingMarket
+    if not isServer() or missionInfo == nil or not missionInfo.isValid or missionInfo.savegameDirectory == nil then
+        return
+    end
+
+    -- Alles sammeln: aktuelle Einträge + noch nicht abgerufene Werte aus dem letzten Laden
+    local toSave = {}   -- [stationKey] = { name = ..., fillTypes = { [name] = remaining } }
+    for key, stationData in pairs(self.savedData) do
+        toSave[key] = { name = stationData.name, fillTypes = {} }
+        for name, remaining in pairs(stationData.fillTypes) do
+            toSave[key].fillTypes[name] = remaining
+        end
+    end
+    for station, data in pairs(self.stations) do
+        local key = self:getStationKey(station)
+        toSave[key] = toSave[key] or { name = getStationName(station), fillTypes = {} }
+        toSave[key].name = getStationName(station)
+        for fillTypeIndex, entry in pairs(data) do
+            local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+            if name ~= nil then
+                if entry.remaining < entry.max then
+                    toSave[key].fillTypes[name] = entry.remaining
+                else
+                    toSave[key].fillTypes[name] = nil   -- voll = Standard, muss nicht gespeichert werden
+                end
+            end
+        end
+    end
+
+    local path = missionInfo.savegameDirectory .. "/" .. self.SAVE_FILENAME
+    local xmlFile = createXMLFile("LivingMarketSave", path, "livingMarket")
+    if xmlFile == nil or xmlFile == 0 then
+        log("WARNUNG: %s konnte nicht geschrieben werden", path)
+        return
+    end
+    setXMLInt(xmlFile, "livingMarket#version", self.SAVE_VERSION)
+
+    local i, entryCount = 0, 0
+    for key, stationData in pairs(toSave) do
+        local hasEntries = next(stationData.fillTypes) ~= nil
+        if hasEntries then
+            local stationKey = string.format("livingMarket.stations.station(%d)", i)
+            setXMLString(xmlFile, stationKey .. "#id", key)
+            setXMLString(xmlFile, stationKey .. "#name", stationData.name or "")
+            local j = 0
+            for name, remaining in pairs(stationData.fillTypes) do
+                local fillTypeKey = string.format("%s.fillType(%d)", stationKey, j)
+                setXMLString(xmlFile, fillTypeKey .. "#name", name)
+                setXMLFloat(xmlFile, fillTypeKey .. "#remaining", remaining)
+                j = j + 1
+                entryCount = entryCount + 1
+            end
+            i = i + 1
+        end
+    end
+
+    saveXMLFile(xmlFile)
+    delete(xmlFile)
+    log("Spielstand gespeichert: %d Stationen, %d Einträge", i, entryCount)
+end
+
+-- Beim Speichern des Spielstands mitspeichern (wie z. B. Courseplay für LS25)
+if FSCareerMissionInfo ~= nil and FSCareerMissionInfo.saveToXMLFile ~= nil then
+    FSCareerMissionInfo.saveToXMLFile = Utils.prependedFunction(FSCareerMissionInfo.saveToXMLFile, function(missionInfo, ...)
+        local ok, err = pcall(LivingMarket.saveToSavegame, missionInfo)
+        if not ok then
+            print("[LivingMarket] FEHLER beim Speichern: " .. tostring(err))
+        end
+    end)
+end
+
+-- ---------------------------------------------------------------------
 -- Mod-Event-Listener
 -- ---------------------------------------------------------------------
 function LivingMarket:loadMap(name)
     g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
+
+    local okLoad, errLoad = pcall(self.loadFromSavegame, self)
+    if not okLoad then
+        print("[LivingMarket] FEHLER beim Laden des Spielstands: " .. tostring(errLoad))
+    end
 
     local ok, err = pcall(self.addMenuPage, self)
     if not ok then
@@ -861,6 +1031,7 @@ end
 function LivingMarket:deleteMap()
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}
+    self.savedData = {}
     self.stationKind = {}
     self.stationNames = {}
     self.excludedCache = {}
