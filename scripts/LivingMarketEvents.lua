@@ -324,7 +324,7 @@ function LivingMarket:formatEventTime(absHour)
     end
     -- Jahr: wechselt mit Monat 1 der Spielzeit (currentPeriod 12 -> 1)
     local year = (env ~= nil and env.currentYear or 1) + math.floor((month - 1 + monthsAhead) / 12)
-    text = string.format("%s %s", text, string.format(g_i18n:getText("livingMarket_yearShort"), year))
+    text = string.format("%s %s", text, string.format(g_i18n:getText("livingMarket_year"), year))
     return string.format("%s %02d:00", text, hour)
 end
 

@@ -142,12 +142,12 @@
             <Button profile="lm_sortHeader" id="sortEvent_type" position="120px 0px" text="$l10n_livingMarket_colEvent" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortEvent_ware" position="264px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortEvent_station" position="480px 0px" text="$l10n_livingMarket_colStationEv" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortEvent_price" position="290px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortEvent_demand" position="390px 0px" text="$l10n_livingMarket_colDemand" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortEvent_refill" position="500px 0px" text="$l10n_livingMarket_colRefill" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_start" position="975px 0px" text="$l10n_livingMarket_colStart" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_finish" position="1100px 0px" text="$l10n_livingMarket_colEnd" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_status" position="1215px 0px" text="$l10n_livingMarket_colStatus" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortEvent_price" position="250px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortEvent_demand" position="350px 0px" text="$l10n_livingMarket_colDemand" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortEvent_refill" position="460px 0px" text="$l10n_livingMarket_colRefill" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_start" position="935px 0px" text="$l10n_livingMarket_colStart" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_finish" position="1085px 0px" text="$l10n_livingMarket_colEnd" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_status" position="1235px 0px" text="$l10n_livingMarket_colStatus" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="eventSortArrow"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
@@ -161,12 +161,12 @@
                     <Bitmap profile="lm_wareIcon" name="icon" position="230px 0px"/>
                     <Text profile="lm_rowTextBold" name="ware" position="264px 0px"/>
                     <Text profile="lm_rowText" name="station" position="480px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="290px 0px"/>
-                    <Text profile="lm_rowTextRight" name="demand" position="390px 0px"/>
-                    <Text profile="lm_rowTextRight" name="refill" position="500px 0px"/>
-                    <Text profile="lm_rowText" name="start" position="975px 0px"/>
-                    <Text profile="lm_rowText" name="end" position="1100px 0px"/>
-                    <Text profile="lm_rowText" name="status" position="1215px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="250px 0px"/>
+                    <Text profile="lm_rowTextRight" name="demand" position="350px 0px"/>
+                    <Text profile="lm_rowTextRight" name="refill" position="460px 0px"/>
+                    <Text profile="lm_rowText" name="start" position="935px 0px"/>
+                    <Text profile="lm_rowText" name="end" position="1085px 0px"/>
+                    <Text profile="lm_rowText" name="status" position="1235px 0px"/>
                 </ListItem>
             </SmoothList>
             <GuiElement profile="lm_sliderArea">
@@ -183,8 +183,8 @@
 
         <GuiElement profile="fs25_settingsControlsListHeader" id="saleHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
             <Button profile="lm_sortHeader" id="sortSale_time" position="20px 0px" text="$l10n_livingMarket_colTime" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortSale_ware" position="184px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortSale_station" position="420px 0px" text="$l10n_livingMarket_colStationEv" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortSale_ware" position="199px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortSale_station" position="430px 0px" text="$l10n_livingMarket_colStationEv" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortSale_amount" position="380px 0px" text="$l10n_livingMarket_colAmount" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortSale_price" position="500px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortSale_revenue" position="630px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
@@ -199,9 +199,9 @@
                 <ListItem profile="lm_listItem" name="sale">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowText" name="time" position="20px 0px"/>
-                    <Bitmap profile="lm_wareIcon" name="icon" position="150px 0px"/>
-                    <Text profile="lm_rowTextBold" name="ware" position="184px 0px"/>
-                    <Text profile="lm_rowText" name="station" position="420px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="165px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="199px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="430px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="500px 0px"/>
                     <Text profile="lm_rowTextRight" name="revenue" position="630px 0px"/>
