@@ -28,8 +28,10 @@ LivingMarket.config           = nil     -- { default = {max, refillPerMonth}, by
 -- Fruchtsorten, die nie begrenzt und nicht angezeigt werden (Name wie in fillTypes.xml).
 -- Geld/Bargeld: die Bank begrenzt auch nicht.
 LivingMarket.EXCLUDED_FILLTYPES = {
-    MONEY = true,
-    CASH  = true,
+    MONEY       = true,
+    CASH        = true,
+    SERVICE     = true,   -- Wartung: wird nur verteilt, nicht transportiert
+    MAINTENANCE = true,
 }
 
 -- ---------------------------------------------------------------------
@@ -200,6 +202,8 @@ function LivingMarket:isExcludedFillType(fillTypeIndex)
         excluded = self.EXCLUDED_FILLTYPES[name] == true
             or string.find(name, "MONEY", 1, true) ~= nil
             or string.find(name, "CASH", 1, true) ~= nil
+            or string.find(name, "SERVICE", 1, true) ~= nil
+            or string.find(name, "MAINTENANCE", 1, true) ~= nil
     end
 
     self.excludedCache[fillTypeIndex] = excluded

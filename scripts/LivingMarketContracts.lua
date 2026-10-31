@@ -200,7 +200,7 @@ end
 -- Kann man diese Ware an dieser Station wirklich verkaufen? (Preis > 0, Ware hat einen Grundpreis)
 -- Schließt z. B. Wartung, Wasser oder Wickelfolie aus, die manche Stationen annehmen, aber nicht bezahlen.
 function LivingMarket:isContractWareSellable(station, fillTypeIndex)
-    if station == nil or fillTypeIndex == nil then
+    if station == nil or fillTypeIndex == nil or self:isExcludedFillType(fillTypeIndex) then
         return false
     end
     if station.acceptedFillTypes ~= nil and not station.acceptedFillTypes[fillTypeIndex] then

@@ -470,6 +470,9 @@ end
 -- Neue Ereignisse kommen zufällig über den Monat verteilt, solange weniger als das Ziel laufen.
 -- Ereignis über eine Ware, die (an der Station) gar nicht verkauft werden kann?
 function LivingMarket:isEventWareSellable(event)
+    if self:isExcludedFillType(event.fillTypeIndex) then
+        return false
+    end
     if event.stationKey ~= nil then
         local station = self:findStationByKey(event.stationKey)
         return station == nil or self:isContractWareSellable(station, event.fillTypeIndex)
