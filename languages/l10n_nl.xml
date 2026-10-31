@@ -6,7 +6,6 @@
         <text name="livingMarket_colShare" text="Open"/>
         <text name="livingMarket_colMarket" text="Druk"/>
         <text name="livingMarket_colDeviation" text="Markt"/>
-        <text name="livingMarket_colBasePrice" text="Basisprijs"/>
         <text name="livingMarket_colHighPrice" text="Seizoenstop"/>
         <text name="livingMarket_colBestMonth" text="Maand"/>
         <text name="livingMarket_none" text="Geen verkooppunten gevonden"/>
@@ -58,7 +57,6 @@
         <text name="livingMarket_filterStock" text="Op voorraad"/>
         <text name="livingMarket_filterFav" text="Favorieten"/>
         <text name="livingMarket_noFavorites" text="Je hebt nog geen favorieten gemarkeerd."/>
-        <text name="livingMarket_stockLabel" text="Voorraad: %s"/>
         <text name="livingMarket_noStock" text="Je hebt niets op voorraad dat hier verkocht kan worden."/>
         <text name="livingMarket_colWare" text="Product"/>
         <text name="livingMarket_colStock" text="Voorraad"/>
@@ -66,7 +64,6 @@
         <text name="livingMarket_colPrice" text="Prijs"/>
         <text name="livingMarket_colSellable" text="Leverbaar"/>
         <text name="livingMarket_colRevenue" text="Opbrengst"/>
-        <text name="livingMarket_colFreeMax" text="Vrij / Maximum"/>
         <text name="livingMarket_colMax" text="Vraag"/>
         <text name="livingMarket_allFull" text="Alle verkooppunten vol"/>
         <text name="livingMarket_detailHint" text="Kies een product"/>

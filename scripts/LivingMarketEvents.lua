@@ -158,8 +158,27 @@ function LivingMarket:notify(text, isWarning)
     end
 end
 
+-- Meldung aus Schlüssel + Werten zusammensetzen (jeder Rechner in seiner Sprache)
+function LivingMarket:showNotification(key, stationName, fillTypeIndex, percent, months, isWarning)
+    local ware = fillTypeTitle(fillTypeIndex)
+    local text = g_i18n:getText(key)
+    if stationName ~= nil and stationName ~= "" then
+        text = string.format(text, stationName, ware, percent, months)
+    else
+        text = string.format(text, ware, percent, months)
+    end
+    self:notify(text, isWarning)
+end
+
+-- Ereignisliste an alle Mitspieler schicken (nur Server, nur im Multiplayer)
+function LivingMarket:broadcastEventList()
+    if g_server ~= nil and g_currentMission ~= nil and g_currentMission.missionDynamicInfo ~= nil
+        and g_currentMission.missionDynamicInfo.isMultiplayer and LivingMarketEventListEvent ~= nil then
+        g_server:broadcastEvent(LivingMarketEventListEvent.new(self.events))
+    end
+end
+
 function LivingMarket:announceEvent(event, phase)
-    local ware = fillTypeTitle(event.fillTypeIndex)
     local percent = math.floor(math.abs(event.price - 1) * 100 + 0.5)
     local key
     if phase == "end" then
@@ -173,13 +192,14 @@ function LivingMarket:announceEvent(event, phase)
     else
         key = phase == "announce" and "livingMarket_evSlumpAnnounce" or "livingMarket_evSlumpStart"
     end
-    local text = g_i18n:getText(key)
-    if event.stationKey ~= nil then
-        text = string.format(text, self:getEventStationName(event), ware, percent, event.months)
-    else
-        text = string.format(text, ware, percent, event.months)
+    local stationName = event.stationKey ~= nil and self:getEventStationName(event) or ""
+    local isWarning = event.type == self.EVENT_SURPLUS or event.type == self.EVENT_SLUMP
+    self:showNotification(key, stationName, event.fillTypeIndex, percent, event.months or 1, isWarning)
+    -- Mitspieler bekommen die Meldung als Schlüssel + Werte und setzen sie in ihrer Sprache zusammen
+    if g_server ~= nil and LivingMarketNotifyEvent ~= nil and g_currentMission.missionDynamicInfo ~= nil
+        and g_currentMission.missionDynamicInfo.isMultiplayer then
+        g_server:broadcastEvent(LivingMarketNotifyEvent.new(key, stationName, event.fillTypeIndex, percent, event.months or 1, isWarning))
     end
-    self:notify(text, event.type == self.EVENT_SURPLUS or event.type == self.EVENT_SLUMP)
 end
 
 -- ---------------------------------------------------------------------
@@ -406,6 +426,7 @@ function LivingMarket:tickEvents()
 
     if changed then
         self:applyEventsToAll()
+        self:broadcastEventList()
     end
 end
 
@@ -423,6 +444,7 @@ function LivingMarket:initEvents()
         end
     end
     self:applyEventsToAll()
+    self:broadcastEventList()
     log("Marktereignisse: %d (Ziel %d)", #self.events, self.eventTarget)
 end
 

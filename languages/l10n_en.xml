@@ -6,7 +6,6 @@
         <text name="livingMarket_colShare" text="Open"/>
         <text name="livingMarket_colMarket" text="Pressure"/>
         <text name="livingMarket_colDeviation" text="Market"/>
-        <text name="livingMarket_colBasePrice" text="Base price"/>
         <text name="livingMarket_colHighPrice" text="Seasonal high"/>
         <text name="livingMarket_colBestMonth" text="Month"/>
         <text name="livingMarket_none" text="No selling stations found"/>
@@ -58,7 +57,6 @@
         <text name="livingMarket_filterStock" text="In stock"/>
         <text name="livingMarket_filterFav" text="Favorites"/>
         <text name="livingMarket_noFavorites" text="You have not marked any favorites yet."/>
-        <text name="livingMarket_stockLabel" text="Stock: %s"/>
         <text name="livingMarket_noStock" text="You have nothing in stock that can be sold here."/>
         <text name="livingMarket_colWare" text="Goods"/>
         <text name="livingMarket_colStock" text="Stock"/>
@@ -66,7 +64,6 @@
         <text name="livingMarket_colPrice" text="Price"/>
         <text name="livingMarket_colSellable" text="Deliverable"/>
         <text name="livingMarket_colRevenue" text="Revenue"/>
-        <text name="livingMarket_colFreeMax" text="Free / Maximum"/>
         <text name="livingMarket_colMax" text="Demand"/>
         <text name="livingMarket_allFull" text="All stations full"/>
         <text name="livingMarket_detailHint" text="Select goods"/>

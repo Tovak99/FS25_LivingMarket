@@ -1243,6 +1243,7 @@ end
 
 function LivingMarket.onStationDelete(station)
     LivingMarket.stations[station] = nil
+    LivingMarket.stationKeys[station] = nil
     LivingMarket.stationKind[station] = nil
     LivingMarket.stationNames[station] = nil
 end
@@ -1290,6 +1291,22 @@ end
 -- Clients. Clients ändern nie selbst etwas, sie zeigen nur an.
 -- ---------------------------------------------------------------------
 LivingMarket.SYNC_INTERVAL = 1000   -- ms, geänderte Werte höchstens so oft senden
+LivingMarket.SYNC_CHUNK    = 200    -- Einträge je Netzwerkpaket (große Karten: mehrere Pakete)
+
+function LivingMarket.chunkEntries(entries)
+    local chunks, current = {}, {}
+    for _, e in ipairs(entries) do
+        table.insert(current, e)
+        if #current >= LivingMarket.SYNC_CHUNK then
+            table.insert(chunks, current)
+            current = {}
+        end
+    end
+    if #current > 0 then
+        table.insert(chunks, current)
+    end
+    return chunks
+end
 LivingMarket.syncTimer     = 0
 LivingMarket.hasDirty      = false
 
@@ -1377,8 +1394,11 @@ end
 -- Neuer Mitspieler: kompletten Stand schicken
 function LivingMarket.sendInitialClientState(mission, connection, user, farm)
     local entries = LivingMarket:collectSyncEntries(false)
-    if #entries > 0 then
-        connection:sendEvent(LivingMarketSyncEvent.new(entries))
+    for _, chunk in ipairs(LivingMarket.chunkEntries(entries)) do
+        connection:sendEvent(LivingMarketSyncEvent.new(chunk))
+    end
+    if LivingMarketEventListEvent ~= nil then
+        connection:sendEvent(LivingMarketEventListEvent.new(LivingMarket.events))
     end
 end
 
@@ -1412,7 +1432,9 @@ function LivingMarket:update(dt)
 
     local entries = self:collectSyncEntries(true)
     if #entries > 0 and g_server ~= nil then
-        g_server:broadcastEvent(LivingMarketSyncEvent.new(entries))
+        for _, chunk in ipairs(self.chunkEntries(entries)) do
+            g_server:broadcastEvent(LivingMarketSyncEvent.new(chunk))
+        end
     end
 end
 
@@ -1599,15 +1621,24 @@ LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { 
 
 -- Dauerhafte Kennung einer Station: uniqueId ihres Gebäudes (vom Spiel im Spielstand geführt).
 -- Rückfall für Stationen ohne Gebäude: Name der Station.
+LivingMarket.stationKeys = {}   -- Zwischenspeicher: [station] = Kennung
+
 function LivingMarket:getStationKey(station)
+    local cached = self.stationKeys[station]
+    if cached ~= nil then
+        return cached
+    end
+    local key = nil
     local placeable = station.owningPlaceable
     if placeable ~= nil and placeable.getUniqueId ~= nil then
         local ok, uniqueId = pcall(placeable.getUniqueId, placeable)
         if ok and uniqueId ~= nil and uniqueId ~= "" then
-            return tostring(uniqueId)
+            key = tostring(uniqueId)
         end
     end
-    return "name:" .. getStationName(station)
+    key = key or ("name:" .. getStationName(station))
+    self.stationKeys[station] = key
+    return key
 end
 
 -- Gespeicherten Eintrag abholen (und aus dem Zwischenspeicher entfernen)
@@ -1841,6 +1872,7 @@ function LivingMarket:deleteMap()
     self.savedData = {}
     self.stationKind = {}
     self.stationNames = {}
+    self.stationKeys = {}
     self.excludedCache = {}
     self.loggedMissionDeliveries = {}
     self.hasLoggedStock = false

@@ -240,7 +240,9 @@ local function getDeviationText(price, basePrice)
         return "-", COLOR_MUTED
     end
     local percent = (price / basePrice - 1) * 100
-    local text = string.format("%+.1f %%", percent):gsub("%.", ",")
+    -- Dezimaltrenner der eingestellten Sprache (z. B. "+1,8 %" deutsch, "+1.8 %" englisch)
+    local separator = (g_i18n ~= nil and g_i18n.decimalSeparator) or "."
+    local text = (string.gsub(string.format("%+.1f %%", percent), "%.", separator))
     return text, priceColor(price, basePrice)
 end
 

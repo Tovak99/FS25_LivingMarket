@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="113">
     <author>Tovak99</author>
-    <version>0.1.0.89</version>
+    <version>0.1.0.90</version>
     <title>
         <en>Living Market</en>
         <de>Lebendiger Markt</de>
@@ -28,6 +28,7 @@
     <extraSourceFiles>
         <sourceFile filename="scripts/DisableProfanityFilter.lua"/>
         <sourceFile filename="scripts/events/LivingMarketSyncEvent.lua"/>
+        <sourceFile filename="scripts/events/LivingMarketNewsEvents.lua"/>
         <sourceFile filename="scripts/gui/LivingMarketFrame.lua"/>
         <sourceFile filename="scripts/gui/LivingMarketLocationDialog.lua"/>
         <sourceFile filename="scripts/LivingMarket.lua"/>
