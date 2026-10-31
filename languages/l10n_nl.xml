@@ -52,6 +52,7 @@
         <text name="livingMarket_colTime" text="Tijd"/>
         <text name="livingMarket_colAmount" text="Hoeveelheid"/>
         <text name="livingMarket_noSales" text="Nog geen verkopen"/>
+        <text name="livingMarket_yearShort" text="J%d"/>
         <text name="livingMarket_year" text="Jaar %d"/>
         <text name="livingMarket_colRefill" text="Aanvulling"/>
         <text name="livingMarket_colStart" text="Begin"/>

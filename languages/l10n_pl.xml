@@ -52,6 +52,7 @@
         <text name="livingMarket_colTime" text="Czas"/>
         <text name="livingMarket_colAmount" text="Ilość"/>
         <text name="livingMarket_noSales" text="Brak sprzedaży"/>
+        <text name="livingMarket_yearShort" text="R%d"/>
         <text name="livingMarket_year" text="Rok %d"/>
         <text name="livingMarket_colRefill" text="Uzupełn."/>
         <text name="livingMarket_colStart" text="Początek"/>
