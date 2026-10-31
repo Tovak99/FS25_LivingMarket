@@ -100,7 +100,7 @@
                 <!-- Spalten bündig unter der Warenliste: Liefermenge, Preis, Marktlage (unter Markt), Erlös -->
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="175px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="300px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="415px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderCenter" id="sortDetail_market" position="590px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="525px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="660px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="755px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
@@ -122,7 +122,7 @@
                     <Text profile="lm_rowTextRight" name="price" position="300px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
                     <Bitmap profile="lm_trendIcon" name="trend" position="755px 0px"/>
-                    <Text profile="lm_rowTextRight" name="market" position="415px 0px"/>
+                    <Text profile="lm_rowTextCenter" name="market" position="590px 0px"/>
                     <Text profile="lm_rowTextRight" name="revenue" position="525px 0px"/>
                     <Text profile="lm_rowTextRight" name="max" position="660px 0px"/>
                     <Text profile="lm_rowTextRight" name="share" position="755px 0px"/>
@@ -433,6 +433,11 @@
             <textAlignment value="right"/>
         </Profile>
 
+        <!-- mittig: Textfeld 450 px breit, Mitte = position + 225 -->
+        <Profile name="lm_sortHeaderCenter" extends="lm_sortHeader">
+            <textAlignment value="center"/>
+        </Profile>
+
         <!-- Zeilen wie im Vorbild: abwechselnd dunkel/heller, ausgewählt in LS-Grün -->
         <!-- Zeilenhöhe: zweiter Wert von size (Spielstandard ca. 45px) -->
         <Profile name="lm_listItem" extends="fs25_settingsControlsListItem">
@@ -497,6 +502,10 @@
              position = gewünschter rechter Rand - 450 -->
         <Profile name="lm_rowTextRight" extends="lm_rowText">
             <textAlignment value="right"/>
+        </Profile>
+
+        <Profile name="lm_rowTextCenter" extends="lm_rowText">
+            <textAlignment value="center"/>
         </Profile>
 
         <Profile name="lm_emptyText" extends="fs25_textDefault" with="anchorTopLeft">

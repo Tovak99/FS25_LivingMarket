@@ -781,6 +781,9 @@ local function limitHeaderHitArea(button)
         if RenderText ~= nil and self.textAlignment == RenderText.ALIGN_RIGHT then
             x2 = self.absPosition[1] + self.absSize[1]
             x1 = x2 - width
+        elseif RenderText ~= nil and self.textAlignment == RenderText.ALIGN_CENTER then
+            x1 = self.absPosition[1] + (self.absSize[1] - width) / 2
+            x2 = x1 + width
         else
             x1 = self.absPosition[1]
             x2 = x1 + width
@@ -868,6 +871,8 @@ function LivingMarketFrame:placeSortArrow(arrow, header, asc)
     local textLeft = header.absPosition[1]
     if RenderText ~= nil and header.textAlignment == RenderText.ALIGN_RIGHT then
         textLeft = header.absPosition[1] + header.absSize[1] - textWidth
+    elseif RenderText ~= nil and header.textAlignment == RenderText.ALIGN_CENTER then
+        textLeft = header.absPosition[1] + (header.absSize[1] - textWidth) / 2
     end
     local x = textLeft - arrow.absSize[1] - SORT_ARROW_GAP
     local y = header.absPosition[2] + (header.absSize[2] - arrow.absSize[2]) / 2
