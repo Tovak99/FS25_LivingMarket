@@ -1383,10 +1383,15 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         return
     end
     local base = isSelected and COLOR_ON_GREEN or COLOR_TEXT
-    -- Frist gelb, wenn weniger als ein Monat bleibt
+    -- Frist rot bei weniger als 6 Spielstunden, gelb bei weniger als einem Monat
     local function deadlineColor(hour)
-        if hour ~= nil and hour - LivingMarket.getNowHour() < LivingMarket.getHoursPerMonth() then
-            return COLOR_MID
+        if hour ~= nil then
+            local left = hour - LivingMarket.getNowHour()
+            if left < 6 then
+                return COLOR_LOW
+            elseif left < LivingMarket.getHoursPerMonth() then
+                return COLOR_MID
+            end
         end
         return base
     end
