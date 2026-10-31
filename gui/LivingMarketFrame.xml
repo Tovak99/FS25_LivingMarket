@@ -14,6 +14,8 @@
 
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
+            <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
+            <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
 
             <!-- Suchfeld rechtsbündig neben dem Titel -->
             <TextInput profile="lm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">

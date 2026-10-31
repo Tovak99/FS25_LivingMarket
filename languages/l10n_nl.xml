@@ -51,6 +51,8 @@
         <text name="livingMarket_evPending" text="aangekondigd"/>
         <text name="livingMarket_allStations" text="Alle verkooppunten"/>
         <text name="livingMarket_noEvents" text="Er zijn momenteel geen marktgebeurtenissen."/>
+        <text name="livingMarket_evFilterStock" text="Leverbaar"/>
+        <text name="livingMarket_noEventsStock" text="Geen marktgebeurtenissen voor goederen die je op voorraad hebt."/>
         <text name="livingMarket_filterAll" text="Alle goederen"/>
         <text name="livingMarket_filterStock" text="Op voorraad"/>
         <text name="livingMarket_filterFav" text="Favorieten"/>

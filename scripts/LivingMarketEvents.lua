@@ -19,8 +19,8 @@ LivingMarket.EVENT_BOOM      = 3   -- marktweit gefragt
 LivingMarket.EVENT_SLUMP     = 4   -- marktweit Überangebot
 
 LivingMarket.EVENT_SETTINGS = {
-    minActive      = 3,      -- so viele Ereignisse sollen etwa gleichzeitig laufen (inkl. angekündigter)
-    maxActive      = 5,
+    minActive      = 10,     -- so viele Ereignisse sollen etwa gleichzeitig laufen (inkl. angekündigter)
+    maxActive      = 20,
     minPrice       = 0.10,   -- Preisänderung ±10..25 %
     maxPrice       = 0.25,
     minMonths      = 1,
@@ -385,9 +385,12 @@ function LivingMarket:tickEvents()
     end
     local missing = self.eventTarget - #self.events
     if missing > 0 then
-        -- Chance je Stunde so, dass fehlende Ereignisse im Lauf von etwa einem Drittel Monat kommen
+        -- Fehlende Ereignisse kommen verteilt im Lauf von etwa einem Drittel Monat:
+        -- je Stunde im Schnitt missing / window neue (ganzzahliger Teil sicher, Rest als Chance)
         local window = math.max(4, self.getHoursPerMonth() / 3)
-        if math.random() < missing / window then
+        local expected = missing / window
+        local count = math.floor(expected) + ((math.random() < expected % 1) and 1 or 0)
+        for _ = 1, math.min(count, missing) do
             if self:spawnEvent() then
                 changed = true
             end

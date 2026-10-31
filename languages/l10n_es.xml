@@ -51,6 +51,8 @@
         <text name="livingMarket_evPending" text="anunciado"/>
         <text name="livingMarket_allStations" text="Todos los puntos"/>
         <text name="livingMarket_noEvents" text="Actualmente no hay eventos de mercado."/>
+        <text name="livingMarket_evFilterStock" text="Entregable"/>
+        <text name="livingMarket_noEventsStock" text="No hay eventos para productos que tengas en stock."/>
         <text name="livingMarket_filterAll" text="Todos los productos"/>
         <text name="livingMarket_filterStock" text="En stock"/>
         <text name="livingMarket_filterFav" text="Favoritos"/>

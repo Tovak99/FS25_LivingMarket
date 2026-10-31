@@ -30,6 +30,7 @@ function LivingMarketFrame.new(target, customMt)
     self.searchText = ""
     self.filterMode = "stock"     -- Filter: "all" = alle Waren, "stock" = lagernd, "fav" = Favoriten
     self.viewMode = "market"      -- Ansicht: "market" = Warenliste + Details, "events" = Marktnachrichten
+    self.eventFilter = "stock"    -- Marktnachrichten: "all" = alle, "stock" = nur Waren, die man liefern kann
     self.eventRows = {}
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
@@ -605,6 +606,7 @@ end
 function LivingMarketFrame:setupSortHeaders()
     limitHeaderHitArea(self.filterButton)
     limitHeaderHitArea(self.viewMarketButton)
+    limitHeaderHitArea(self.eventFilterButton)
     limitHeaderHitArea(self.viewEventsButton)
     limitHeaderHitArea(self.detailTitle)
     for key in pairs(self.WARE_COLUMNS) do
@@ -799,7 +801,7 @@ function LivingMarketFrame:setViewMode(mode)
     if self.emptyText ~= nil and not showMarket then
         self.emptyText:setVisible(false)
     end
-    for _, element in ipairs({ self.eventFrame, self.eventHeader, self.eventArea }) do
+    for _, element in ipairs({ self.eventFrame, self.eventHeader, self.eventArea, self.eventFilterButton }) do
         if element ~= nil then
             element:setVisible(not showMarket)
         end
@@ -831,9 +833,34 @@ function LivingMarketFrame:setViewMode(mode)
     self:updateMenuButtons()
 end
 
+function LivingMarketFrame:onClickEventFilter()
+    self.eventFilter = self.eventFilter == "stock" and "all" or "stock"
+    self:refreshEvents()
+end
+
 function LivingMarketFrame:refreshEvents()
-    self.eventRows = LivingMarket:getEventList()
+    local rows = LivingMarket:getEventList()
+    -- Filter "Lieferbar": nur Waren mit eigenem Lagerbestand
+    if self.eventFilter == "stock" then
+        local stock = {}
+        for _, ware in ipairs(self.wares or {}) do
+            stock[ware.fillTypeIndex] = ware.stock or 0
+        end
+        local filtered = {}
+        for _, row in ipairs(rows) do
+            if (stock[row.fillTypeIndex] or 0) >= 1 then
+                table.insert(filtered, row)
+            end
+        end
+        rows = filtered
+    end
+    self.eventRows = rows
+
+    if self.eventFilterButton ~= nil then
+        self.eventFilterButton:setText(g_i18n:getText(self.eventFilter == "stock" and "livingMarket_evFilterStock" or "livingMarket_filterAll"))
+    end
     if self.eventEmptyText ~= nil then
+        self.eventEmptyText:setText(g_i18n:getText(self.eventFilter == "stock" and "livingMarket_noEventsStock" or "livingMarket_noEvents"))
         self.eventEmptyText:setVisible(self.viewMode == "events" and #self.eventRows == 0)
     end
     if self.eventList ~= nil then
