@@ -7,7 +7,7 @@
         <text name="livingMarket_colMarket" text="Presión"/>
         <text name="livingMarket_colDeviation" text="Mercado"/>
         <text name="livingMarket_colBasePrice" text="Precio base"/>
-        <text name="livingMarket_colHighPrice" text="Mejor precio"/>
+        <text name="livingMarket_colHighPrice" text="Máximo anual"/>
         <text name="livingMarket_colBestMonth" text="Mejor mes"/>
         <text name="livingMarket_none" text="No se encontraron puntos de venta"/>
         <text name="livingMarket_unknownStation" text="Punto de venta"/>

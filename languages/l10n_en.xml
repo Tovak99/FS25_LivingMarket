@@ -7,7 +7,7 @@
         <text name="livingMarket_colMarket" text="Pressure"/>
         <text name="livingMarket_colDeviation" text="Market"/>
         <text name="livingMarket_colBasePrice" text="Base price"/>
-        <text name="livingMarket_colHighPrice" text="Best price"/>
+        <text name="livingMarket_colHighPrice" text="Annual high"/>
         <text name="livingMarket_colBestMonth" text="Best month"/>
         <text name="livingMarket_none" text="No selling stations found"/>
         <text name="livingMarket_unknownStation" text="Selling station"/>
