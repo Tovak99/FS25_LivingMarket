@@ -134,14 +134,14 @@
             <pivot value="0 1"/>
             <position value="0px 0px"/>
             <size value="100% 100%"/>
-            <absoluteSizeOffset value="0px 300px"/>
+            <absoluteSizeOffset value="0px 190px"/>
         </Profile>
 
         <Profile name="lm_detailArea">
             <anchors value="0 1 0 0"/>
             <pivot value="0 0"/>
             <position value="0px 0px"/>
-            <size value="100% 300px"/>
+            <size value="100% 190px"/>
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
