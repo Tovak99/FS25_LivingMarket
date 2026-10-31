@@ -1191,7 +1191,9 @@ function LivingMarketFrame:populateEventCell(row, cell)
     -- nur die Werte zeigen, die das Ereignis tatsächlich ändert
     local refillEvent = isRefillEvent(row.type)
     put("price", refillEvent and "-" or string.format("%+d %%", row.pricePercent), refillEvent and COLOR_MUTED or typeColor)
-    put("demand", refillEvent and "-" or string.format("%d %%", math.floor(row.maxFactor * 100 + 0.5)), refillEvent and COLOR_MUTED or main)   -- z. B. 150 %
+    -- Bedarf: mehr als normal grün, weniger rot (wie der Preis)
+    local demandColor = (row.maxFactor or 1) > 1 and COLOR_GOOD or ((row.maxFactor or 1) < 1 and COLOR_LOW or main)
+    put("demand", refillEvent and "-" or string.format("%d %%", math.floor(row.maxFactor * 100 + 0.5)), refillEvent and COLOR_MUTED or demandColor)   -- z. B. 150 %
     put("refill", refillEvent and string.format("%+d %%", math.floor(((row.refillFactor or 1) - 1) * 100 + 0.5)) or "-",
         refillEvent and typeColor or COLOR_MUTED)
     put("start", row.startText, row.pending and COLOR_MID or main)
