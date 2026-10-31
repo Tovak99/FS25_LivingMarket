@@ -324,10 +324,13 @@ local function getEventText(eventType, eventPrice, eventRefill)
     if label == nil then
         return nil, nil
     end
-    local value = isRefillEvent(eventType) and eventRefill or eventPrice
+    local refill = isRefillEvent(eventType)
+    local value = refill and eventRefill or eventPrice
     local percent = math.floor(((value or 1) - 1) * 100 + 0.5)
     local color = isPositiveEvent(eventType) and COLOR_GOOD or COLOR_LOW
-    return string.format("%s %+d %%", g_i18n:getText(label), percent), color
+    -- z. B. "Engpass – Preis +24 %" bzw. "Nachgefragt – Verkäufe +23 %"
+    local what = g_i18n:getText(refill and "livingMarket_colRefill" or "livingMarket_colPrice")
+    return string.format("%s – %s %+d %%", g_i18n:getText(label), what, percent), color
 end
 
 local function formatPrice(pricePer1000)
