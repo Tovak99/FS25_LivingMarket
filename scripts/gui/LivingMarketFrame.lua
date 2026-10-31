@@ -1415,8 +1415,8 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)), base)
     else
         put("amount", LivingMarket.formatLiters(row.amount), base)
-        -- Frist, wenn das Angebot jetzt angenommen wird
-        local deadline = LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth()
+        -- feste Frist ab Erscheinen der Ausschreibung (ältere Angebote: ab jetzt)
+        local deadline = row.deadlineHour or (LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth())
         put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(deadline)), base)
     end
     put("price", formatPrice(row.price), base)
@@ -1459,7 +1459,7 @@ function LivingMarketFrame:onContractAction()
         LivingMarket:notify(string.format(g_i18n:getText("livingMarket_ctLimit"), s.maxActivePerFarm), true)
         return
     end
-    local deadline = LivingMarket:formatEventTime(LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth())
+    local deadline = LivingMarket:formatEventTime(row.deadlineHour or (LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth()))
     local value = row.amount / 1000 * row.price
     local text = string.format(g_i18n:getText("livingMarket_ctAcceptText"),
         LivingMarket.formatLiters(row.amount), row.wareTitle, row.stationName, deadline,

@@ -256,11 +256,11 @@ function LivingMarketContractListEvent:writeStream(streamId, connection)
         streamWriteFloat32(streamId, c.eventMarkup or 0)
         streamWriteUInt8(streamId, c.months or 1)
         streamWriteInt32(streamId, math.floor((c.offerEndHour or now) - now))
+        streamWriteInt32(streamId, math.floor((c.deadlineHour or now) - now))
         if c.state == "active" then
             streamWriteUInt8(streamId, c.farmId or 0)
             streamWriteFloat32(streamId, c.price or 0)
             streamWriteFloat32(streamId, c.bonus or 0)
-            streamWriteInt32(streamId, math.floor((c.deadlineHour or now) - now))
         end
     end
     local entries = {}
@@ -312,11 +312,11 @@ function LivingMarketContractListEvent:readStream(streamId, connection)
         c.eventMarkup   = streamReadFloat32(streamId)
         c.months        = streamReadUInt8(streamId)
         c.offerEndHour  = now + streamReadInt32(streamId)
+        c.deadlineHour  = now + streamReadInt32(streamId)
         if c.state == "active" then
             c.farmId       = streamReadUInt8(streamId)
             c.price        = streamReadFloat32(streamId)
             c.bonus        = streamReadFloat32(streamId)
-            c.deadlineHour = now + streamReadInt32(streamId)
         end
         table.insert(self.contracts, c)
     end

@@ -64,8 +64,8 @@
     <!-- Lieferverträge (Ausschreibungen der Stationen)
          enabled            = false schaltet neue Ausschreibungen ab
          minOffers/maxOffers = so viele offene Ausschreibungen gleichzeitig (jeden Monat neu gewählt)
-         offerMonths        = nicht angenommene Ausschreibung verfällt nach so vielen Monaten
-         minMonths/maxMonths = Frist ab Annahme in Monaten
+         offerMonths        = nicht angenommene Ausschreibung verfällt nach so vielen Monaten (spätestens zur Frist)
+         minMonths/maxMonths = Frist in Monaten, gerechnet ab Erscheinen der Ausschreibung
          minShare/maxShare  = Menge als Anteil vom Maximum der Station (auf 1000 l abgerundet)
          minMarkup/maxMarkup = Grundaufschlag auf den Marktpreis des Monats
          reputationMarkup   = zusätzlicher Aufschlag bei bestem Ansehen (5 Sterne)

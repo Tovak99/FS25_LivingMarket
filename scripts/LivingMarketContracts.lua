@@ -217,9 +217,13 @@ function LivingMarket:createContractOffer()
                         markup        = randomRange(s.minMarkup, s.maxMarkup),
                         eventMarkup   = positive and s.eventMarkup or 0,
                         months        = math.random(s.minMonths, math.max(s.minMonths, s.maxMonths)),
-                        offerEndHour  = self.getNowHour() + s.offerMonths * self.getHoursPerMonth(),
                         delivered     = 0,
                     }
+                    -- Frist zählt ab Erscheinen der Ausschreibung; annehmen geht bis zum Verfall
+                    -- (höchstens offerMonths, nie nach der Frist)
+                    local now = self.getNowHour()
+                    contract.deadlineHour = now + contract.months * self.getHoursPerMonth()
+                    contract.offerEndHour = math.min(contract.deadlineHour, now + s.offerMonths * self.getHoursPerMonth())
                     self.contractNextId = self.contractNextId + 1
                     return contract
                 end
@@ -364,7 +368,9 @@ function LivingMarket:acceptContract(id, farmId)
     contract.farmId = farmId
     contract.state = "active"
     contract.delivered = 0
-    contract.deadlineHour = self.getNowHour() + contract.months * self.getHoursPerMonth()
+    if contract.deadlineHour == nil then   -- ältere Angebote ohne feste Frist
+        contract.deadlineHour = self.getNowHour() + contract.months * self.getHoursPerMonth()
+    end
     self:contractsChanged()
     return true
 end
@@ -621,9 +627,11 @@ function LivingMarket:saveContractsToXML(xmlFile, baseKey)
                 setXMLInt(xmlFile, key .. "#farm", contract.farmId)
                 setXMLFloat(xmlFile, key .. "#price", contract.price or 0)
                 setXMLFloat(xmlFile, key .. "#bonus", contract.bonus or 0)
-                setXMLInt(xmlFile, key .. "#deadlineIn", math.floor((contract.deadlineHour or now) - now))
             else
                 setXMLInt(xmlFile, key .. "#offerEndIn", math.floor((contract.offerEndHour or now) - now))
+            end
+            if contract.deadlineHour ~= nil then
+                setXMLInt(xmlFile, key .. "#deadlineIn", math.floor(contract.deadlineHour - now))
             end
             i = i + 1
         end
@@ -690,9 +698,14 @@ function LivingMarket:loadContractsFromXML(xmlFile, baseKey)
                 contract.farmId = getXMLInt(xmlFile, key .. "#farm")
                 contract.price = getXMLFloat(xmlFile, key .. "#price")
                 contract.bonus = getXMLFloat(xmlFile, key .. "#bonus")
-                contract.deadlineHour = now + (getXMLInt(xmlFile, key .. "#deadlineIn") or 0)
             else
                 contract.offerEndHour = now + (getXMLInt(xmlFile, key .. "#offerEndIn") or 0)
+            end
+            local deadlineIn = getXMLInt(xmlFile, key .. "#deadlineIn")
+            if deadlineIn ~= nil then
+                contract.deadlineHour = now + deadlineIn
+            elseif contract.state == "active" then
+                contract.deadlineHour = now
             end
             self.contractNextId = math.max(self.contractNextId, contract.id + 1)
             table.insert(self.contracts, contract)
