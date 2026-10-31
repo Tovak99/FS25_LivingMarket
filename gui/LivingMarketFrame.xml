@@ -81,7 +81,8 @@
             <ThreePartBitmap profile="lm_tableFrameBottom" id="detailFrame"/>
 
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-                <!-- erste Spalte: Name der gewählten Ware -->
+                <!-- erste Spalte: Icon und Name der gewählten Ware -->
+                <Bitmap profile="lm_wareIcon" id="detailIcon" position="18px 0px" visible="false"/>
                 <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="190px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="330px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>

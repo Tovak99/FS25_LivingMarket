@@ -313,6 +313,15 @@ function LivingMarketFrame:updateDetail(ware)
     end
     self.selectedFillType = ware ~= nil and ware.fillTypeIndex or self.selectedFillType
 
+    -- Icon der Ware im Kopf des Detailfensters
+    if self.detailIcon ~= nil then
+        if ware ~= nil then
+            setWareIcon(self.detailIcon, ware.fillTypeIndex)
+        else
+            self.detailIcon:setVisible(false)
+        end
+    end
+
     self:updateSortHeaders()
 
     self.detailList:reloadData(true)
