@@ -113,3 +113,47 @@ function LivingMarketNotifyEvent:run(connection)
         LivingMarket:showNotification(self.key, self.stationName, self.fillTypeIndex, self.percent, self.months, self.isWarning)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Favoriten (gemeinsam für alle): komplette Liste der Warennamen.
+-- Mitspieler -> Server: Server übernimmt und schickt an alle anderen weiter.
+-- Server -> Mitspieler: Mitspieler übernimmt.
+-- ---------------------------------------------------------------------
+LivingMarketFavoritesEvent = {}
+local LivingMarketFavoritesEvent_mt = Class(LivingMarketFavoritesEvent, Event)
+InitEventClass(LivingMarketFavoritesEvent, "LivingMarketFavoritesEvent")
+
+function LivingMarketFavoritesEvent.emptyNew()
+    return Event.new(LivingMarketFavoritesEvent_mt)
+end
+
+function LivingMarketFavoritesEvent.new(names)
+    local self = LivingMarketFavoritesEvent.emptyNew()
+    self.names = names or {}
+    return self
+end
+
+function LivingMarketFavoritesEvent:writeStream(streamId, connection)
+    local count = math.min(#self.names, 1000)
+    streamWriteUInt16(streamId, count)
+    for i = 1, count do
+        streamWriteString(streamId, self.names[i])
+    end
+end
+
+function LivingMarketFavoritesEvent:readStream(streamId, connection)
+    self.names = {}
+    local count = streamReadUInt16(streamId)
+    for _ = 1, count do
+        table.insert(self.names, streamReadString(streamId))
+    end
+    self:run(connection)
+end
+
+function LivingMarketFavoritesEvent:run(connection)
+    LivingMarket:setFavoriteNames(self.names)
+    if not connection:getIsServer() and g_server ~= nil then
+        -- kam von einem Mitspieler: an alle anderen weitergeben
+        g_server:broadcastEvent(LivingMarketFavoritesEvent.new(self.names), nil, connection)
+    end
+end
