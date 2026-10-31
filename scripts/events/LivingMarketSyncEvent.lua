@@ -34,6 +34,7 @@ function LivingMarketSyncEvent:writeStream(streamId, connection)
         streamWriteFloat32(streamId, e.refill)
         streamWriteFloat32(streamId, e.eventPrice or 1)
         streamWriteFloat32(streamId, e.eventRefill or 1)
+        streamWriteFloat32(streamId, e.eventMax or 1)
         streamWriteUInt8(streamId, e.eventType or 0)
     end
 end
@@ -50,6 +51,7 @@ function LivingMarketSyncEvent:readStream(streamId, connection)
         e.refill        = streamReadFloat32(streamId)
         e.eventPrice    = streamReadFloat32(streamId)
         e.eventRefill   = streamReadFloat32(streamId)
+        e.eventMax      = streamReadFloat32(streamId)
         e.eventType     = streamReadUInt8(streamId)
         table.insert(self.entries, e)
     end
