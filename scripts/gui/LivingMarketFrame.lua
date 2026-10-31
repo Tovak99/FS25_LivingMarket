@@ -362,7 +362,8 @@ LivingMarketFrame.DETAIL_COLUMNS = {
     name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
     price  = { label = "livingMarket_colPrice",     isText = false },
     market = { label = "livingMarket_colMarket",    isText = false },
-    amount = { label = "livingMarket_colFreeMax",   isText = false },
+    amount = { label = "livingMarket_colSellable",  isText = false },
+    max    = { label = "livingMarket_colMax",       isText = false },
     share  = { label = "livingMarket_colShare",     isText = false },
 }
 
@@ -411,6 +412,8 @@ local function stationValue(station, key)
         return station.deviation
     elseif key == "amount" then
         return station.remaining
+    elseif key == "max" then
+        return station.max
     elseif key == "share" then
         return station.share
     end
@@ -876,7 +879,12 @@ function LivingMarketFrame:populateStationCell(station, cell)
 
     nameText:setText(station.name)
     priceText:setText(formatPrice(station.price))
-    amountText:setText(string.format("%s / %s", LivingMarket.formatLiters(station.remaining), LivingMarket.formatLiters(station.max)))
+    amountText:setText(LivingMarket.formatLiters(station.remaining))
+    local maxText = cell:getAttribute("max")
+    if maxText ~= nil then
+        maxText:setText(LivingMarket.formatLiters(station.max))
+        setColor(maxText, isFull and COLOR_MUTED or COLOR_TEXT)
+    end
     shareText:setText(string.format("%d %%", math.floor(station.share * 100 + 0.5)))
 
     -- Volle Stationen ausgegraut

@@ -30,6 +30,7 @@
         <text name="livingMarket_colSellable" text="Entregable"/>
         <text name="livingMarket_colRevenue" text="Ingresos"/>
         <text name="livingMarket_colFreeMax" text="Libre / Máximo"/>
+        <text name="livingMarket_colMax" text="Máximo"/>
         <text name="livingMarket_allFull" text="Todos los puntos llenos"/>
         <text name="livingMarket_detailHint" text="Elige un producto"/>
     </texts>

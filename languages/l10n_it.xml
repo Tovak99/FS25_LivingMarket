@@ -30,6 +30,7 @@
         <text name="livingMarket_colSellable" text="Consegnabile"/>
         <text name="livingMarket_colRevenue" text="Ricavo"/>
         <text name="livingMarket_colFreeMax" text="Libero / Massimo"/>
+        <text name="livingMarket_colMax" text="Massimo"/>
         <text name="livingMarket_allFull" text="Tutti i punti vendita pieni"/>
         <text name="livingMarket_detailHint" text="Scegli un prodotto"/>
     </texts>
