@@ -568,7 +568,15 @@ function LivingMarket:getEntry(station, fillTypeIndex)
         self:recalcEntryLimits(entry, false)
         entry.remaining = entry.max
         if saved ~= nil and saved.remaining ~= nil then
-            entry.remaining = math.max(0, math.min(saved.remaining, entry.max))
+            local remaining = saved.remaining
+            if saved.baseMax == nil then
+                -- Spielstand vor 0.2.1.29 (ohne gespeicherten Grundwert): einmalig voll
+                remaining = entry.max
+            elseif saved.baseMax > 0 and math.abs(saved.baseMax - (entry.baseMax or 0)) > 0.5 then
+                -- Grundwert in der Konfiguration geändert: freie Menge anteilig umrechnen
+                remaining = remaining * (entry.baseMax or 0) / saved.baseMax
+            end
+            entry.remaining = math.max(0, math.min(remaining, entry.max))
         end
         data[fillTypeIndex] = entry
     end
@@ -1896,6 +1904,7 @@ function LivingMarket:loadFromSavegame()
                         remaining = remaining,
                         noise     = version >= 4 and getXMLFloat(xmlFile, fillTypeKey .. "#noise") or nil,
                         refillNoise = getXMLFloat(xmlFile, fillTypeKey .. "#refillNoise"),
+                        baseMax   = getXMLFloat(xmlFile, fillTypeKey .. "#baseMax"),
                     }
                     entryCount = entryCount + 1
                 end
@@ -1972,7 +1981,7 @@ function LivingMarket.saveToSavegame(missionInfo)
                 local differs = entry.remaining < entry.max or math.abs((entry.noise or 1) - 1) > 0.0005
                     or math.abs((entry.refillNoise or 1) - 1) > 0.0005
                 if differs then
-                    toSave[key].fillTypes[name] = { remaining = entry.remaining, noise = entry.noise, refillNoise = entry.refillNoise }
+                    toSave[key].fillTypes[name] = { remaining = entry.remaining, noise = entry.noise, refillNoise = entry.refillNoise, baseMax = entry.baseMax }
                 else
                     toSave[key].fillTypes[name] = nil   -- alles Standard, muss nicht gespeichert werden
                 end
@@ -2005,6 +2014,9 @@ function LivingMarket.saveToSavegame(missionInfo)
                 end
                 if saved.refillNoise ~= nil then
                     setXMLFloat(xmlFile, fillTypeKey .. "#refillNoise", saved.refillNoise)
+                end
+                if saved.baseMax ~= nil then
+                    setXMLFloat(xmlFile, fillTypeKey .. "#baseMax", saved.baseMax)   -- Grundwert aus der Konfiguration beim Speichern
                 end
                 j = j + 1
                 entryCount = entryCount + 1
