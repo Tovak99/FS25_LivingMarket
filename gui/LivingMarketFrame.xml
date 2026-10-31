@@ -105,7 +105,7 @@
                 <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="660px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="755px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeader" id="detailEventHeader" position="215px 0px" text="$l10n_livingMarket_colEvent"/>
-                <Button profile="lm_sortHeaderRight" id="detailEffectHeader" position="75px 0px" text="$l10n_livingMarket_colEffect"/>
+                <Button profile="lm_sortHeader" id="detailEffectHeader" position="325px 0px" text="$l10n_livingMarket_colEffect"/>
                 <Button profile="lm_sortHeader" id="detailStarsHeader" position="1225px 0px" text="$l10n_livingMarket_colReputation"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
@@ -117,7 +117,7 @@
                     <Text profile="lm_rowTextBold" name="name" position="66px 0px"/>
                     <!-- Marktereignis der Station in zwei Spalten: "Engpass" | "Preis +24 % · Bedarf +50 %" (rechte Kante 525) -->
                     <Text profile="lm_rowText" name="event" position="215px 0px"/>
-                    <Text profile="lm_rowTextRight" name="eventEffect" position="75px 0px"/>
+                    <Text profile="lm_rowText" name="eventEffect" position="325px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="175px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="300px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
