@@ -26,12 +26,12 @@
         <ThreePartBitmap profile="lm_tableFrameTop" id="wareFrame"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Button profile="lm_sortHeader" id="sortWare_title" position="50px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="20px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="230px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortWare_station" position="730px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="720px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_title" position="60px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="30px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="240px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_station" position="740px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="730px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="950px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
@@ -39,7 +39,7 @@
         <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (lm_wareArea).
              Die Liste darin verhält sich wie vorher auf der ganzen Seite. -->
         <GuiElement profile="lm_wareArea">
-            <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="110px 60px" selectOnClick="false" onClick="onClickWare">
+            <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Bitmap profile="lm_wareIcon" name="icon"/>
@@ -70,15 +70,15 @@
 
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
-                <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="510px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="770px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeader" id="detailTitle" position="60px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="520px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="780px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="950px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
-            <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="110px 60px" selectOnClick="false">
+            <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
@@ -153,7 +153,7 @@
             <pivot value="0 0"/>
             <position value="13px 292px"/>
             <size value="100% 100%"/>
-            <absoluteSizeOffset value="74px 304px"/>
+            <absoluteSizeOffset value="55px 304px"/>
         </Profile>
 
         <Profile name="lm_tableFrameBottom" extends="lm_rowBg">
@@ -161,7 +161,7 @@
             <pivot value="0 0"/>
             <position value="13px -8px"/>
             <size value="100% 100%"/>
-            <absoluteSizeOffset value="74px 4px"/>
+            <absoluteSizeOffset value="55px 4px"/>
         </Profile>
 
         <!-- Scrollbalken: rechts im Tabellenrahmen, so hoch wie die Liste (60px unter der
@@ -169,7 +169,7 @@
         <Profile name="lm_sliderArea">
             <anchors value="1 1 0 1"/>
             <pivot value="1 0"/>
-            <position value="-66px 0px"/>
+            <position value="-50px 0px"/>
             <size value="14px 100%"/>
             <absoluteSizeOffset value="0px 60px"/>
         </Profile>
