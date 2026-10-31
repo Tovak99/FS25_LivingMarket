@@ -21,7 +21,7 @@ LivingMarket.DEBUG          = false   -- true: Testknöpfe im Menü und ausführ
 -- Bedarf je Ware: kommt aus der Konfigurationsdatei (config/defaultConfig.xml bzw. die Kopie
 -- in modSettings). Diese Werte gelten nur, falls keine Datei gelesen werden kann.
 LivingMarket.CONFIG_FILENAME  = "FS25_LivingMarket_config.xml"
-LivingMarket.FALLBACK_MAX     = 30000   -- Liter
+LivingMarket.FALLBACK_MAX     = 60000   -- Liter
 LivingMarket.FALLBACK_REFILL  = 0.30    -- Anteil vom Maximum je Spielmonat
 LivingMarket.config           = nil     -- { default = {max, refillPerMonth}, byFillType = {[index] = {max, refillPerMonth, group}} }
 
@@ -307,6 +307,26 @@ function LivingMarket:loadConfig()
     local defaultPath = Utils.getFilename("config/defaultConfig.xml", self.modDir)
     local dir = self:getModSettingsDir()
     local userPath = dir ~= nil and (dir .. self.CONFIG_FILENAME) or nil
+
+    -- Ältere Kopie (kleinere Version als die Standarddatei): als ..._old.xml sichern und neu anlegen
+    if userPath ~= nil and fileExists(userPath) and copyFile ~= nil then
+        local function readVersion(file)
+            local xml = loadXMLFile("LivingMarketConfigVersion", file)
+            if xml == nil or xml == 0 then
+                return nil
+            end
+            local version = getXMLInt(xml, "livingMarket#version") or 1
+            delete(xml)
+            return version
+        end
+        local userVersion, defaultVersion = readVersion(userPath), readVersion(defaultPath)
+        if userVersion ~= nil and defaultVersion ~= nil and userVersion < defaultVersion then
+            local backupPath = dir .. string.gsub(self.CONFIG_FILENAME, "%.xml$", "_old.xml")
+            pcall(copyFile, userPath, backupPath, true)
+            pcall(copyFile, defaultPath, userPath, true)
+            print(string.format("[LivingMarket] Konfiguration auf Version %d aktualisiert, alte Datei gesichert: %s", defaultVersion, backupPath))
+        end
+    end
 
     -- Beim ersten Start die Standarddatei nach modSettings kopieren, damit man sie anpassen kann
     if userPath ~= nil and not fileExists(userPath) and copyFile ~= nil then
