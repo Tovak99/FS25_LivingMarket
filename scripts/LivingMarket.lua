@@ -1102,8 +1102,17 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
         return 0
     end
 
+    -- Verkaufsprotokoll (DEBUG): Preis vor dem Abladen und tatsächlich gutgeschriebenes Geld
+    local farm = (LivingMarket.DEBUG and g_farmManager ~= nil) and g_farmManager:getFarmById(farmId) or nil
+    local moneyBefore = farm ~= nil and farm.money or nil
+    local priceBefore = LivingMarket:getPricePer1000(station, fillTypeIndex)
+
     local moved = superFunc(station, farmId, allowed, fillTypeIndex, ...)
     local used = moved or allowed
+
+    if moneyBefore ~= nil then
+        LivingMarket:trackSale(station, fillTypeIndex, used, farm.money - moneyBefore, priceBefore)
+    end
     entry.remaining = math.max(entry.remaining - used, 0)
     LivingMarket:markDirty(entry)
     return moved
@@ -1116,6 +1125,41 @@ function LivingMarket.getEffectiveFillTypePrice(station, superFunc, fillTypeInde
         return price
     end
     return price * LivingMarket:getPriceFactor(station, fillTypeIndex)
+end
+
+-- Verkäufe sammeln und nach kurzer Pause zusammengefasst ins Log schreiben
+LivingMarket.saleLog = {}
+
+function LivingMarket:trackSale(station, fillTypeIndex, liters, money, pricePer1000)
+    local key = tostring(station) .. "/" .. tostring(fillTypeIndex)
+    local sale = self.saleLog[key]
+    if sale == nil then
+        sale = { station = station, fillTypeIndex = fillTypeIndex, liters = 0, money = 0,
+                 firstPrice = pricePer1000, entry = self:getEntry(station, fillTypeIndex) }
+        sale.startShare = sale.entry ~= nil and sale.entry.max > 0 and (sale.entry.remaining + liters) / sale.entry.max or nil
+        self.saleLog[key] = sale
+    end
+    sale.liters = sale.liters + liters
+    sale.money = sale.money + money
+    sale.lastPrice = pricePer1000
+    sale.idle = 0
+end
+
+function LivingMarket:flushSaleLog(dt)
+    for key, sale in pairs(self.saleLog) do
+        sale.idle = (sale.idle or 0) + dt
+        if sale.idle > 5000 then   -- 5 s keine Lieferung mehr: Abladen beendet
+            local priceAfter = self:getPricePer1000(sale.station, sale.fillTypeIndex)
+            local paid = sale.liters > 0 and sale.money / sale.liters * 1000 or 0
+            local shareAfter = sale.entry ~= nil and sale.entry.max > 0 and sale.entry.remaining / sale.entry.max or nil
+            log("Verkauf '%s' %s: %.0f l, Geld %+.0f, bezahlt %.1f je 1000 l | Preis beim ersten Liter %.1f, beim letzten %.1f, jetzt %.1f | frei %s -> %s",
+                getStationName(sale.station), tostring(g_fillTypeManager:getFillTypeNameByIndex(sale.fillTypeIndex)),
+                sale.liters, sale.money, paid, sale.firstPrice or 0, sale.lastPrice or 0, priceAfter,
+                sale.startShare ~= nil and string.format("%.0f %%", sale.startShare * 100) or "?",
+                shareAfter ~= nil and string.format("%.0f %%", shareAfter * 100) or "?")
+            self.saleLog[key] = nil
+        end
+    end
 end
 
 function LivingMarket.onStationDelete(station)
@@ -1254,6 +1298,9 @@ if FSBaseMission ~= nil and FSBaseMission.sendInitialClientState ~= nil then
 end
 
 function LivingMarket:update(dt)
+    if next(self.saleLog) ~= nil then
+        self:flushSaleLog(dt)
+    end
     if not self.hasDirty then
         return
     end
