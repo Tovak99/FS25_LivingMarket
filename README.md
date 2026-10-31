@@ -9,6 +9,11 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 - **Begrenzter Bedarf** pro Verkaufsstelle und Ware nach Warengruppen, z. B. Getreide 250.000 l (40 % Auffüllung je Monat), Lebensmittel 30.000 l (30 %), hochwertige Endprodukte 10.000 l (20 %)
   - einstellbar in `modSettings/FS25_LivingMarket_config.xml` (wird beim ersten Start aus `config/defaultConfig.xml` angelegt)
 - **Preis folgt dem Bedarf:** ab 50 % freiem Bedarf Normalpreis, darunter immer stärker fallend bis −50 % (bei 10 % und weniger)
+- **Marktereignisse** (etwa 3–5 gleichzeitig, je 1–2 Monate, mit Meldung):
+  - Engpass an einer Station: mehr Bedarf, Preis +10–25 %
+  - Überangebot an einer Station: weniger Bedarf, Preis −10–25 %
+  - marktweit gefragt oder Flaute für eine Ware (einen Monat vorher angekündigt)
+  - dazu kleine Schwankungen des Bedarfs (±10 %) zu jedem Monat
 - **Ausgenommen:** Produktionen, Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
 - **Eigene Seite im Ingame-Menü (ESC)**
   - eine Zeile pro Ware: Lager, beste Station (höchster Preis *mit freiem Bedarf*), Preis je 1000 l, verkaufbare Menge, Erlös
@@ -33,6 +38,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 |---|---|
 | `modDesc.xml` | Mod-Beschreibung, Version, Skripte, Sprachen |
 | `scripts/LivingMarket.lua` | Kernlogik: Bedarf, Hooks auf `SellingStation`, Lager, Preise, Menüseite einhängen |
+| `scripts/LivingMarketEvents.lua` | Marktereignisse und Schwankungen |
 | `scripts/gui/LivingMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
 | `scripts/events/LivingMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
 | `gui/LivingMarketFrame.xml` | Layout und Profile der Menüseite |

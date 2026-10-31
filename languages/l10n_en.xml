@@ -17,6 +17,19 @@
         <text name="livingMarket_favAdd" text="Add to favorites"/>
         <text name="livingMarket_favRemove" text="Remove from favorites"/>
         <text name="livingMarket_testRefill" text="Test: refill 1 in-game hour"/>
+        <text name="livingMarket_evShortage" text="Shortage: %s urgently needs %s – price +%d %% for %d month(s)"/>
+        <text name="livingMarket_evSurplus" text="Surplus: %s has enough %s – price −%d %% for %d month(s)"/>
+        <text name="livingMarket_evBoomAnnounce" text="Market news: from next month %s is in demand everywhere (+%d %% for %d month(s))"/>
+        <text name="livingMarket_evBoomStart" text="Market news: %s is now in demand everywhere (+%d %% for %d month(s))"/>
+        <text name="livingMarket_evSlumpAnnounce" text="Market news: from next month there is too much %s everywhere (−%d %% for %d month(s))"/>
+        <text name="livingMarket_evSlumpStart" text="Market news: too much %s everywhere (−%d %% for %d month(s))"/>
+        <text name="livingMarket_evEndStation" text="Market back to normal at %s: %s"/>
+        <text name="livingMarket_evEndMarket" text="Market back to normal: %s"/>
+        <text name="livingMarket_evLabelShortage" text="Shortage"/>
+        <text name="livingMarket_evLabelSurplus" text="Surplus"/>
+        <text name="livingMarket_evLabelBoom" text="In demand"/>
+        <text name="livingMarket_evLabelSlump" text="Slump"/>
+        <text name="livingMarket_testMonth" text="Test: month change"/>
         <text name="livingMarket_filterAll" text="All goods"/>
         <text name="livingMarket_filterStock" text="In stock"/>
         <text name="livingMarket_filterFav" text="Favorites"/>

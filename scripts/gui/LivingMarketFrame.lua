@@ -37,6 +37,7 @@ function LivingMarketFrame.new(target, customMt)
     self.clearSearchButtonInfo = {}
     self.favButtonInfo = {}
     self.testRefillButtonInfo = {}
+    self.testMonthButtonInfo = {}
 
     return self
 end
@@ -48,6 +49,11 @@ function LivingMarketFrame:initialize()
         inputAction = InputAction.MENU_EXTRA_2,
         text = g_i18n:getText("livingMarket_testRefill"),
         callback = function() self:onTestRefill() end
+    }
+    self.testMonthButtonInfo = {
+        inputAction = InputAction.MENU_ACTIVATE,
+        text = g_i18n:getText("livingMarket_testMonth"),
+        callback = function() self:onTestMonth() end
     }
     self.favButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
@@ -199,6 +205,19 @@ local function setTrendIcon(icon, price, basePrice)
     icon:setVisible(true)
 end
 
+-- Marktereignis einer Station: Text und Farbe (Engpass/Gefragt grün, Überangebot/Flaute rot)
+local EVENT_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
+                       [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
+local function getEventText(eventType, eventPrice)
+    local label = EVENT_LABELS[eventType or 0]
+    if label == nil then
+        return nil, nil
+    end
+    local percent = math.floor(((eventPrice or 1) - 1) * 100 + 0.5)
+    local color = (eventType == 1 or eventType == 3) and COLOR_GOOD or COLOR_LOW
+    return string.format("%s %+d %%", g_i18n:getText(label), percent), color
+end
+
 local function formatPrice(pricePer1000)
     return LivingMarket.formatMoney(pricePer1000)
 end
@@ -248,7 +267,7 @@ function LivingMarketFrame:getFilteredWares()
                 -- gefundene Station ist zugleich die beste (höchster Preis mit freiem Bedarf)?
                 row.isBestStation = ware.best ~= nil and match.remaining >= 1 and match.price >= ware.best.price
                 row.sellable = math.min(ware.stock, math.max(match.remaining, 0))
-                row.revenue = LivingMarket:estimateRevenue(match.basePrice / 1000, match.remaining, match.max, row.sellable)
+                row.revenue = LivingMarket:estimateRevenue(match.basePrice * (match.eventPrice or 1) / 1000, match.remaining, match.max, row.sellable)
             end
         end
         if stockOk and searchOk then
@@ -307,7 +326,7 @@ function LivingMarketFrame:updateDetail(ware)
             -- Erlös, wenn der Lagerbestand (soweit möglich) an diese Station geht
             local amount = math.min(ware.stock or 0, math.max(station.remaining, 0))
             station.deliverable = amount   -- Liefermenge: höchstens der eigene Lagerbestand
-            station.revenue = LivingMarket:estimateRevenue((station.basePrice or station.price) / 1000, station.remaining, station.max, amount)
+            station.revenue = LivingMarket:estimateRevenue((station.basePrice or station.price) * (station.eventPrice or 1) / 1000, station.remaining, station.max, amount)
             table.insert(self.detailStations, station)
         end
         self:sortStations(self.detailStations)
@@ -715,6 +734,11 @@ function LivingMarketFrame:onToggleFavorite()
     self:rebuildWareList()
 end
 
+function LivingMarketFrame:onTestMonth()
+    LivingMarket:onPeriodChanged()
+    self:refreshData()
+end
+
 function LivingMarketFrame:onTestRefill()
     LivingMarket:onHourChanged()
     self:refreshData()
@@ -735,6 +759,9 @@ function LivingMarketFrame:updateMenuButtons()
     -- Testknopf nur im Debug-Modus und nur, wo der Bedarf verwaltet wird (Server/Einzelspieler)
     if LivingMarket.DEBUG and g_server ~= nil then
         table.insert(self.menuButtonInfo, self.testRefillButtonInfo)
+        if InputAction.MENU_ACTIVATE ~= nil then
+            table.insert(self.menuButtonInfo, self.testMonthButtonInfo)
+        end
     end
     self:setMenuButtonInfoDirty()
 end
@@ -859,7 +886,8 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     end
 
     stationText:setText(ware.best.name)
-    setColor(stationText, ware.isBestStation and COLOR_GOOD or COLOR_TEXT)
+    local _, eventColor = getEventText(ware.best.eventType, ware.best.eventPrice)
+    setColor(stationText, ware.isBestStation and COLOR_GOOD or eventColor or COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
     setColor(priceText, COLOR_TEXT)
     setTrendIcon(cell:getAttribute("trend"), ware.best.price, ware.marketPrice)
@@ -904,6 +932,12 @@ function LivingMarketFrame:populateStationCell(station, cell)
     priceText:setText(formatPrice(station.price))
     local deliverable = station.deliverable or station.remaining
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")
+    local eventText = cell:getAttribute("event")
+    if eventText ~= nil then
+        local text, color = getEventText(station.eventType, station.eventPrice)
+        eventText:setText(text or "")
+        setColor(eventText, isFull and COLOR_MUTED or color or COLOR_TEXT)
+    end
     local revenueText = cell:getAttribute("revenue")
     if revenueText ~= nil then
         if (station.revenue or 0) >= 1 then

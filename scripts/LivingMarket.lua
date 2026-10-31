@@ -121,6 +121,10 @@ local function getStationName(station)
     return name
 end
 
+function LivingMarket:getStationNameOf(station)
+    return getStationName(station)
+end
+
 -- Kleinschreibung für die Suche (utf8ToLower kann auch Umlaute)
 function LivingMarket.toLower(text)
     if utf8ToLower ~= nil then
@@ -433,18 +437,25 @@ function LivingMarket:getEntry(station, fillTypeIndex)
     local data = self:getStationData(station)
     local entry = data[fillTypeIndex]
     if entry == nil then
-        local max, refill = self:getLimitFor(station, fillTypeIndex)
-        entry = { remaining = max, max = max, refill = refill }
-        -- Stand aus dem Spielstand übernehmen (falls vorhanden): Maximum, Auffüllrate, Restbedarf
+        local baseMax, baseRefill = self:getLimitFor(station, fillTypeIndex)
+        entry = {
+            baseMax    = baseMax,       -- aus der Konfiguration
+            baseRefill = baseRefill,    -- Liter je Spielmonat
+            noise      = self:rollNoise(),   -- kleine Schwankung des Bedarfs (±10 %), neu zu jedem Monat
+            eventPrice = 1,             -- Preisfaktor durch Marktereignisse
+            eventMax   = 1,             -- Bedarfsfaktor durch Marktereignisse
+            eventType  = 0,             -- 0 kein Ereignis, sonst LivingMarket.EVENT_*
+        }
+        -- Stand aus dem Spielstand übernehmen (falls vorhanden): Schwankung, Restbedarf
         local saved = self:takeSavedEntry(station, fillTypeIndex)
-        if saved ~= nil then
-            if saved.max ~= nil and saved.max > 0 then
-                entry.max = saved.max
-            end
-            if saved.refill ~= nil and saved.refill >= 0 then
-                entry.refill = saved.refill
-            end
-            entry.remaining = math.max(0, math.min(saved.remaining or entry.max, entry.max))
+        if saved ~= nil and saved.noise ~= nil and saved.noise > 0 then
+            entry.noise = saved.noise
+        end
+        self:applyEventsToEntry(station, fillTypeIndex, entry)
+        self:recalcEntryLimits(entry, false)
+        entry.remaining = entry.max
+        if saved ~= nil and saved.remaining ~= nil then
+            entry.remaining = math.max(0, math.min(saved.remaining, entry.max))
         end
         data[fillTypeIndex] = entry
     end
@@ -493,6 +504,15 @@ end
 
 -- Faktor auf den Spielpreis für diese Station und Ware (1 = unverändert)
 function LivingMarket:getPriceFactor(station, fillTypeIndex)
+    local entry = self:getEntry(station, fillTypeIndex)
+    if entry == nil or entry.max <= 0 then
+        return 1
+    end
+    return self:getFactorForShare(entry.remaining / entry.max) * (entry.eventPrice or 1)
+end
+
+-- Nur der Malus durch Massenverkauf (Marktlage), ohne Ereignis
+function LivingMarket:getDemandFactor(station, fillTypeIndex)
     local entry = self:getEntry(station, fillTypeIndex)
     if entry == nil or entry.max <= 0 then
         return 1
@@ -739,14 +759,16 @@ function LivingMarket:getWareData()
                         byFillType[fillTypeIndex] = ware
                         table.insert(wares, ware)
                     end
-                    local price  = self:getPricePer1000(station, fillTypeIndex)   -- enthält schon den Marktfaktor
-                    local factor = self:getPriceFactor(station, fillTypeIndex)
+                    local price  = self:getPricePer1000(station, fillTypeIndex)   -- enthält Marktlage und Ereignis
+                    local factor = self:getPriceFactor(station, fillTypeIndex)     -- gesamt
                     table.insert(ware.stations, {
                         name      = stationName,
                         searchKey = LivingMarket.toLower(stationName),
                         price     = price,
-                        factor    = factor,
-                        basePrice = factor > 0 and price / factor or price,      -- Preis ohne Marktfaktor
+                        factor    = self:getDemandFactor(station, fillTypeIndex),  -- Marktlage (Massenverkauf)
+                        eventPrice = entry.eventPrice or 1,
+                        eventType  = entry.eventType or 0,
+                        basePrice = factor > 0 and price / factor or price,      -- Spielpreis ohne Marktlage und Ereignis
                         deviation = (ware.basePrice ~= nil and ware.basePrice > 0) and price / ware.basePrice or nil,   -- Preis / Grundpreis
                         remaining = entry.remaining,
                         max       = entry.max,
@@ -788,7 +810,7 @@ function LivingMarket:getWareData()
 
         if ware.best ~= nil then
             ware.sellable = math.min(ware.stock, ware.best.remaining)
-            ware.revenue  = self:estimateRevenue(ware.best.basePrice / 1000, ware.best.remaining, ware.best.max, ware.sellable)
+            ware.revenue  = self:estimateRevenue(ware.best.basePrice * ware.best.eventPrice / 1000, ware.best.remaining, ware.best.max, ware.sellable)
         else
             ware.sellable = 0
             ware.revenue  = 0
@@ -1260,7 +1282,9 @@ function LivingMarket:collectSyncEntries(onlyDirty)
                         fillTypeIndex = fillTypeIndex,
                         remaining     = entry.remaining,
                         max           = entry.max,
-                        refill        = entry.refill
+                        refill        = entry.refill,
+                        eventPrice    = entry.eventPrice or 1,
+                        eventType     = entry.eventType or 0
                     })
                 end
                 entry.isDirty = false
@@ -1277,9 +1301,11 @@ function LivingMarket:applySyncEntries(entries)
         if station ~= nil then
             local entry = self:getEntry(station, e.fillTypeIndex)
             if entry ~= nil then
-                entry.remaining = e.remaining
-                entry.max       = e.max
-                entry.refill    = e.refill
+                entry.remaining  = e.remaining
+                entry.max        = e.max
+                entry.refill     = e.refill
+                entry.eventPrice = e.eventPrice or 1
+                entry.eventType  = e.eventType or 0
             end
         end
     end
@@ -1298,6 +1324,16 @@ if FSBaseMission ~= nil and FSBaseMission.sendInitialClientState ~= nil then
 end
 
 function LivingMarket:update(dt)
+    if not self.eventsInitialized and isServer() then
+        self.eventInitTimer = (self.eventInitTimer or 10000) - dt
+        if self.eventInitTimer <= 0 then
+            self.eventsInitialized = true
+            local ok, err = pcall(self.initEvents, self)
+            if not ok then
+                print("[LivingMarket] FEHLER bei den Marktereignissen: " .. tostring(err))
+            end
+        end
+    end
     if next(self.saleLog) ~= nil then
         self:flushSaleLog(dt)
     end
@@ -1495,7 +1531,7 @@ end
 -- Je Eintrag: Restbedarf, Maximum, Auffüllrate. Gespeichert wird nur, was vom Standard abweicht.
 -- ---------------------------------------------------------------------
 LivingMarket.SAVE_FILENAME = "livingMarket.xml"
-LivingMarket.SAVE_VERSION  = 3   -- 3: refill je Spielmonat, Maxima aus der Konfiguration
+LivingMarket.SAVE_VERSION  = 4   -- 4: Schwankung je Eintrag + Marktereignisse; Maxima immer aus Konfiguration
 LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { [fillTypeName] = { remaining, max, refill } } }
 
 -- Dauerhafte Kennung einer Station: uniqueId ihres Gebäudes (vom Spiel im Spielstand geführt).
@@ -1544,9 +1580,9 @@ function LivingMarket:loadFromSavegame()
         return
     end
 
-    -- Vor Version 3 galten feste Maxima und Auffüllung je Stunde: dann nur den Restbedarf übernehmen
+    -- Maxima/Auffüllung kommen immer aus der Konfiguration; gespeichert sind Restbedarf,
+    -- Schwankung (ab Version 4) und die Marktereignisse (ab Version 4)
     local version = getXMLInt(xmlFile, "livingMarket#version") or 1
-    local keepLimits = version >= 3
 
     local stationCount, entryCount = 0, 0
     local i = 0
@@ -1569,8 +1605,7 @@ function LivingMarket:loadFromSavegame()
                 if name ~= nil and remaining ~= nil then
                     stationData.fillTypes[name] = {
                         remaining = remaining,
-                        max       = keepLimits and getXMLFloat(xmlFile, fillTypeKey .. "#max") or nil,
-                        refill    = keepLimits and getXMLFloat(xmlFile, fillTypeKey .. "#refill") or nil,
+                        noise     = version >= 4 and getXMLFloat(xmlFile, fillTypeKey .. "#noise") or nil,
                     }
                     entryCount = entryCount + 1
                 end
@@ -1581,8 +1616,11 @@ function LivingMarket:loadFromSavegame()
         end
         i = i + 1
     end
+    if version >= 4 then
+        self:loadEventsFromXML(xmlFile, "livingMarket.events")
+    end
     delete(xmlFile)
-    log("Spielstand geladen: %d Stationen, %d Einträge", stationCount, entryCount)
+    log("Spielstand geladen: %d Stationen, %d Einträge, %d Marktereignisse", stationCount, entryCount, #self.events)
 end
 
 function LivingMarket.saveToSavegame(missionInfo)
@@ -1606,14 +1644,10 @@ function LivingMarket.saveToSavegame(missionInfo)
         for fillTypeIndex, entry in pairs(data) do
             local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
             if name ~= nil then
-                -- Gespeichert wird, was vom Standard abweicht: Restbedarf unter Maximum
-                -- oder ein (dynamisch) geändertes Maximum bzw. eine geänderte Auffüllrate
-                local defaultMax, defaultRefill = self:getLimitFor(station, fillTypeIndex)
-                local differs = entry.remaining < entry.max
-                    or math.abs(entry.max - defaultMax) > 0.01
-                    or math.abs(entry.refill - defaultRefill) > 0.01
+                -- Gespeichert wird, was vom Standard abweicht: Restbedarf unter Maximum oder eine Schwankung
+                local differs = entry.remaining < entry.max or math.abs((entry.noise or 1) - 1) > 0.0005
                 if differs then
-                    toSave[key].fillTypes[name] = { remaining = entry.remaining, max = entry.max, refill = entry.refill }
+                    toSave[key].fillTypes[name] = { remaining = entry.remaining, noise = entry.noise }
                 else
                     toSave[key].fillTypes[name] = nil   -- alles Standard, muss nicht gespeichert werden
                 end
@@ -1641,11 +1675,8 @@ function LivingMarket.saveToSavegame(missionInfo)
                 local fillTypeKey = string.format("%s.fillType(%d)", stationKey, j)
                 setXMLString(xmlFile, fillTypeKey .. "#name", name)
                 setXMLFloat(xmlFile, fillTypeKey .. "#remaining", saved.remaining)
-                if saved.max ~= nil then
-                    setXMLFloat(xmlFile, fillTypeKey .. "#max", saved.max)
-                end
-                if saved.refill ~= nil then
-                    setXMLFloat(xmlFile, fillTypeKey .. "#refill", saved.refill)
+                if saved.noise ~= nil then
+                    setXMLFloat(xmlFile, fillTypeKey .. "#noise", saved.noise)
                 end
                 j = j + 1
                 entryCount = entryCount + 1
@@ -1654,9 +1685,11 @@ function LivingMarket.saveToSavegame(missionInfo)
         end
     end
 
+    self:saveEventsToXML(xmlFile, "livingMarket.events")
+
     saveXMLFile(xmlFile)
     delete(xmlFile)
-    log("Spielstand gespeichert: %d Stationen, %d Einträge", i, entryCount)
+    log("Spielstand gespeichert: %d Stationen, %d Einträge, %d Marktereignisse", i, entryCount, #self.events)
 end
 
 -- Beim Speichern des Spielstands mitspeichern (wie z. B. Courseplay für LS25)
@@ -1674,6 +1707,12 @@ end
 -- ---------------------------------------------------------------------
 function LivingMarket:loadMap(name)
     g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
+    if MessageType.PERIOD_CHANGED ~= nil then
+        g_messageCenter:subscribe(MessageType.PERIOD_CHANGED, self.onPeriodChanged, self)
+    end
+    self.events = {}
+    self.eventsInitialized = false
+    self.eventInitTimer = 10000   -- erste Ereignisse 10 s nach dem Laden würfeln (falls keine gespeichert)
 
     self.config = nil
     local okConfig, errConfig = pcall(self.loadConfig, self)
@@ -1707,6 +1746,8 @@ function LivingMarket:deleteMap()
     self.hasLoggedPriceDebug = false
     self.consumables = nil
     self.config = nil
+    self.events = {}
+    self.eventsInitialized = false
     self.hasDirty = false
     self.syncTimer = 0
 end

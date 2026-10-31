@@ -17,6 +17,19 @@
         <text name="livingMarket_favAdd" text="Toevoegen aan favorieten"/>
         <text name="livingMarket_favRemove" text="Verwijderen uit favorieten"/>
         <text name="livingMarket_testRefill" text="Test: 1 speluur aanvullen"/>
+        <text name="livingMarket_evShortage" text="Tekort: %s heeft dringend %s nodig – prijs +%d %% voor %d maand(en)"/>
+        <text name="livingMarket_evSurplus" text="Overschot: %s heeft genoeg %s – prijs −%d %% voor %d maand(en)"/>
+        <text name="livingMarket_evBoomAnnounce" text="Marktnieuws: vanaf volgende maand is %s overal gevraagd (+%d %% voor %d maand(en))"/>
+        <text name="livingMarket_evBoomStart" text="Marktnieuws: %s is nu overal gevraagd (+%d %% voor %d maand(en))"/>
+        <text name="livingMarket_evSlumpAnnounce" text="Marktnieuws: vanaf volgende maand overal te veel %s (−%d %% voor %d maand(en))"/>
+        <text name="livingMarket_evSlumpStart" text="Marktnieuws: overal te veel %s (−%d %% voor %d maand(en))"/>
+        <text name="livingMarket_evEndStation" text="Markt weer normaal bij %s: %s"/>
+        <text name="livingMarket_evEndMarket" text="Markt weer normaal: %s"/>
+        <text name="livingMarket_evLabelShortage" text="Tekort"/>
+        <text name="livingMarket_evLabelSurplus" text="Overschot"/>
+        <text name="livingMarket_evLabelBoom" text="Gevraagd"/>
+        <text name="livingMarket_evLabelSlump" text="Malaise"/>
+        <text name="livingMarket_testMonth" text="Test: maandwissel"/>
         <text name="livingMarket_filterAll" text="Alle goederen"/>
         <text name="livingMarket_filterStock" text="Op voorraad"/>
         <text name="livingMarket_filterFav" text="Favorieten"/>

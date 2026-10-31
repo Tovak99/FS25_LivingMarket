@@ -17,6 +17,19 @@
         <text name="livingMarket_favAdd" text="Añadir a favoritos"/>
         <text name="livingMarket_favRemove" text="Quitar de favoritos"/>
         <text name="livingMarket_testRefill" text="Prueba: reponer 1 hora de juego"/>
+        <text name="livingMarket_evShortage" text="Escasez: %s necesita urgentemente %s – precio +%d %% durante %d mes(es)"/>
+        <text name="livingMarket_evSurplus" text="Excedente: %s tiene suficiente %s – precio −%d %% durante %d mes(es)"/>
+        <text name="livingMarket_evBoomAnnounce" text="Noticias: desde el próximo mes %s tiene demanda en todas partes (+%d %% durante %d mes(es))"/>
+        <text name="livingMarket_evBoomStart" text="Noticias: %s tiene ahora demanda en todas partes (+%d %% durante %d mes(es))"/>
+        <text name="livingMarket_evSlumpAnnounce" text="Noticias: desde el próximo mes hay demasiado %s en todas partes (−%d %% durante %d mes(es))"/>
+        <text name="livingMarket_evSlumpStart" text="Noticias: demasiado %s en todas partes (−%d %% durante %d mes(es))"/>
+        <text name="livingMarket_evEndStation" text="Mercado de nuevo normal en %s: %s"/>
+        <text name="livingMarket_evEndMarket" text="Mercado de nuevo normal: %s"/>
+        <text name="livingMarket_evLabelShortage" text="Escasez"/>
+        <text name="livingMarket_evLabelSurplus" text="Excedente"/>
+        <text name="livingMarket_evLabelBoom" text="Demanda"/>
+        <text name="livingMarket_evLabelSlump" text="Caída"/>
+        <text name="livingMarket_testMonth" text="Prueba: cambio de mes"/>
         <text name="livingMarket_filterAll" text="Todos los productos"/>
         <text name="livingMarket_filterStock" text="En stock"/>
         <text name="livingMarket_filterFav" text="Favoritos"/>

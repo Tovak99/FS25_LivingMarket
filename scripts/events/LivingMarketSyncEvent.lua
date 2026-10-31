@@ -17,7 +17,7 @@ function LivingMarketSyncEvent.emptyNew()
     return Event.new(LivingMarketSyncEvent_mt)
 end
 
--- entries: Liste von { placeable, fillTypeIndex, remaining, max, refill }
+-- entries: Liste von { placeable, fillTypeIndex, remaining, max, refill, eventPrice, eventType }
 function LivingMarketSyncEvent.new(entries)
     local self = LivingMarketSyncEvent.emptyNew()
     self.entries = entries or {}
@@ -32,6 +32,8 @@ function LivingMarketSyncEvent:writeStream(streamId, connection)
         streamWriteFloat32(streamId, e.remaining)
         streamWriteFloat32(streamId, e.max)
         streamWriteFloat32(streamId, e.refill)
+        streamWriteFloat32(streamId, e.eventPrice or 1)
+        streamWriteUInt8(streamId, e.eventType or 0)
     end
 end
 
@@ -45,6 +47,8 @@ function LivingMarketSyncEvent:readStream(streamId, connection)
         e.remaining     = streamReadFloat32(streamId)
         e.max           = streamReadFloat32(streamId)
         e.refill        = streamReadFloat32(streamId)
+        e.eventPrice    = streamReadFloat32(streamId)
+        e.eventType     = streamReadUInt8(streamId)
         table.insert(self.entries, e)
     end
     self:run(connection)

@@ -99,6 +99,8 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="66px 0px"/>
+                    <!-- Marktereignis der Station, z. B. "Engpass +18 %" (rechte Kante 400) -->
+                    <Text profile="lm_rowTextRight" name="event" position="-50px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="55px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="180px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
