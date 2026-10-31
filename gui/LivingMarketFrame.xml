@@ -31,8 +31,8 @@
             <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-20px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_price" position="160px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_market" position="270px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortWare_station" position="760px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_market" position="290px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_station" position="775px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="720px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
@@ -50,8 +50,8 @@
                     <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="-20px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="160px 0px"/>
-                    <Text profile="lm_rowTextRight" name="market" position="270px 0px"/>
-                    <Text profile="lm_rowText" name="station" position="760px 0px"/>
+                    <Text profile="lm_rowTextRight" name="market" position="290px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="775px 0px"/>
                     <Text profile="lm_rowTextRight" name="sellable" position="720px 0px"/>
                     <Text profile="lm_rowTextRight" name="revenue" position="940px 0px"/>
                 </ListItem>
