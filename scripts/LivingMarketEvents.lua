@@ -254,7 +254,8 @@ function LivingMarket:pickStationWare(filter)
         if station ~= nil and station.acceptedFillTypes ~= nil then
             local candidates = {}
             for fillTypeIndex, accepted in pairs(station.acceptedFillTypes) do
-                if accepted and (filter == nil or filter(fillTypeIndex)) and self:getEntry(station, fillTypeIndex) ~= nil then
+                if accepted and (filter == nil or filter(fillTypeIndex)) and self:getEntry(station, fillTypeIndex) ~= nil
+                    and self:isContractWareSellable(station, fillTypeIndex) then
                     table.insert(candidates, fillTypeIndex)
                 end
             end
@@ -275,7 +276,7 @@ function LivingMarket:pickMarketWare()
     local count = {}
     for _, station in ipairs(self:collectStations()) do
         for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
-            if accepted and self:getEntry(station, fillTypeIndex) ~= nil then
+            if accepted and self:getEntry(station, fillTypeIndex) ~= nil and self:isContractWareSellable(station, fillTypeIndex) then
                 count[fillTypeIndex] = (count[fillTypeIndex] or 0) + 1
             end
         end
@@ -467,6 +468,16 @@ end
 
 -- Jede Spielstunde: fällige Ereignisse starten/beenden, gelegentlich neue würfeln.
 -- Neue Ereignisse kommen zufällig über den Monat verteilt, solange weniger als das Ziel laufen.
+-- Ereignis über eine Ware, die (an der Station) gar nicht verkauft werden kann?
+function LivingMarket:isEventWareSellable(event)
+    if event.stationKey ~= nil then
+        local station = self:findStationByKey(event.stationKey)
+        return station == nil or self:isContractWareSellable(station, event.fillTypeIndex)
+    end
+    local fillType = g_fillTypeManager:getFillTypeByIndex(event.fillTypeIndex)
+    return fillType ~= nil and (fillType.pricePerLiter or 0) > 0
+end
+
 function LivingMarket:tickEvents()
     if g_server == nil or not self.eventsInitialized then
         return
@@ -477,16 +488,20 @@ function LivingMarket:tickEvents()
 
     local kept = {}
     for _, event in ipairs(self.events) do
-        if not event.active and now >= event.startHour then
-            event.active = true
-            self:announceEvent(event, "start")
-            changed = true
-        end
-        if event.active and now >= event.endHour then
-            self:announceEvent(event, "end")
-            changed = true
+        if not self:isEventWareSellable(event) then
+            changed = true   -- Ware ohne Verkaufswert (z. B. Wartung): Ereignis still entfernen
         else
-            table.insert(kept, event)
+            if not event.active and now >= event.startHour then
+                event.active = true
+                self:announceEvent(event, "start")
+                changed = true
+            end
+            if event.active and now >= event.endHour then
+                self:announceEvent(event, "end")
+                changed = true
+            else
+                table.insert(kept, event)
+            end
         end
     end
     self.events = kept
