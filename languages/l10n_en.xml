@@ -26,7 +26,7 @@
         <text name="livingMarket_colWare" text="Goods"/>
         <text name="livingMarket_colStock" text="Stock"/>
         <text name="livingMarket_colBestStation" text="Best station"/>
-        <text name="livingMarket_colPrice" text="Price / 1000 l"/>
+        <text name="livingMarket_colPrice" text="Price"/>
         <text name="livingMarket_colSellable" text="Sellable"/>
         <text name="livingMarket_colRevenue" text="Revenue"/>
         <text name="livingMarket_colFreeMax" text="Free / Maximum"/>

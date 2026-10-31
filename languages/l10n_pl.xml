@@ -26,7 +26,7 @@
         <text name="livingMarket_colWare" text="Towar"/>
         <text name="livingMarket_colStock" text="Zapas"/>
         <text name="livingMarket_colBestStation" text="Najlepszy punkt"/>
-        <text name="livingMarket_colPrice" text="Cena / 1000 l"/>
+        <text name="livingMarket_colPrice" text="Cena"/>
         <text name="livingMarket_colSellable" text="Do sprzedania"/>
         <text name="livingMarket_colRevenue" text="Przychód"/>
         <text name="livingMarket_colFreeMax" text="Wolne / Maksimum"/>

@@ -26,7 +26,7 @@
         <text name="livingMarket_colWare" text="Prodotto"/>
         <text name="livingMarket_colStock" text="Scorte"/>
         <text name="livingMarket_colBestStation" text="Miglior punto vendita"/>
-        <text name="livingMarket_colPrice" text="Prezzo / 1000 l"/>
+        <text name="livingMarket_colPrice" text="Prezzo"/>
         <text name="livingMarket_colSellable" text="Vendibile"/>
         <text name="livingMarket_colRevenue" text="Ricavo"/>
         <text name="livingMarket_colFreeMax" text="Libero / Massimo"/>
