@@ -299,7 +299,7 @@ end
 -- Grundpreis der Ware aus dem Basisspiel (je 1000 l), unabhängig von Station, Monat und Marktlage.
 -- Grundwert der Ware × Faktor des Schwierigkeitsgrads (Schwer 1,0 / Normal 1,8 / Einfach 3,0).
 -- Ausnahme Verbrauchsgüter (Diesel, Dünger, Saatgut ...): immer Faktor 1,0.
-LivingMarket.PRICE_DEBUG_FILLTYPES = { "DIESEL", "FERTILIZER", "METHANE", "MINERAL_FEED", "WHEAT", "WOODBEAM" }
+LivingMarket.PRICE_DEBUG_FILLTYPES = { "DIESEL", "FERTILIZER", "WHEAT", "FABRIC", "WOODBEAM" }
 
 local function getRawPriceValues(fillTypeIndex)
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
@@ -321,13 +321,42 @@ function LivingMarket:logPriceDebug()
     if not self.DEBUG or self.hasLoggedPriceDebug then
         return
     end
-    self.hasLoggedPriceDebug = true
+    self.hasLoggedPriceDebug = true   -- vor dem Rest setzen: getYearPrices ruft wieder getBasePricePer1000
     for _, name in ipairs(self.PRICE_DEBUG_FILLTYPES) do
         local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(name)
         if fillTypeIndex ~= nil then
             local raw, multiplier, managerPrice = getRawPriceValues(fillTypeIndex)
             log("Preisdaten %s: Grundwert/l=%s Faktor=%s economyManager/l=%s", name,
                 tostring(raw), tostring(multiplier), tostring(managerPrice))
+            -- Aufbau der Wirtschaftsdaten der Ware (Monatsfaktoren / Preisverlauf?)
+            local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+            local economy = fillType ~= nil and fillType.economy or nil
+            if type(economy) == "table" then
+                local parts = {}
+                for key, value in pairs(economy) do
+                    if type(value) == "table" then
+                        local values = {}
+                        for i = 1, 12 do
+                            if value[i] ~= nil then
+                                table.insert(values, type(value[i]) == "number" and string.format("%.3f", value[i]) or type(value[i]))
+                            end
+                        end
+                        local count = 0
+                        for _ in pairs(value) do count = count + 1 end
+                        table.insert(parts, string.format("%s={%d Einträge: %s}", tostring(key), count, table.concat(values, " ")))
+                    else
+                        table.insert(parts, string.format("%s=%s", tostring(key), tostring(value)))
+                    end
+                end
+                table.sort(parts)
+                log("Wirtschaft %s: %s", name, table.concat(parts, " | "))
+            else
+                log("Wirtschaft %s: keine economy-Tabelle", name)
+            end
+            local result = self:getYearPrices(fillTypeIndex)
+            if result ~= nil then
+                log("Jahrespreise %s (je 1000 l): %s", name, table.concat(result.text, " "))
+            end
         end
     end
 end
@@ -354,6 +383,37 @@ function LivingMarket:getConsumables()
     end
     self.consumables = consumables
     return consumables
+end
+
+-- Preis je Monat (1-12) aus den Monatsfaktoren der Ware, falls das Spiel sie bereitstellt.
+-- Ergebnis: { prices = {[monat] = Preis je 1000 l}, max, maxMonth, min, minMonth, text = {...} }
+function LivingMarket:getYearPrices(fillTypeIndex)
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    local economy = fillType ~= nil and fillType.economy or nil
+    local factors = economy ~= nil and economy.factors or nil
+    local base = self:getBasePricePer1000(fillTypeIndex)
+    if type(factors) ~= "table" or base == nil then
+        return nil
+    end
+    local result = { prices = {}, text = {} }
+    for month = 1, 12 do
+        local factor = factors[month]
+        if type(factor) == "number" then
+            local price = base * factor
+            result.prices[month] = price
+            table.insert(result.text, string.format("%d:%.0f", month, price))
+            if result.max == nil or price > result.max then
+                result.max, result.maxMonth = price, month
+            end
+            if result.min == nil or price < result.min then
+                result.min, result.minMonth = price, month
+            end
+        end
+    end
+    if result.max == nil then
+        return nil
+    end
+    return result
 end
 
 function LivingMarket:getBasePricePer1000(fillTypeIndex)
