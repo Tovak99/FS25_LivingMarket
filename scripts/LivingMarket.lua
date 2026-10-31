@@ -299,13 +299,8 @@ end
 -- Grundpreis der Ware aus dem Basisspiel (je 1000 l), inkl. Schwierigkeitsgrad,
 -- unabhängig von Station, Monat und Marktlage
 function LivingMarket:getBasePricePer1000(fillTypeIndex)
-    local economyManager = g_currentMission ~= nil and g_currentMission.economyManager or nil
-    if economyManager ~= nil and economyManager.getPricePerLiter ~= nil then
-        local ok, pricePerLiter = pcall(economyManager.getPricePerLiter, economyManager, fillTypeIndex)
-        if ok and pricePerLiter ~= nil then
-            return pricePerLiter * 1000
-        end
-    end
+    -- Grundwert der Ware × Faktor des Schwierigkeitsgrads (Schwer 1,0 / Normal 1,8 / Einfach 3,0).
+    -- Bewusst selbst gerechnet, damit der Faktor sicher enthalten ist.
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
     if fillType == nil or fillType.pricePerLiter == nil then
         return nil
@@ -316,6 +311,10 @@ function LivingMarket:getBasePricePer1000(fillTypeIndex)
         if ok and value ~= nil then
             multiplier = value
         end
+    end
+    if not self.hasLoggedPriceMultiplier then
+        self.hasLoggedPriceMultiplier = true
+        log("Preisfaktor Schwierigkeitsgrad: %.2f", multiplier)
     end
     return fillType.pricePerLiter * multiplier * 1000
 end
