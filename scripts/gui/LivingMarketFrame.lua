@@ -325,7 +325,6 @@ LivingMarketFrame.WARE_COLUMNS = {
     basePrice = { label = "livingMarket_colBasePrice",  isText = false },
     deviation = { label = "livingMarket_colDeviation",  isText = false },
     price    = { label = "livingMarket_colPrice",       isText = false },
-    market   = { label = "livingMarket_colMarket",      isText = false },
     sellable = { label = "livingMarket_colSellable",    isText = false },
     revenue  = { label = "livingMarket_colRevenue",     isText = false },
 }
@@ -333,7 +332,6 @@ LivingMarketFrame.DETAIL_COLUMNS = {
     name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
     price  = { label = "livingMarket_colPrice",     isText = false },
     market = { label = "livingMarket_colMarket",    isText = false },
-    deviation = { label = "livingMarket_colDeviation", isText = false },
     amount = { label = "livingMarket_colFreeMax",   isText = false },
     share  = { label = "livingMarket_colShare",     isText = false },
 }
