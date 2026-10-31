@@ -1419,7 +1419,18 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
         return
     end
-    put("status", g_i18n:getText(row.isActive and "livingMarket_ctActive" or "livingMarket_ctOffer"), row.isActive and COLOR_GOOD or COLOR_MID)
+    -- Status: laufend grün; Angebot nach Gültigkeit: gelb unter 6 Std., rot unter 1 Std., sonst weiß
+    local statusColor = COLOR_GOOD
+    if not row.isActive then
+        statusColor = base
+        local left = (row.offerEndHour or math.huge) - LivingMarket.getNowHour()
+        if left < 1 then
+            statusColor = COLOR_LOW
+        elseif left < 6 then
+            statusColor = COLOR_MID
+        end
+    end
+    put("status", g_i18n:getText(row.isActive and "livingMarket_ctActive" or "livingMarket_ctOffer"), statusColor)
     put("ware", row.wareTitle, base)
     put("station", row.stationName, base)
     if row.isActive then
