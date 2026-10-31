@@ -215,10 +215,16 @@ function LivingMarket:getEntry(station, fillTypeIndex)
     if entry == nil then
         local max, refill = self:getLimitFor(station, fillTypeIndex)
         entry = { remaining = max, max = max, refill = refill }
-        -- Stand aus dem Spielstand übernehmen (falls vorhanden)
-        local saved = self:takeSavedRemaining(station, fillTypeIndex)
+        -- Stand aus dem Spielstand übernehmen (falls vorhanden): Maximum, Auffüllrate, Restbedarf
+        local saved = self:takeSavedEntry(station, fillTypeIndex)
         if saved ~= nil then
-            entry.remaining = math.max(0, math.min(saved, max))
+            if saved.max ~= nil and saved.max > 0 then
+                entry.max = saved.max
+            end
+            if saved.refill ~= nil and saved.refill >= 0 then
+                entry.refill = saved.refill
+            end
+            entry.remaining = math.max(0, math.min(saved.remaining or entry.max, entry.max))
         end
         data[fillTypeIndex] = entry
     end
@@ -852,11 +858,11 @@ end
 -- ---------------------------------------------------------------------
 -- Spielstand: Restbedarf speichern und laden
 -- Datei: <Spielstand-Ordner>/livingMarket.xml
--- Gespeichert wird nur, was vom Maximum abweicht (volle Einträge = Standard).
+-- Je Eintrag: Restbedarf, Maximum, Auffüllrate. Gespeichert wird nur, was vom Standard abweicht.
 -- ---------------------------------------------------------------------
 LivingMarket.SAVE_FILENAME = "livingMarket.xml"
-LivingMarket.SAVE_VERSION  = 1
-LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { [fillTypeName] = remaining } }
+LivingMarket.SAVE_VERSION  = 2
+LivingMarket.savedData     = {}   -- [stationKey] = { name = ..., fillTypes = { [fillTypeName] = { remaining, max, refill } } }
 
 -- Dauerhafte Kennung einer Station: uniqueId ihres Gebäudes (vom Spiel im Spielstand geführt).
 -- Rückfall für Stationen ohne Gebäude: Name der Station.
@@ -871,18 +877,18 @@ function LivingMarket:getStationKey(station)
     return "name:" .. getStationName(station)
 end
 
--- Gespeicherten Restbedarf abholen (und aus dem Zwischenspeicher entfernen)
-function LivingMarket:takeSavedRemaining(station, fillTypeIndex)
+-- Gespeicherten Eintrag abholen (und aus dem Zwischenspeicher entfernen)
+function LivingMarket:takeSavedEntry(station, fillTypeIndex)
     local stationData = self.savedData[self:getStationKey(station)]
     if stationData == nil then
         return nil
     end
     local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
-    local remaining = fillTypeName ~= nil and stationData.fillTypes[fillTypeName] or nil
-    if remaining ~= nil then
+    local saved = fillTypeName ~= nil and stationData.fillTypes[fillTypeName] or nil
+    if saved ~= nil then
         stationData.fillTypes[fillTypeName] = nil
     end
-    return remaining
+    return saved
 end
 
 function LivingMarket:loadFromSavegame()
@@ -923,7 +929,11 @@ function LivingMarket:loadFromSavegame()
                 local name = getXMLString(xmlFile, fillTypeKey .. "#name")
                 local remaining = getXMLFloat(xmlFile, fillTypeKey .. "#remaining")
                 if name ~= nil and remaining ~= nil then
-                    stationData.fillTypes[name] = remaining
+                    stationData.fillTypes[name] = {
+                        remaining = remaining,
+                        max       = getXMLFloat(xmlFile, fillTypeKey .. "#max"),      -- ab Version 2
+                        refill    = getXMLFloat(xmlFile, fillTypeKey .. "#refill"),   -- ab Version 2
+                    }
                     entryCount = entryCount + 1
                 end
                 j = j + 1
@@ -947,8 +957,8 @@ function LivingMarket.saveToSavegame(missionInfo)
     local toSave = {}   -- [stationKey] = { name = ..., fillTypes = { [name] = remaining } }
     for key, stationData in pairs(self.savedData) do
         toSave[key] = { name = stationData.name, fillTypes = {} }
-        for name, remaining in pairs(stationData.fillTypes) do
-            toSave[key].fillTypes[name] = remaining
+        for name, saved in pairs(stationData.fillTypes) do
+            toSave[key].fillTypes[name] = saved
         end
     end
     for station, data in pairs(self.stations) do
@@ -958,10 +968,16 @@ function LivingMarket.saveToSavegame(missionInfo)
         for fillTypeIndex, entry in pairs(data) do
             local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
             if name ~= nil then
-                if entry.remaining < entry.max then
-                    toSave[key].fillTypes[name] = entry.remaining
+                -- Gespeichert wird, was vom Standard abweicht: Restbedarf unter Maximum
+                -- oder ein (dynamisch) geändertes Maximum bzw. eine geänderte Auffüllrate
+                local defaultMax, defaultRefill = self:getLimitFor(station, fillTypeIndex)
+                local differs = entry.remaining < entry.max
+                    or math.abs(entry.max - defaultMax) > 0.01
+                    or math.abs(entry.refill - defaultRefill) > 0.01
+                if differs then
+                    toSave[key].fillTypes[name] = { remaining = entry.remaining, max = entry.max, refill = entry.refill }
                 else
-                    toSave[key].fillTypes[name] = nil   -- voll = Standard, muss nicht gespeichert werden
+                    toSave[key].fillTypes[name] = nil   -- alles Standard, muss nicht gespeichert werden
                 end
             end
         end
@@ -983,10 +999,16 @@ function LivingMarket.saveToSavegame(missionInfo)
             setXMLString(xmlFile, stationKey .. "#id", key)
             setXMLString(xmlFile, stationKey .. "#name", stationData.name or "")
             local j = 0
-            for name, remaining in pairs(stationData.fillTypes) do
+            for name, saved in pairs(stationData.fillTypes) do
                 local fillTypeKey = string.format("%s.fillType(%d)", stationKey, j)
                 setXMLString(xmlFile, fillTypeKey .. "#name", name)
-                setXMLFloat(xmlFile, fillTypeKey .. "#remaining", remaining)
+                setXMLFloat(xmlFile, fillTypeKey .. "#remaining", saved.remaining)
+                if saved.max ~= nil then
+                    setXMLFloat(xmlFile, fillTypeKey .. "#max", saved.max)
+                end
+                if saved.refill ~= nil then
+                    setXMLFloat(xmlFile, fillTypeKey .. "#refill", saved.refill)
+                end
                 j = j + 1
                 entryCount = entryCount + 1
             end
