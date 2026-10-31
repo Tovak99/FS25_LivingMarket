@@ -48,6 +48,10 @@
         <text name="livingMarket_scopeGlobal" text="Globaal"/>
         <text name="livingMarket_colStationEv" text="Verkooppunt"/>
         <text name="livingMarket_colDemand" text="Vraag"/>
+        <text name="livingMarket_viewSales" text="Verkopen"/>
+        <text name="livingMarket_colTime" text="Tijd"/>
+        <text name="livingMarket_colAmount" text="Hoeveelheid"/>
+        <text name="livingMarket_noSales" text="Nog geen verkopen"/>
         <text name="livingMarket_year" text="Jaar %d"/>
         <text name="livingMarket_colRefill" text="Aanvulling"/>
         <text name="livingMarket_colStart" text="Begin"/>

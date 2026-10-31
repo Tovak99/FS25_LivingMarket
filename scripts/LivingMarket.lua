@@ -1299,6 +1299,9 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
 
     local moved = superFunc(station, farmId, allowed, fillTypeIndex, ...)
     local used = moved or allowed
+    if not LivingMarket.hasSellHook and LivingMarket.recordSale ~= nil then
+        LivingMarket:recordSale(station, farmId, fillTypeIndex, used, used * priceBefore / 1000)
+    end
 
     if moneyBefore ~= nil then
         LivingMarket:trackSale(station, fillTypeIndex, used, farm.money - moneyBefore, priceBefore)
@@ -1513,6 +1516,9 @@ function LivingMarket.sendInitialClientState(mission, connection, user, farm)
     if LivingMarketEventListEvent ~= nil then
         connection:sendEvent(LivingMarketEventListEvent.new(LivingMarket.events))
     end
+    if LivingMarket.sendSalesToConnection ~= nil then
+        LivingMarket:sendSalesToConnection(connection)
+    end
     if LivingMarketFavoritesEvent ~= nil then
         LivingMarket:isFavorite(0)
         connection:sendEvent(LivingMarketFavoritesEvent.new(LivingMarket:getFavoriteNames()))
@@ -1536,6 +1542,9 @@ function LivingMarket:update(dt)
     end
     if next(self.saleLog) ~= nil then
         self:flushSaleLog(dt)
+    end
+    if self.updateSalesSync ~= nil then
+        self:updateSalesSync(dt)
     end
     if not self.hasDirty then
         return
@@ -1859,6 +1868,10 @@ function LivingMarket:loadFromSavegame()
     if version >= 4 then
         self:loadEventsFromXML(xmlFile, "livingMarket.events")
     end
+    -- Verkaufsverlauf (ab 0.2.1.5)
+    if self.loadSalesFromXML ~= nil then
+        self:loadSalesFromXML(xmlFile, "livingMarket.sales")
+    end
     -- Favoriten (gemeinsam, ab 0.2.0.5)
     if hasXMLProperty(xmlFile, "livingMarket.favorites") then
         self.favorites = readFillTypeNames(xmlFile, "livingMarket.favorites")
@@ -1880,6 +1893,7 @@ function LivingMarket:loadFromSavegame()
             wareSort    = sortState("ware"),
             detailSort  = sortState("detail"),
             eventSort   = sortState("event"),
+            saleSort    = sortState("sale"),
         }
     end
     self.uiStateVersion = (self.uiStateVersion or 0) + 1
@@ -1955,6 +1969,10 @@ function LivingMarket.saveToSavegame(missionInfo)
 
     self:saveEventsToXML(xmlFile, "livingMarket.events")
 
+    if self.saveSalesToXML ~= nil then
+        self:saveSalesToXML(xmlFile, "livingMarket.sales")
+    end
+
     -- Favoriten (gemeinsam für alle Spieler); Abschnitt auch bei leerer Liste, damit nichts neu übernommen wird
     self:isFavorite(0)
     setXMLBool(xmlFile, "livingMarket.favorites#saved", true)
@@ -1965,7 +1983,7 @@ function LivingMarket.saveToSavegame(missionInfo)
     if ui ~= nil then
         if ui.filterMode ~= nil then setXMLString(xmlFile, "livingMarket.ui#filter", ui.filterMode) end
         if ui.eventFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#eventFilter", ui.eventFilter) end
-        for _, name in ipairs({ "ware", "detail", "event" }) do
+        for _, name in ipairs({ "ware", "detail", "event", "sale" }) do
             local state = ui[name .. "Sort"]
             if state ~= nil and state.key ~= nil then
                 setXMLString(xmlFile, "livingMarket.ui#" .. name .. "Sort", state.key)
@@ -2027,6 +2045,9 @@ end
 
 function LivingMarket:deleteMap()
     self.favorites = nil
+    if self.resetSales ~= nil then
+        self:resetSales()
+    end
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}
     self.savedData = {}

@@ -33,6 +33,8 @@ function LivingMarketFrame.new(target, customMt)
     self.eventFilter = "stock"    -- Marktnachrichten: "all" = alle, "stock" = nur Waren, die man liefern kann
     self.eventSort = { key = "status", asc = true }   -- Sortierung Marktnachrichten (laufende zuerst)
     self.eventRows = {}
+    self.saleSort = { key = "time", asc = false }      -- Sortierung Verkäufe (neueste zuerst)
+    self.saleRows = {}
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
     self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
@@ -73,6 +75,10 @@ function LivingMarketFrame:initialize()
         self.eventList:setDataSource(self)
         self.eventList:setDelegate(self)
     end
+    if self.saleList ~= nil then
+        self.saleList:setDataSource(self)
+        self.saleList:setDelegate(self)
+    end
 
     self:setupSortHeaders()
 
@@ -92,6 +98,7 @@ function LivingMarketFrame:applyUiState()
     self.wareSort = { key = "title", asc = true }
     self.detailSort = { key = "price", asc = false }
     self.eventSort = { key = "status", asc = true }
+    self.saleSort = { key = "time", asc = false }
     if ui == nil then
         return
     end
@@ -109,6 +116,7 @@ function LivingMarketFrame:applyUiState()
     take(ui.wareSort, self.WARE_COLUMNS, self.wareSort)
     take(ui.detailSort, self.DETAIL_COLUMNS, self.detailSort)
     take(ui.eventSort, self.EVENT_COLUMNS, self.eventSort)
+    take(ui.saleSort, self.SALE_COLUMNS, self.saleSort)
 end
 
 -- Aktuelle Filter/Sortierung merken (wird mit dem Spielstand gespeichert)
@@ -122,6 +130,7 @@ function LivingMarketFrame:storeUiState()
         wareSort    = copy(self.wareSort),
         detailSort  = copy(self.detailSort),
         eventSort   = copy(self.eventSort),
+        saleSort    = copy(self.saleSort),
     }
 end
 
@@ -130,7 +139,7 @@ function LivingMarketFrame:onFrameOpen()
     self:applyUiState()
 
     -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
-    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame }) do
+    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame, self.saleFrame }) do
         if frame ~= nil and frame.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
             local c = LivingMarketFrame.FRAME_COLOR
             frame:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
@@ -146,6 +155,9 @@ function LivingMarketFrame:onFrameOpen()
     end
     if self.eventSlider ~= nil then
         self.eventSlider:setDataElement(self.eventList)
+    end
+    if self.saleSlider ~= nil then
+        self.saleSlider:setDataElement(self.saleList)
     end
     self:refreshData()
     self:setViewMode(self.viewMode)
@@ -299,6 +311,11 @@ function LivingMarketFrame:refreshData()
             self.emptyText:setVisible(false)
         end
         self:refreshEvents()
+    elseif self.viewMode == "sales" then
+        if self.emptyText ~= nil then
+            self.emptyText:setVisible(false)
+        end
+        self:refreshSales()
     end
 end
 
@@ -472,6 +489,16 @@ LivingMarketFrame.EVENT_COLUMNS = {
     finish  = { label = "livingMarket_colEnd",       isText = true  },
     status  = { label = "livingMarket_colStatus",    isText = true  },   -- laufende zuerst
 }
+LivingMarketFrame.SALE_COLUMNS = {
+    time    = { label = "livingMarket_colTime",      isText = false },
+    ware    = { label = "livingMarket_colWare",      isText = true  },
+    station = { label = "livingMarket_colStationEv", isText = true  },
+    amount  = { label = "livingMarket_colAmount",    isText = false },
+    price   = { label = "livingMarket_colPrice",     isText = false },
+    revenue = { label = "livingMarket_colRevenue",   isText = false },
+    market  = { label = "livingMarket_colMarket",    isText = false },
+    event   = { label = "livingMarket_colEvent",     isText = true  },
+}
 LivingMarketFrame.DETAIL_COLUMNS = {
     name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
     price  = { label = "livingMarket_colPrice",     isText = false },
@@ -513,6 +540,26 @@ local function wareValue(ware, key)
         return ware.sellable
     elseif key == "revenue" then
         return ware.revenue
+    end
+end
+
+local function saleValue(row, key)
+    if key == "time" then
+        return row.id
+    elseif key == "ware" then
+        return LivingMarket.toLower(row.wareTitle or "")
+    elseif key == "station" then
+        return LivingMarket.toLower(row.stationName or "")
+    elseif key == "amount" then
+        return row.liters
+    elseif key == "price" then
+        return row.pricePer1000
+    elseif key == "revenue" then
+        return row.money
+    elseif key == "market" then
+        return row.factor
+    elseif key == "event" then
+        return row.eventLabel or ""
     end
 end
 
@@ -614,6 +661,8 @@ function LivingMarketFrame:onClickSortHeader(element)
             sortState, columns, key = self.detailSort, self.DETAIL_COLUMNS, column
         elseif table_ == "Event" then
             sortState, columns, key = self.eventSort, self.EVENT_COLUMNS, column
+        elseif table_ == "Sale" then
+            sortState, columns, key = self.saleSort, self.SALE_COLUMNS, column
         end
     end
     if sortState == nil or columns[key] == nil then
@@ -632,6 +681,8 @@ function LivingMarketFrame:onClickSortHeader(element)
         self:rebuildWareList()
     elseif sortState == self.eventSort then
         self:refreshEvents()
+    elseif sortState == self.saleSort then
+        self:refreshSales()
     else
         self:updateDetail(self.detailWare)
     end
@@ -695,6 +746,7 @@ function LivingMarketFrame:setupSortHeaders()
     limitHeaderHitArea(self.viewMarketButton)
     limitHeaderHitArea(self.eventFilterButton)
     limitHeaderHitArea(self.viewEventsButton)
+    limitHeaderHitArea(self.viewSalesButton)
     limitHeaderHitArea(self.detailTitle)
     for key in pairs(self.WARE_COLUMNS) do
         limitHeaderHitArea(self["sortWare_" .. key])
@@ -704,6 +756,9 @@ function LivingMarketFrame:setupSortHeaders()
     end
     for key in pairs(self.EVENT_COLUMNS) do
         limitHeaderHitArea(self["sortEvent_" .. key])
+    end
+    for key in pairs(self.SALE_COLUMNS) do
+        limitHeaderHitArea(self["sortSale_" .. key])
     end
 end
 
@@ -734,6 +789,9 @@ function LivingMarketFrame:updateSortHeaders()
     self:placeSortArrow(self.detailSortArrow, apply("Detail", self.DETAIL_COLUMNS, self.detailSort), self.detailSort.asc)
     if self.eventSortArrow ~= nil then
         self:placeSortArrow(self.eventSortArrow, apply("Event", self.EVENT_COLUMNS, self.eventSort), self.eventSort.asc)
+    end
+    if self.saleSortArrow ~= nil then
+        self:placeSortArrow(self.saleSortArrow, apply("Sale", self.SALE_COLUMNS, self.saleSort), self.saleSort.asc)
     end
 end
 
@@ -824,8 +882,13 @@ function LivingMarketFrame:update(dt)
         end
     end
 
-    -- Uhr in den Marktnachrichten
-    if self.viewMode == "events" then
+    -- Verkäufe: neue Einträge sofort zeigen
+    if self.viewMode == "sales" and self.shownSalesVersion ~= LivingMarket.salesVersion then
+        self:refreshSales()
+    end
+
+    -- Uhr in den Marktnachrichten und Verkäufen
+    if self.viewMode == "events" or self.viewMode == "sales" then
         self.clockTimer = (self.clockTimer or 0) - dt
         if self.clockTimer <= 0 then
             self.clockTimer = 250
@@ -907,9 +970,18 @@ function LivingMarketFrame:onClickViewEvents()
     self:setViewMode("events")
 end
 
+function LivingMarketFrame:onClickViewSales()
+    self:setViewMode("sales")
+end
+
 function LivingMarketFrame:setViewMode(mode)
+    if mode ~= "events" and mode ~= "sales" then
+        mode = "market"
+    end
     self.viewMode = mode
-    local showMarket = mode ~= "events"
+    local showMarket = mode == "market"
+    local showEvents = mode == "events"
+    local showSales = mode == "sales"
 
     for _, element in ipairs({ self.wareFrame, self.wareHeader, self.wareArea, self.detailPanel,
                                self.filterButton, self.searchInput }) do
@@ -929,17 +1001,27 @@ function LivingMarketFrame:setViewMode(mode)
     end
     for _, element in ipairs({ self.eventFrame, self.eventHeader, self.eventArea, self.eventFilterButton }) do
         if element ~= nil then
-            element:setVisible(not showMarket)
+            element:setVisible(showEvents)
         end
+    end
+    for _, element in ipairs({ self.saleFrame, self.saleHeader, self.saleArea }) do
+        if element ~= nil then
+            element:setVisible(showSales)
+        end
+    end
+    if self.eventEmptyText ~= nil and not showEvents then
+        self.eventEmptyText:setVisible(false)
+    end
+    if self.saleEmptyText ~= nil and not showSales then
+        self.saleEmptyText:setVisible(false)
     end
 
     if showMarket then
         self:rebuildWareList()   -- setzt auch den Hinweis bei leerer Liste
-        if self.eventEmptyText ~= nil then
-            self.eventEmptyText:setVisible(false)
-        end
-    else
+    elseif showEvents then
         self:refreshEvents()
+    else
+        self:refreshSales()
     end
 
     local function paint(button, active)
@@ -955,7 +1037,8 @@ function LivingMarketFrame:setViewMode(mode)
         end
     end
     paint(self.viewMarketButton, showMarket)
-    paint(self.viewEventsButton, not showMarket)
+    paint(self.viewEventsButton, showEvents)
+    paint(self.viewSalesButton, showSales)
     self:updateMenuButtons()
 end
 
@@ -1041,20 +1124,85 @@ function LivingMarketFrame:populateEventCell(row, cell)
     setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
 end
 
+-- ---------------------------------------------------------------------
+-- Verkäufe (letzte 50 des eigenen Hofs)
+-- ---------------------------------------------------------------------
+function LivingMarketFrame:refreshSales()
+    self.shownSalesVersion = LivingMarket.salesVersion
+    local farmId = g_currentMission ~= nil and g_currentMission.getFarmId ~= nil and g_currentMission:getFarmId() or 0
+    local rows = {}
+    for _, sale in ipairs(LivingMarket:getSalesForFarm(farmId)) do
+        local fillType = g_fillTypeManager:getFillTypeByIndex(sale.fillTypeIndex)
+        local label = EVENT_LABELS[sale.eventType or 0]
+        table.insert(rows, {
+            id            = sale.id,
+            fillTypeIndex = sale.fillTypeIndex,
+            wareTitle     = fillType ~= nil and (fillType.title or fillType.name) or "?",
+            stationName   = sale.stationName,
+            liters        = sale.liters,
+            money         = sale.money,
+            pricePer1000  = sale.liters > 0 and sale.money / sale.liters * 1000 or 0,
+            factor        = sale.factor or 1,
+            eventType     = sale.eventType or 0,
+            eventLabel    = label ~= nil and g_i18n:getText(label) or nil,
+            timeText      = LivingMarket:formatSaleTime(sale.minute or 0),
+        })
+    end
+    local key, asc = self.saleSort.key, self.saleSort.asc
+    table.sort(rows, function(a, b)
+        return compare(saleValue(a, key), saleValue(b, key), asc, -a.id, -b.id)
+    end)
+    self.saleRows = rows
+    self:updateSortHeaders()
+    if self.saleEmptyText ~= nil then
+        self.saleEmptyText:setVisible(self.viewMode == "sales" and #rows == 0)
+    end
+    if self.saleList ~= nil then
+        self.saleList:reloadData(true)
+    end
+end
+
+function LivingMarketFrame:populateSaleCell(row, cell)
+    if row == nil or cell:getAttribute("time") == nil then
+        return
+    end
+    local function put(name, text, color)
+        local element = cell:getAttribute(name)
+        if element ~= nil then
+            element:setText(text or "")
+            setTextColorAll(element, color or COLOR_TEXT)
+        end
+    end
+    put("time", row.timeText)
+    put("ware", row.wareTitle)
+    put("station", row.stationName)
+    put("amount", LivingMarket.formatLiters(row.liters))
+    put("price", formatPrice(row.pricePer1000))
+    put("revenue", LivingMarket.formatMoney(row.money), COLOR_GOOD)
+    local marketText, marketColor = getMarketText(row.factor)
+    put("market", marketText, marketColor)
+    if row.eventLabel ~= nil then
+        put("event", row.eventLabel, isPositiveEvent(row.eventType) and COLOR_GOOD or COLOR_LOW)
+    else
+        put("event", "-", COLOR_MUTED_LIGHT)
+    end
+    setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
+end
+
 function LivingMarketFrame:updateMenuButtons()
     self:updateFilterButton()
 
     self.menuButtonInfo = { self.backButtonInfo }
     local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
-    if self.viewMode == "events" then
-        ware = nil   -- in den Marktnachrichten keine Favoriten-Taste
+    if self.viewMode ~= "market" then
+        ware = nil   -- in Marktnachrichten und Verkäufen keine Favoriten-/Lagerorte-Taste
     end
     if ware ~= nil then
         table.insert(self.menuButtonInfo, self.locationButtonInfo)
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
         table.insert(self.menuButtonInfo, self.favButtonInfo)
     end
-    if self:isSearching() and self.viewMode ~= "events" then
+    if self:isSearching() and self.viewMode == "market" then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
     end
     self:setMenuButtonInfoDirty()
@@ -1072,6 +1220,8 @@ function LivingMarketFrame:getNumberOfItemsInSection(list, section)
         return #self.visibleWares
     elseif list == self.eventList then
         return #self.eventRows
+    elseif list == self.saleList then
+        return #self.saleRows
     end
     return #self.detailStations
 end
@@ -1079,6 +1229,8 @@ end
 function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
     if list == self.eventList then
         return "event"
+    elseif list == self.saleList then
+        return "sale"
     end
     return list == self.wareList and "ware" or "station"
 end
@@ -1100,6 +1252,10 @@ function LivingMarketFrame:populateCellForItemInSection(list, section, index, ce
     if list == self.eventList then
         setRowBackground(cell:getAttribute("bg"), index, false)
         self:populateEventCell(self.eventRows[index], cell)
+        return
+    elseif list == self.saleList then
+        setRowBackground(cell:getAttribute("bg"), index, false)
+        self:populateSaleCell(self.saleRows[index], cell)
         return
     end
     local isSelected = list == self.wareList and index == self.selectedWareIndex

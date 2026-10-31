@@ -157,3 +157,67 @@ function LivingMarketFavoritesEvent:run(connection)
         g_server:broadcastEvent(LivingMarketFavoritesEvent.new(self.names), nil, connection)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Verkaufsverlauf: Server -> Mitspieler (neue/geänderte Verkäufe; replace = komplette Liste beim Beitreten)
+-- ---------------------------------------------------------------------
+LivingMarketSalesEvent = {}
+local LivingMarketSalesEvent_mt = Class(LivingMarketSalesEvent, Event)
+InitEventClass(LivingMarketSalesEvent, "LivingMarketSalesEvent")
+
+function LivingMarketSalesEvent.emptyNew()
+    return Event.new(LivingMarketSalesEvent_mt)
+end
+
+function LivingMarketSalesEvent.new(sales, replace)
+    local self = LivingMarketSalesEvent.emptyNew()
+    self.sales = sales or {}
+    self.replace = replace == true
+    return self
+end
+
+function LivingMarketSalesEvent:writeStream(streamId, connection)
+    local now = LivingMarket.getNowMinute()
+    local count = math.min(#self.sales, 4000)
+    streamWriteBool(streamId, self.replace)
+    streamWriteUInt16(streamId, count)
+    for i = 1, count do
+        local sale = self.sales[i]
+        streamWriteInt32(streamId, sale.id)
+        streamWriteUInt8(streamId, sale.farmId)
+        streamWriteUIntN(streamId, sale.fillTypeIndex, FillTypeManager.SEND_NUM_BITS)
+        streamWriteString(streamId, sale.stationName or "")
+        streamWriteFloat32(streamId, sale.liters)
+        streamWriteFloat32(streamId, sale.money)
+        streamWriteInt32(streamId, (sale.minute or now) - now)
+        streamWriteFloat32(streamId, sale.factor or 1)
+        streamWriteUInt8(streamId, sale.eventType or 0)
+    end
+end
+
+function LivingMarketSalesEvent:readStream(streamId, connection)
+    local now = LivingMarket.getNowMinute()
+    self.replace = streamReadBool(streamId)
+    self.sales = {}
+    local count = streamReadUInt16(streamId)
+    for _ = 1, count do
+        local sale = {}
+        sale.id            = streamReadInt32(streamId)
+        sale.farmId        = streamReadUInt8(streamId)
+        sale.fillTypeIndex = streamReadUIntN(streamId, FillTypeManager.SEND_NUM_BITS)
+        sale.stationName   = streamReadString(streamId)
+        sale.liters        = streamReadFloat32(streamId)
+        sale.money         = streamReadFloat32(streamId)
+        sale.minute        = now + streamReadInt32(streamId)
+        sale.factor        = streamReadFloat32(streamId)
+        sale.eventType     = streamReadUInt8(streamId)
+        table.insert(self.sales, sale)
+    end
+    self:run(connection)
+end
+
+function LivingMarketSalesEvent:run(connection)
+    if connection:getIsServer() and g_server == nil then   -- nur auf Clients übernehmen
+        LivingMarket:applySales(self.sales, self.replace)
+    end
+end

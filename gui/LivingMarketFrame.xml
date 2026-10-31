@@ -8,9 +8,10 @@
             </Bitmap>
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
-            <!-- Ansicht umschalten: Markt / Marktnachrichten (aktive Ansicht grün) -->
-            <Button profile="lm_viewButton" id="viewMarketButton" position="-860px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
-            <Button profile="lm_viewButton" id="viewEventsButton" position="-620px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
+            <!-- Ansicht umschalten: Markt / Marktnachrichten / Verkäufe (aktive Ansicht grün; Position = rechte Textkante) -->
+            <Button profile="lm_viewButton" id="viewMarketButton" position="-1030px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
+            <Button profile="lm_viewButton" id="viewEventsButton" position="-760px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
+            <Button profile="lm_viewButton" id="viewSalesButton" position="-620px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
 
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
@@ -171,6 +172,46 @@
         </GuiElement>
 
         <Text profile="lm_emptyText" id="eventEmptyText" text="$l10n_livingMarket_noEvents" visible="false"/>
+
+        <!-- ============ Ansicht Verkäufe (letzte 50 Verkäufe des eigenen Hofs) ============ -->
+        <ThreePartBitmap profile="lm_tableFrameFull" id="saleFrame" visible="false"/>
+
+        <GuiElement profile="fs25_settingsControlsListHeader" id="saleHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
+            <Button profile="lm_sortHeader" id="sortSale_time" position="20px 0px" text="$l10n_livingMarket_colTime" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortSale_ware" position="184px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortSale_station" position="420px 0px" text="$l10n_livingMarket_colStationEv" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortSale_amount" position="380px 0px" text="$l10n_livingMarket_colAmount" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortSale_price" position="500px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortSale_revenue" position="630px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortSale_market" position="750px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortSale_event" position="1230px 0px" text="$l10n_livingMarket_colEvent" onClick="onClickSortHeader"/>
+            <Bitmap profile="lm_sortArrow" id="saleSortArrow"/>
+            <ThreePartBitmap profile="lm_headerLine"/>
+        </GuiElement>
+
+        <GuiElement profile="lm_eventsArea" id="saleArea" visible="false">
+            <SmoothList profile="fs25_settingsControlsList" id="saleList" absoluteSizeOffset="90px 60px" selectOnClick="false">
+                <ListItem profile="lm_listItem" name="sale">
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
+                    <Text profile="lm_rowText" name="time" position="20px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="150px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="184px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="420px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="500px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="630px 0px"/>
+                    <Text profile="lm_rowTextRight" name="market" position="750px 0px"/>
+                    <Text profile="lm_rowText" name="event" position="1230px 0px"/>
+                </ListItem>
+            </SmoothList>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="saleSlider" dataElementId="saleList"/>
+                </ThreePartBitmap>
+            </GuiElement>
+        </GuiElement>
+
+        <Text profile="lm_emptyText" id="saleEmptyText" text="$l10n_livingMarket_noSales" visible="false"/>
     </GuiElement>
 
     <GUIProfiles>
