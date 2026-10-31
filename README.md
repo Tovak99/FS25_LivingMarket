@@ -2,7 +2,7 @@
 
 Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nicht mehr unbegrenzt an: Jede Station hat pro Ware einen **Bedarf**, der beim Verkauf sinkt und sich mit der Zeit langsam wieder auffüllt. Ziel ist ein lebendiger Markt mit Nachfrage, Engpässen, Preisänderungen und Angeboten.
 
-> Status: Entwicklungsversion 0.2.1.37 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
+> Status: Entwicklungsversion 0.2.1.42 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
 
 ## Funktionen
 
