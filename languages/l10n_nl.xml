@@ -80,7 +80,7 @@
         <text name="livingMarket_ctResultDone" text="Nagekomen"/>
         <text name="livingMarket_ctResultFailed" text="Niet nagekomen"/>
         <text name="livingMarket_ctResultCancelled" text="Opgezegd"/>
-        <text name="livingMarket_ctHistoryTitle" text="Afgerond"/>
+        <text name="livingMarket_ctHistoryTitle" text="Resultaat"/>
         <text name="livingMarket_ctBonusPenalty" text="Bonus / boete"/>
         <text name="livingMarket_ctNoHistory" text="Nog geen afgeronde contracten"/>
         <text name="livingMarket_year" text="Jaar %d"/>

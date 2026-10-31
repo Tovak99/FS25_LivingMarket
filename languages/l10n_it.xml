@@ -80,7 +80,7 @@
         <text name="livingMarket_ctResultDone" text="Adempiuto"/>
         <text name="livingMarket_ctResultFailed" text="Non adempiuto"/>
         <text name="livingMarket_ctResultCancelled" text="Disdetto"/>
-        <text name="livingMarket_ctHistoryTitle" text="Conclusi"/>
+        <text name="livingMarket_ctHistoryTitle" text="Esito"/>
         <text name="livingMarket_ctBonusPenalty" text="Bonus / penale"/>
         <text name="livingMarket_ctNoHistory" text="Nessun contratto concluso"/>
         <text name="livingMarket_year" text="Anno %d"/>

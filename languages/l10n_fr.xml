@@ -80,7 +80,7 @@
         <text name="livingMarket_ctResultDone" text="Rempli"/>
         <text name="livingMarket_ctResultFailed" text="Non rempli"/>
         <text name="livingMarket_ctResultCancelled" text="Résilié"/>
-        <text name="livingMarket_ctHistoryTitle" text="Terminés"/>
+        <text name="livingMarket_ctHistoryTitle" text="Résultat"/>
         <text name="livingMarket_ctBonusPenalty" text="Prime / pénalité"/>
         <text name="livingMarket_ctNoHistory" text="Aucun contrat terminé"/>
         <text name="livingMarket_year" text="Année %d"/>
