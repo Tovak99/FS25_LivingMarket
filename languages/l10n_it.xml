@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Opzioni"/>
         <text name="livingMarket_optSecContracts" text="Contratti"/>
         <text name="livingMarket_optMaxContracts" text="Numero di contratti"/>
-        <text name="livingMarket_optMaxContractsHint" text="Quanti contratti una fattoria può avere in corso contemporaneamente. Vale per tutta la partita. Predefinito: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Quante offerte di contratto ci sono contemporaneamente. Quelle accettate o scadute vengono sostituite entro un giorno. Vale per tutta la partita. Predefinito: %d"/>
         <text name="livingMarket_optHostOnly" text="(solo host/admin)"/>
         <text name="livingMarket_optDefault" text="Predefinito"/>
         <text name="livingMarket_optBack" text="Indietro"/>

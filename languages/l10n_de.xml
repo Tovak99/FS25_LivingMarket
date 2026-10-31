@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Optionen"/>
         <text name="livingMarket_optSecContracts" text="Verträge"/>
         <text name="livingMarket_optMaxContracts" text="Anzahl der Verträge"/>
-        <text name="livingMarket_optMaxContractsHint" text="Wie viele Verträge ein Hof gleichzeitig laufen haben kann. Gilt für das ganze Spiel. Standard: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Wie viele Vertragsangebote es gleichzeitig gibt. Angenommene oder abgelaufene werden innerhalb eines Tages ersetzt. Gilt für das ganze Spiel. Standard: %d"/>
         <text name="livingMarket_optHostOnly" text="(nur Host/Admin)"/>
         <text name="livingMarket_optDefault" text="Standard"/>
         <text name="livingMarket_optBack" text="Zurück"/>

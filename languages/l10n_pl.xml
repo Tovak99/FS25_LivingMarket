@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Opcje"/>
         <text name="livingMarket_optSecContracts" text="Umowy"/>
         <text name="livingMarket_optMaxContracts" text="Liczba umów"/>
-        <text name="livingMarket_optMaxContractsHint" text="Ile umów gospodarstwo może mieć jednocześnie w toku. Dotyczy całej gry. Domyślnie: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Ile ofert umów jest dostępnych jednocześnie. Przyjęte lub wygasłe oferty są zastępowane w ciągu jednego dnia. Dotyczy całej gry. Domyślnie: %d"/>
         <text name="livingMarket_optHostOnly" text="(tylko host/admin)"/>
         <text name="livingMarket_optDefault" text="Domyślne"/>
         <text name="livingMarket_optBack" text="Wróć"/>

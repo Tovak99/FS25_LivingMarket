@@ -16,8 +16,8 @@
 
 LivingMarket.CONTRACT_SETTINGS = {
     enabled          = true,
-    minOffers        = 3,      -- so viele offene Ausschreibungen gleichzeitig (jeden Monat neu gewählt)
-    maxOffers        = 6,
+    minOffers        = 3,      -- nicht mehr verwendet (Anzahl = maxOffers bzw. Option)
+    maxOffers        = 6,      -- offene Ausschreibungen gleichzeitig (Standard der Option)
     offerMonths      = 1,      -- nicht angenommene Ausschreibung verfällt nach ...
     minMonths        = 1,      -- Frist ab Annahme
     maxMonths        = 3,
@@ -52,9 +52,12 @@ LivingMarket.CONTRACT_HISTORY_MAX = 20   -- je Hof
 LivingMarket.contractsVersion = 0
 LivingMarket.contractOverride = nil  -- während einer Vertragslieferung: { station, fillTypeIndex, pricePerLiter }
 
--- Option "Anzahl der Verträge" (Optionsseite, gilt für das ganze Spiel, im Spielstand)
-LivingMarket.MAX_CONTRACTS_LIMIT = 10    -- höchster einstellbarer Wert
-LivingMarket.maxContractsSetting = nil   -- nil = Standard aus der Konfiguration (maxActivePerFarm)
+-- Option "Anzahl der Verträge" (Optionsseite, gilt für das ganze Spiel, im Spielstand):
+-- so viele Ausschreibungen gibt es gleichzeitig; fehlende werden innerhalb eines Spieltags ersetzt
+LivingMarket.MAX_CONTRACTS_LIMIT = 20    -- höchster einstellbarer Wert
+LivingMarket.maxContractsSetting = nil   -- nil = Standard aus der Konfiguration (maxOffers)
+LivingMarket.CONTRACT_REFILL_HOURS = 24  -- fehlende Ausschreibungen spätestens nach so vielen Spielstunden ersetzt
+LivingMarket.contractSpawnHours = {}     -- geplante Zeitpunkte (Spielstunde) für neue Ausschreibungen
 
 local function isServerSide()
     return g_currentMission ~= nil and g_currentMission:getIsServer()
@@ -291,13 +294,22 @@ local function countOffers()
     return count
 end
 
--- Laufende Verträge je Hof höchstens (Option oder Standard aus der Konfiguration)
+-- Laufende Verträge je Hof höchstens (Konfiguration)
 function LivingMarket:getMaxActiveContracts()
-    return self.maxContractsSetting or self.CONTRACT_SETTINGS.maxActivePerFarm
+    return self.CONTRACT_SETTINGS.maxActivePerFarm
+end
+
+-- Ausschreibungen gleichzeitig (Option oder Standard aus der Konfiguration)
+function LivingMarket:getDefaultContractCount()
+    return self.CONTRACT_SETTINGS.maxOffers
+end
+
+function LivingMarket:getContractOfferTarget()
+    return self.maxContractsSetting or self:getDefaultContractCount()
 end
 
 function LivingMarket:getMaxContractsLimit()
-    return math.max(self.MAX_CONTRACTS_LIMIT, self.CONTRACT_SETTINGS.maxActivePerFarm)
+    return math.max(self.MAX_CONTRACTS_LIMIT, self:getDefaultContractCount())
 end
 
 -- Darf dieser Spieler die Spiel-Optionen ändern? (Einzelspieler/Host oder Admin)
@@ -312,7 +324,7 @@ end
 function LivingMarket:applyMaxContracts(value)
     if value ~= nil then
         value = math.floor(value)
-        if value < 1 or value == self.CONTRACT_SETTINGS.maxActivePerFarm then
+        if value < 1 or value == self:getDefaultContractCount() then
             value = nil   -- Standard
         else
             value = math.min(value, self:getMaxContractsLimit())
@@ -603,21 +615,26 @@ function LivingMarket:tickContracts()
         end
     end
 
-    if self.contractTarget == nil then
-        self:rollContractTarget()
+    -- Ausschreibungen auf die eingestellte Anzahl auffüllen: jede fehlende bekommt einen
+    -- zufälligen Zeitpunkt innerhalb des nächsten Spieltags
+    local spawns = self.contractSpawnHours
+    local missing = s.enabled and (self:getContractOfferTarget() - countOffers()) or 0
+    while #spawns > math.max(0, missing) do
+        table.remove(spawns)   -- Anzahl gesenkt oder Angebote anders entstanden
     end
-    local missing = s.enabled and (self.contractTarget - countOffers()) or 0
-    if missing > 0 then
-        -- wie die Marktereignisse: verteilt über etwa ein Drittel Monat
-        local window = math.max(4, self.getHoursPerMonth() / 3)
-        local expected = missing / window
-        local count = math.floor(expected) + ((math.random() < expected % 1) and 1 or 0)
-        for _ = 1, math.min(count, missing) do
+    while #spawns < missing do
+        table.insert(spawns, now + math.random(1, self.CONTRACT_REFILL_HOURS))
+    end
+    for i = #spawns, 1, -1 do
+        if now >= spawns[i] then
             local contract = self:createContractOffer()
             if contract ~= nil then
                 table.insert(self.contracts, contract)
                 self:announceContract(0, "livingMarket_ctNewOffer", contract, 0)
+                table.remove(spawns, i)
                 changed = true
+            else
+                spawns[i] = now + 1   -- gerade nichts Passendes: nächste Stunde erneut versuchen
             end
         end
     end
@@ -811,7 +828,7 @@ function LivingMarket:loadContractsFromXML(xmlFile, baseKey)
     self.contractNextId = getXMLInt(xmlFile, baseKey .. "#nextId") or 1
     self.maxContractsSetting = nil
     local maxActive = getXMLInt(xmlFile, baseKey .. "#maxActive")
-    if maxActive ~= nil and maxActive >= 1 and maxActive ~= self.CONTRACT_SETTINGS.maxActivePerFarm then
+    if maxActive ~= nil and maxActive >= 1 and maxActive ~= self:getDefaultContractCount() then
         self.maxContractsSetting = math.min(maxActive, self:getMaxContractsLimit())
     end
     local i = 0
@@ -906,6 +923,7 @@ function LivingMarket:resetContracts()
     self.reputation = {}
     self.contractNextId = 1
     self.contractTarget = nil
+    self.contractSpawnHours = {}
     self.contractOverride = nil
     self.maxContractsSetting = nil
     self.contractsVersion = self.contractsVersion + 1

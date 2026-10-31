@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Opties"/>
         <text name="livingMarket_optSecContracts" text="Contracten"/>
         <text name="livingMarket_optMaxContracts" text="Aantal contracten"/>
-        <text name="livingMarket_optMaxContractsHint" text="Hoeveel contracten een boerderij tegelijk kan hebben lopen. Geldt voor het hele spel. Standaard: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Hoeveel contractaanbiedingen er tegelijk zijn. Aangenomen of verlopen aanbiedingen worden binnen een dag vervangen. Geldt voor het hele spel. Standaard: %d"/>
         <text name="livingMarket_optHostOnly" text="(alleen host/admin)"/>
         <text name="livingMarket_optDefault" text="Standaard"/>
         <text name="livingMarket_optBack" text="Terug"/>

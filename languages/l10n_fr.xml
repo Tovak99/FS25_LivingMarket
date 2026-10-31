@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Options"/>
         <text name="livingMarket_optSecContracts" text="Contrats"/>
         <text name="livingMarket_optMaxContracts" text="Nombre de contrats"/>
-        <text name="livingMarket_optMaxContractsHint" text="Nombre de contrats qu'une ferme peut avoir en cours en même temps. S'applique à toute la partie. Par défaut : %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Nombre d'offres de contrat disponibles en même temps. Les offres acceptées ou expirées sont remplacées en un jour. S'applique à toute la partie. Par défaut : %d"/>
         <text name="livingMarket_optHostOnly" text="(hôte/admin uniquement)"/>
         <text name="livingMarket_optDefault" text="Par défaut"/>
         <text name="livingMarket_optBack" text="Retour"/>

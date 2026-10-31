@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Opciones"/>
         <text name="livingMarket_optSecContracts" text="Contratos"/>
         <text name="livingMarket_optMaxContracts" text="Número de contratos"/>
-        <text name="livingMarket_optMaxContractsHint" text="Cuántos contratos puede tener una granja en curso a la vez. Se aplica a toda la partida. Predeterminado: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="Cuántas ofertas de contrato hay a la vez. Las aceptadas o caducadas se reponen en un día. Se aplica a toda la partida. Predeterminado: %d"/>
         <text name="livingMarket_optHostOnly" text="(solo anfitrión/admin)"/>
         <text name="livingMarket_optDefault" text="Predeterminado"/>
         <text name="livingMarket_optBack" text="Volver"/>

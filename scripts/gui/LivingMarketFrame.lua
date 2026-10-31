@@ -1198,8 +1198,8 @@ end
 
 function LivingMarketFrame:refreshOptions()
     self.shownOptionsVersion = LivingMarket.contractsVersion
-    local value = LivingMarket:getMaxActiveContracts()
-    local default = LivingMarket.CONTRACT_SETTINGS.maxActivePerFarm
+    local value = LivingMarket:getContractOfferTarget()
+    local default = LivingMarket:getDefaultContractCount()
     local limit = LivingMarket:getMaxContractsLimit()
     local canChange = LivingMarket:canChangeGameSettings()
     if self.optMaxContractsValue ~= nil then
@@ -1223,12 +1223,12 @@ function LivingMarketFrame:refreshOptions()
 end
 
 function LivingMarketFrame:onClickMaxContractsMinus()
-    LivingMarket:requestMaxContracts(math.max(1, LivingMarket:getMaxActiveContracts() - 1))
+    LivingMarket:requestMaxContracts(math.max(1, LivingMarket:getContractOfferTarget() - 1))
     self:refreshOptions()
 end
 
 function LivingMarketFrame:onClickMaxContractsPlus()
-    LivingMarket:requestMaxContracts(math.min(LivingMarket:getMaxContractsLimit(), LivingMarket:getMaxActiveContracts() + 1))
+    LivingMarket:requestMaxContracts(math.min(LivingMarket:getMaxContractsLimit(), LivingMarket:getContractOfferTarget() + 1))
     self:refreshOptions()
 end
 

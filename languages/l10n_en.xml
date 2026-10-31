@@ -73,7 +73,7 @@
         <text name="livingMarket_optTitle" text="Options"/>
         <text name="livingMarket_optSecContracts" text="Contracts"/>
         <text name="livingMarket_optMaxContracts" text="Number of contracts"/>
-        <text name="livingMarket_optMaxContractsHint" text="How many contracts a farm can have running at the same time. Applies to the whole game. Default: %d"/>
+        <text name="livingMarket_optMaxContractsHint" text="How many contract offers exist at the same time. Accepted or expired offers are replaced within one day. Applies to the whole game. Default: %d"/>
         <text name="livingMarket_optHostOnly" text="(host/admin only)"/>
         <text name="livingMarket_optDefault" text="Default"/>
         <text name="livingMarket_optBack" text="Back"/>
