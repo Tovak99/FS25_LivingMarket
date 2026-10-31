@@ -85,6 +85,7 @@
         <text name="livingMarket_ctNoHistory" text="Noch keine abgeschlossenen Verträge"/>
         <text name="livingMarket_ctEnded" text="Beendet"/>
         <text name="livingMarket_ctUntil" text="bis %s"/>
+        <text name="livingMarket_ctRepInfo" text="Ansehen bei %s: +%d bei Erfüllung, −%d bei Nichterfüllung."/>
         <text name="livingMarket_year" text="Jahr %d"/>
         <text name="livingMarket_colRefill" text="Verkäufe"/>
         <text name="livingMarket_colStart" text="Beginn"/>

@@ -85,6 +85,7 @@
         <text name="livingMarket_ctNoHistory" text="Aún no hay contratos finalizados"/>
         <text name="livingMarket_ctEnded" text="Finalizado"/>
         <text name="livingMarket_ctUntil" text="hasta %s"/>
+        <text name="livingMarket_ctRepInfo" text="Reputación con %s: +%d si se cumple, −%d si no."/>
         <text name="livingMarket_year" text="Año %d"/>
         <text name="livingMarket_colRefill" text="Salida"/>
         <text name="livingMarket_colStart" text="Inicio"/>

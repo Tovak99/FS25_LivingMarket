@@ -85,6 +85,7 @@
         <text name="livingMarket_ctNoHistory" text="No completed contracts yet"/>
         <text name="livingMarket_ctEnded" text="Ended"/>
         <text name="livingMarket_ctUntil" text="by %s"/>
+        <text name="livingMarket_ctRepInfo" text="Standing with %s: +%d if fulfilled, −%d if not."/>
         <text name="livingMarket_year" text="Year %d"/>
         <text name="livingMarket_colRefill" text="Turnover"/>
         <text name="livingMarket_colStart" text="Start"/>

@@ -236,6 +236,7 @@
                     <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
                     <Text profile="lm_rowText" name="station" position="360px 0px"/>
                     <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
+                    <Text profile="lm_rowText" name="repGain" position="658px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
                     <Text profile="lm_rowTextRight" name="bonus" position="600px 0px"/>
@@ -288,6 +289,7 @@
                     <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
                     <Text profile="lm_rowText" name="station" position="360px 0px"/>
                     <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
+                    <Text profile="lm_rowText" name="repGain" position="658px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
                     <Text profile="lm_rowTextRight" name="bonus" position="650px 0px"/>

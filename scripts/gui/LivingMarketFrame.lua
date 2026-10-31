@@ -1425,6 +1425,12 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         put("bonus", (row.money >= 0 and "+" or "−") .. LivingMarket.formatMoney(math.abs(row.money)), row.money >= 0 and COLOR_GOOD or COLOR_LOW)
         put("deadline", LivingMarket:formatEventTime(row.endHour or 0), muted)
         put("stock", "", muted)
+        local cs = LivingMarket.CONTRACT_SETTINGS
+        if done then
+            put("repGain", string.format("+%d", cs.repFulfilled), COLOR_GOOD)
+        else
+            put("repGain", string.format("−%d", cs.repFailed), COLOR_LOW)
+        end
         setStarsIcon(cell:getAttribute("stars"), row.stars)
         setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
         return
@@ -1443,6 +1449,9 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
     put("status", g_i18n:getText(row.isActive and "livingMarket_ctActive" or "livingMarket_ctOffer"), statusColor)
     put("ware", row.wareTitle, base)
     put("station", row.stationName, base)
+    -- mögliche Änderung des Ansehens: + bei Erfüllung / − bei Nichterfüllung
+    local cs = LivingMarket.CONTRACT_SETTINGS
+    put("repGain", string.format("+%d / −%d", cs.repFulfilled, cs.repFailed), isSelected and COLOR_ON_GREEN or COLOR_MUTED_LIGHT)
     if row.isActive then
         put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
         put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)),
@@ -1499,6 +1508,7 @@ function LivingMarketFrame:onContractAction()
         LivingMarket.formatLiters(row.amount), row.wareTitle, row.stationName, deadline,
         formatPrice(row.price), LivingMarket.formatMoney(value), LivingMarket.formatMoney(row.bonus),
         math.floor(s.penaltyRate * 100 + 0.5), LivingMarket.formatMoney(value * s.penaltyRate), row.stationName)
+    text = text .. "\n" .. string.format(g_i18n:getText("livingMarket_ctRepInfo"), row.stationName, s.repFulfilled, s.repFailed)
     if (row.stock or 0) < 1 then
         text = text .. "\n\n" .. g_i18n:getText("livingMarket_ctNoStock")
     end
