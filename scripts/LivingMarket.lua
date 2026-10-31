@@ -1682,6 +1682,26 @@ function LivingMarket:loadFromSavegame()
     if version >= 4 then
         self:loadEventsFromXML(xmlFile, "livingMarket.events")
     end
+
+    -- Filter und Sortierung der Menüseite
+    if hasXMLProperty(xmlFile, "livingMarket.ui") then
+        local function sortState(name)
+            local key = getXMLString(xmlFile, "livingMarket.ui#" .. name .. "Sort")
+            if key == nil then
+                return nil
+            end
+            local asc = getXMLBool(xmlFile, "livingMarket.ui#" .. name .. "Asc")
+            return { key = key, asc = asc ~= false }
+        end
+        self.uiState = {
+            filterMode  = getXMLString(xmlFile, "livingMarket.ui#filter"),
+            eventFilter = getXMLString(xmlFile, "livingMarket.ui#eventFilter"),
+            wareSort    = sortState("ware"),
+            detailSort  = sortState("detail"),
+            eventSort   = sortState("event"),
+        }
+    end
+    self.uiStateVersion = (self.uiStateVersion or 0) + 1
     delete(xmlFile)
     log("Spielstand geladen: %d Stationen, %d Einträge, %d Marktereignisse", stationCount, entryCount, #self.events)
 end
@@ -1750,6 +1770,20 @@ function LivingMarket.saveToSavegame(missionInfo)
 
     self:saveEventsToXML(xmlFile, "livingMarket.events")
 
+    -- Filter und Sortierung der Menüseite
+    local ui = self.uiState
+    if ui ~= nil then
+        if ui.filterMode ~= nil then setXMLString(xmlFile, "livingMarket.ui#filter", ui.filterMode) end
+        if ui.eventFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#eventFilter", ui.eventFilter) end
+        for _, name in ipairs({ "ware", "detail", "event" }) do
+            local state = ui[name .. "Sort"]
+            if state ~= nil and state.key ~= nil then
+                setXMLString(xmlFile, "livingMarket.ui#" .. name .. "Sort", state.key)
+                setXMLBool(xmlFile, "livingMarket.ui#" .. name .. "Asc", state.asc ~= false)
+            end
+        end
+    end
+
     saveXMLFile(xmlFile)
     delete(xmlFile)
     log("Spielstand gespeichert: %d Stationen, %d Einträge, %d Marktereignisse", i, entryCount, #self.events)
@@ -1816,6 +1850,8 @@ function LivingMarket:deleteMap()
     self.config = nil
     self.events = {}
     self.eventsInitialized = false
+    self.uiState = nil
+    self.uiStateVersion = (self.uiStateVersion or 0) + 1
     self.hasDirty = false
     self.syncTimer = 0
 end

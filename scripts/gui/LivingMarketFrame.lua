@@ -92,8 +92,55 @@ function LivingMarketFrame:initialize()
     self:updateMenuButtons()
 end
 
+-- Filter und Sortierung aus dem Spielstand übernehmen (einmal je geladenem Spielstand)
+function LivingMarketFrame:applyUiState()
+    if self.appliedUiStateVersion == LivingMarket.uiStateVersion then
+        return
+    end
+    self.appliedUiStateVersion = LivingMarket.uiStateVersion
+    local ui = LivingMarket.uiState
+    -- Standardwerte (z. B. neuer Spielstand)
+    self.filterMode = "stock"
+    self.eventFilter = "stock"
+    self.wareSort = { key = "title", asc = true }
+    self.detailSort = { key = "price", asc = false }
+    self.eventSort = { key = "status", asc = true }
+    if ui == nil then
+        return
+    end
+    if ui.filterMode == "all" or ui.filterMode == "stock" or ui.filterMode == "fav" then
+        self.filterMode = ui.filterMode
+    end
+    if ui.eventFilter == "all" or ui.eventFilter == "stock" then
+        self.eventFilter = ui.eventFilter
+    end
+    local function take(state, columns, target)
+        if state ~= nil and columns[state.key] ~= nil then
+            target.key, target.asc = state.key, state.asc ~= false
+        end
+    end
+    take(ui.wareSort, self.WARE_COLUMNS, self.wareSort)
+    take(ui.detailSort, self.DETAIL_COLUMNS, self.detailSort)
+    take(ui.eventSort, self.EVENT_COLUMNS, self.eventSort)
+end
+
+-- Aktuelle Filter/Sortierung merken (wird mit dem Spielstand gespeichert)
+function LivingMarketFrame:storeUiState()
+    local function copy(state)
+        return { key = state.key, asc = state.asc }
+    end
+    LivingMarket.uiState = {
+        filterMode  = self.filterMode,
+        eventFilter = self.eventFilter,
+        wareSort    = copy(self.wareSort),
+        detailSort  = copy(self.detailSort),
+        eventSort   = copy(self.eventSort),
+    }
+end
+
 function LivingMarketFrame:onFrameOpen()
     LivingMarketFrame:superClass().onFrameOpen(self)
+    self:applyUiState()
 
     -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
     for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame }) do
@@ -578,6 +625,7 @@ function LivingMarketFrame:onClickSortHeader(element)
         sortState.key = key
         sortState.asc = columns[key].isText
     end
+    self:storeUiState()
 
     if sortState == self.wareSort then
         self:rebuildWareList()
@@ -785,6 +833,7 @@ LivingMarketFrame.FILTER_LABEL = { all = "livingMarket_filterAll", stock = "livi
 
 function LivingMarketFrame:onClickFilter()
     self.filterMode = self.FILTER_NEXT[self.filterMode] or "all"
+    self:storeUiState()
     self:rebuildWareList()
 end
 
@@ -882,6 +931,7 @@ local EVENT_TYPE_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingM
 
 function LivingMarketFrame:onClickEventFilter()
     self.eventFilter = self.eventFilter == "stock" and "all" or "stock"
+    self:storeUiState()
     self:refreshEvents()
 end
 
