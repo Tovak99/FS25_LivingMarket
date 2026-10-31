@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="Du hast diese Ware gar nicht auf Lager!"/>
         <text name="livingMarket_ctCancelText" text="Vertrag wirklich kündigen?&#10;Bisher geliefert: %s von %s %s an %s.&#10;&#10;Strafe %s und weniger Ansehen bei %s."/>
         <text name="livingMarket_ctLimit" text="Du hast bereits %d laufende Verträge."/>
+        <text name="livingMarket_optTitle" text="Optionen"/>
+        <text name="livingMarket_optSecContracts" text="Verträge"/>
+        <text name="livingMarket_optMaxContracts" text="Anzahl der Verträge"/>
+        <text name="livingMarket_optMaxContractsHint" text="Wie viele Verträge ein Hof gleichzeitig laufen haben kann. Gilt für das ganze Spiel. Standard: %d"/>
+        <text name="livingMarket_optHostOnly" text="(nur Host/Admin)"/>
+        <text name="livingMarket_optDefault" text="Standard"/>
+        <text name="livingMarket_optBack" text="Zurück"/>
         <text name="livingMarket_ctNewOffer" text="Neue Ausschreibung: %s sucht %s %s"/>
         <text name="livingMarket_ctDone" text="Vertrag erfüllt: %s %s an %s – Bonus %s"/>
         <text name="livingMarket_ctFailed" text="Vertrag nicht erfüllt: %s %s an %s – Strafe %s"/>

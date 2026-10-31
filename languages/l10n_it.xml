@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="Non hai per niente questa merce in magazzino!"/>
         <text name="livingMarket_ctCancelText" text="Disdire davvero il contratto?&#10;Consegnato finora: %s di %s di %s a %s.&#10;&#10;Penale %s e minore reputazione presso %s."/>
         <text name="livingMarket_ctLimit" text="Hai già %d contratti in corso."/>
+        <text name="livingMarket_optTitle" text="Opzioni"/>
+        <text name="livingMarket_optSecContracts" text="Contratti"/>
+        <text name="livingMarket_optMaxContracts" text="Numero di contratti"/>
+        <text name="livingMarket_optMaxContractsHint" text="Quanti contratti una fattoria può avere in corso contemporaneamente. Vale per tutta la partita. Predefinito: %d"/>
+        <text name="livingMarket_optHostOnly" text="(solo host/admin)"/>
+        <text name="livingMarket_optDefault" text="Predefinito"/>
+        <text name="livingMarket_optBack" text="Indietro"/>
         <text name="livingMarket_ctNewOffer" text="Nuova gara: %s cerca %s di %s"/>
         <text name="livingMarket_ctDone" text="Contratto adempiuto: %s di %s a %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contratto non adempiuto: %s di %s a %s – penale %s"/>

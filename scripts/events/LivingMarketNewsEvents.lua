@@ -454,3 +454,49 @@ function LivingMarketContractNotifyEvent:run(connection)
         LivingMarket:showContractNotification(self.farmId, self.key, self.stationName, self.fillTypeIndex, self.liters, self.money)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Optionen (gilt für das ganze Spiel): Anzahl der Verträge
+-- Mitspieler (Admin) -> Server: neuen Wert anfragen; Server -> alle: Wert übernehmen.
+-- 0 = Standard aus der Konfiguration
+-- ---------------------------------------------------------------------
+LivingMarketSettingsEvent = {}
+local LivingMarketSettingsEvent_mt = Class(LivingMarketSettingsEvent, Event)
+InitEventClass(LivingMarketSettingsEvent, "LivingMarketSettingsEvent")
+
+function LivingMarketSettingsEvent.emptyNew()
+    return Event.new(LivingMarketSettingsEvent_mt)
+end
+
+function LivingMarketSettingsEvent.new(maxContracts)
+    local self = LivingMarketSettingsEvent.emptyNew()
+    self.maxContracts = math.max(0, math.min(255, math.floor(maxContracts or 0)))
+    return self
+end
+
+function LivingMarketSettingsEvent:writeStream(streamId, connection)
+    streamWriteUInt8(streamId, self.maxContracts)
+end
+
+function LivingMarketSettingsEvent:readStream(streamId, connection)
+    self.maxContracts = streamReadUInt8(streamId)
+    self:run(connection)
+end
+
+function LivingMarketSettingsEvent:run(connection)
+    local value = self.maxContracts > 0 and self.maxContracts or nil
+    if connection:getIsServer() then
+        if g_server == nil then   -- Mitspieler: Wert vom Server übernehmen
+            LivingMarket:applyMaxContracts(value)
+        end
+        return
+    end
+    -- Server: nur Admins dürfen ändern
+    if g_server == nil or g_currentMission == nil or g_currentMission.userManager == nil then
+        return
+    end
+    local user = g_currentMission.userManager.getUserByConnection ~= nil and g_currentMission.userManager:getUserByConnection(connection) or nil
+    if user ~= nil and user.getIsMasterUser ~= nil and user:getIsMasterUser() then
+        LivingMarket:applyMaxContracts(value)
+    end
+end

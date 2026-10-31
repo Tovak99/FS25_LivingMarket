@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="¡No tienes nada de este producto en stock!"/>
         <text name="livingMarket_ctCancelText" text="¿Rescindir realmente el contrato?&#10;Entregado hasta ahora: %s de %s de %s a %s.&#10;&#10;Penalización %s y menos reputación con %s."/>
         <text name="livingMarket_ctLimit" text="Ya tienes %d contratos en curso."/>
+        <text name="livingMarket_optTitle" text="Opciones"/>
+        <text name="livingMarket_optSecContracts" text="Contratos"/>
+        <text name="livingMarket_optMaxContracts" text="Número de contratos"/>
+        <text name="livingMarket_optMaxContractsHint" text="Cuántos contratos puede tener una granja en curso a la vez. Se aplica a toda la partida. Predeterminado: %d"/>
+        <text name="livingMarket_optHostOnly" text="(solo anfitrión/admin)"/>
+        <text name="livingMarket_optDefault" text="Predeterminado"/>
+        <text name="livingMarket_optBack" text="Volver"/>
         <text name="livingMarket_ctNewOffer" text="Nueva licitación: %s busca %s de %s"/>
         <text name="livingMarket_ctDone" text="Contrato cumplido: %s de %s a %s – bonificación %s"/>
         <text name="livingMarket_ctFailed" text="Contrato no cumplido: %s de %s a %s – penalización %s"/>

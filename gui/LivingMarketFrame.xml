@@ -19,7 +19,7 @@
             <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
             <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
             <!-- Filter der Verträge (Alle Angebote / Vorrätig): rechts am Platz des Suchfelds (dort ausgeblendet) -->
-            <Button profile="lm_filterButton" id="contractFilterButton" position="-20px 0px" text="" onClick="onClickContractFilter" visible="false"/>
+            <Button profile="lm_filterButton" id="contractFilterButton" position="-64px 0px" text="" onClick="onClickContractFilter" visible="false"/>
 
             <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
             <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
@@ -34,6 +34,11 @@
                 </Bitmap>
                 <Text profile="lm_searchHint" id="searchHint" name="ignore" text="$l10n_livingMarket_searchHint"/>
             </TextInput>
+
+            <!-- Optionen (Regler-Symbol) ganz rechts; auf der Optionsseite Kreuz zum Zurückgehen -->
+            <Bitmap profile="lm_optionsIcon" id="optionsIcon"/>
+            <Button profile="lm_optionsButton" id="optionsButton" text="" onClick="onClickOptions"/>
+            <Text profile="lm_optionsBackText" id="optionsBackText" text="$l10n_livingMarket_optBack" visible="false"/>
         </GuiElement>
 
 
@@ -307,6 +312,27 @@
             </GuiElement>
             <Text profile="lm_emptyText" id="historyEmptyText" text="$l10n_livingMarket_ctNoHistory" visible="false"/>
         </GuiElement>
+
+        <!-- ============ Optionen (wie im Feld-Info-Mod: Bereiche mit Zeilen, Regler rechts) ============ -->
+        <GuiElement profile="lm_optionsArea" id="optionsArea" visible="false">
+            <Text profile="lm_optTitle" text="$l10n_livingMarket_optTitle"/>
+
+            <!-- Bereich Verträge -->
+            <Text profile="lm_optSection" position="45px -70px" text="$l10n_livingMarket_optSecContracts"/>
+            <ThreePartBitmap profile="lm_optSectionLine" position="45px -98px"/>
+            <GuiElement profile="lm_optRow" position="45px -110px">
+                <ThreePartBitmap profile="lm_optRowBg"/>
+                <Text profile="lm_optLabel" id="optMaxContractsLabel" text="$l10n_livingMarket_optMaxContracts"/>
+                <Text profile="lm_optHint" id="optMaxContractsHint" text=""/>
+                <ThreePartBitmap profile="lm_optButtonBg" id="optMaxContractsMinusBg" position="-290px 0px"/>
+                <Button profile="lm_optButton" id="optMaxContractsMinus" position="-290px 0px" text="-" onClick="onClickMaxContractsMinus"/>
+                <Text profile="lm_optValue" id="optMaxContractsValue" position="-220px 0px" text=""/>
+                <ThreePartBitmap profile="lm_optButtonBg" id="optMaxContractsPlusBg" position="-180px 0px"/>
+                <Button profile="lm_optButton" id="optMaxContractsPlus" position="-180px 0px" text="+" onClick="onClickMaxContractsPlus"/>
+                <ThreePartBitmap profile="lm_optDefaultBg" id="optMaxContractsDefaultBg" position="-20px 0px"/>
+                <Button profile="lm_optDefaultButton" id="optMaxContractsDefault" position="-20px 0px" text="$l10n_livingMarket_optDefault" onClick="onClickMaxContractsDefault"/>
+            </GuiElement>
+        </GuiElement>
     </GuiElement>
 
     <GUIProfiles>
@@ -315,8 +341,8 @@
         <Profile name="lm_searchInput" extends="fs25_settingsTextInput">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-20px 0px"/>
-            <size value="280px 48px"/>
+            <position value="-64px 0px"/>
+            <size value="240px 48px"/>
             <!-- Text linksbündig wie der Hinweistext; mittig gesetzt zeichnet das Spiel
                  den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
             <textAlignment value="left"/>
@@ -326,7 +352,7 @@
         <Profile name="lm_clockText" extends="fs25_textDefault">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-20px 0px"/>
+            <position value="-64px 0px"/>
             <size value="420px 40px"/>
             <textAlignment value="right"/>
             <textVerticalAlignment value="middle"/>
@@ -341,7 +367,7 @@
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
-            <size value="245px 30px"/>
+            <size value="205px 30px"/>
             <position value="15px 0px"/>
             <textAlignment value="left"/>
             <textVerticalAlignment value="middle"/>
@@ -588,6 +614,134 @@
         <Profile name="lm_tableFrameFull" extends="lm_tableFrameTop">
             <position value="37px -8px"/>
             <absoluteSizeOffset value="55px 4px"/>
+        </Profile>
+
+        <!-- ============ Optionen ============ -->
+        <!-- Regler-Symbol rechts in der Kopfzeile; der unsichtbare Button darüber nimmt den Klick -->
+        <Profile name="lm_optionsIcon">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <position value="-20px 0px"/>
+            <size value="34px 34px"/>
+            <imageColor value="0.85 0.85 0.85 1"/>
+        </Profile>
+        <Profile name="lm_optionsButton" extends="lm_sortHeader">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <position value="-20px 0px"/>
+            <size value="34px 34px"/>
+            <textOffset value="0px 0px"/>
+        </Profile>
+        <Profile name="lm_optionsBackText" extends="lm_clockText">
+            <position value="-64px 0px"/>
+            <textSize value="17px"/>
+            <textBold value="false"/>
+            <textColor value="0.65 0.65 0.65 1"/>
+        </Profile>
+
+        <Profile name="lm_optionsArea" extends="lm_eventsArea"/>
+
+        <Profile name="lm_optTitle" extends="fs25_textDefault">
+            <anchors value="0 0 1 1"/>
+            <pivot value="0 1"/>
+            <position value="45px -10px"/>
+            <size value="900px 40px"/>
+            <textAlignment value="left"/>
+            <textVerticalAlignment value="middle"/>
+            <textSize value="28px"/>
+            <textBold value="true"/>
+            <textColor value="1 1 1 1"/>
+        </Profile>
+
+        <Profile name="lm_optSection" extends="lm_optTitle">
+            <size value="900px 26px"/>
+            <textSize value="17px"/>
+            <textUpperCase value="true"/>
+            <textColor value="0.85 0.85 0.85 1"/>
+        </Profile>
+
+        <!-- Linie unter der Bereichsüberschrift (volle Breite abzüglich 45 px Rand je Seite) -->
+        <Profile name="lm_optSectionLine" extends="lm_headerLine">
+            <anchors value="0 1 1 1"/>
+            <pivot value="0 1"/>
+            <size value="100% 2px"/>
+            <absoluteSizeOffset value="90px 0px"/>
+            <imageColor value="0.30 0.30 0.30 1"/>
+            <imageFocusedColor value="0.30 0.30 0.30 1"/>
+            <imageSelectedColor value="0.30 0.30 0.30 1"/>
+            <imageHighlightedColor value="0.30 0.30 0.30 1"/>
+        </Profile>
+
+        <!-- Eine Einstellung: Kachel mit Name, Hinweis und Bedienelementen rechts -->
+        <Profile name="lm_optRow">
+            <anchors value="0 1 1 1"/>
+            <pivot value="0 1"/>
+            <size value="100% 64px"/>
+            <absoluteSizeOffset value="90px 0px"/>
+        </Profile>
+        <Profile name="lm_optRowBg" extends="lm_headerLine">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="0px 0px"/>
+            <size value="100% 100%"/>
+            <imageColor value="0.14 0.14 0.14 1"/>
+            <imageFocusedColor value="0.14 0.14 0.14 1"/>
+            <imageSelectedColor value="0.14 0.14 0.14 1"/>
+            <imageHighlightedColor value="0.14 0.14 0.14 1"/>
+        </Profile>
+        <Profile name="lm_optLabel" extends="lm_optTitle">
+            <position value="16px -8px"/>
+            <size value="1000px 26px"/>
+            <textSize value="19px"/>
+        </Profile>
+        <Profile name="lm_optHint" extends="lm_optLabel">
+            <position value="16px -36px"/>
+            <size value="1000px 20px"/>
+            <textSize value="15px"/>
+            <textBold value="false"/>
+            <textColor value="0.65 0.65 0.65 1"/>
+        </Profile>
+
+        <!-- Schaltflächen: Fläche (ThreePartBitmap) + unsichtbarer Button mit Text darüber -->
+        <Profile name="lm_optButtonBg" extends="lm_optRowBg">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <size value="40px 34px"/>
+            <imageColor value="0.30 0.30 0.30 1"/>
+            <imageFocusedColor value="0.30 0.30 0.30 1"/>
+            <imageSelectedColor value="0.30 0.30 0.30 1"/>
+            <imageHighlightedColor value="0.30 0.30 0.30 1"/>
+        </Profile>
+        <Profile name="lm_optDefaultBg" extends="lm_optButtonBg">
+            <size value="140px 34px"/>
+        </Profile>
+        <Profile name="lm_optButton" extends="lm_sortHeader">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <size value="40px 34px"/>
+            <textOffset value="0px 0px"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+            <textSize value="24px"/>
+            <textColor value="1 1 1 1"/>
+            <textFocusedColor value="1 1 1 1"/>
+            <textSelectedColor value="1 1 1 1"/>
+            <textHighlightedColor value="0.47 0.64 0.11 1"/>
+            <textDisabledColor value="0.40 0.40 0.40 1"/>
+        </Profile>
+        <Profile name="lm_optDefaultButton" extends="lm_optButton">
+            <size value="140px 34px"/>
+            <textSize value="15px"/>
+        </Profile>
+        <Profile name="lm_optValue" extends="fs25_textDefault">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <size value="70px 34px"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+            <textSize value="21px"/>
+            <textBold value="true"/>
+            <textColor value="0.47 0.64 0.11 1"/>
         </Profile>
     </GUIProfiles>
 </GUI>

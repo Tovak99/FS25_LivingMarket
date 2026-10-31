@@ -52,6 +52,10 @@ LivingMarket.CONTRACT_HISTORY_MAX = 20   -- je Hof
 LivingMarket.contractsVersion = 0
 LivingMarket.contractOverride = nil  -- während einer Vertragslieferung: { station, fillTypeIndex, pricePerLiter }
 
+-- Option "Anzahl der Verträge" (Optionsseite, gilt für das ganze Spiel, im Spielstand)
+LivingMarket.MAX_CONTRACTS_LIMIT = 10    -- höchster einstellbarer Wert
+LivingMarket.maxContractsSetting = nil   -- nil = Standard aus der Konfiguration (maxActivePerFarm)
+
 local function isServerSide()
     return g_currentMission ~= nil and g_currentMission:getIsServer()
 end
@@ -287,6 +291,52 @@ local function countOffers()
     return count
 end
 
+-- Laufende Verträge je Hof höchstens (Option oder Standard aus der Konfiguration)
+function LivingMarket:getMaxActiveContracts()
+    return self.maxContractsSetting or self.CONTRACT_SETTINGS.maxActivePerFarm
+end
+
+function LivingMarket:getMaxContractsLimit()
+    return math.max(self.MAX_CONTRACTS_LIMIT, self.CONTRACT_SETTINGS.maxActivePerFarm)
+end
+
+-- Darf dieser Spieler die Spiel-Optionen ändern? (Einzelspieler/Host oder Admin)
+function LivingMarket:canChangeGameSettings()
+    if g_currentMission == nil then
+        return false
+    end
+    return g_currentMission:getIsServer() or g_currentMission.isMasterUser == true
+end
+
+-- Wert übernehmen (Server: speichern und an alle schicken; Mitspieler: vom Server erhalten)
+function LivingMarket:applyMaxContracts(value)
+    if value ~= nil then
+        value = math.floor(value)
+        if value < 1 or value == self.CONTRACT_SETTINGS.maxActivePerFarm then
+            value = nil   -- Standard
+        else
+            value = math.min(value, self:getMaxContractsLimit())
+        end
+    end
+    self.maxContractsSetting = value
+    self.contractsVersion = self.contractsVersion + 1
+    if isServerSide() and isMultiplayerGame() and LivingMarketSettingsEvent ~= nil and g_server ~= nil then
+        g_server:broadcastEvent(LivingMarketSettingsEvent.new(value or 0))
+    end
+end
+
+-- Aus der Optionsseite: neuen Wert setzen (nil = Standard)
+function LivingMarket:requestMaxContracts(value)
+    if not self:canChangeGameSettings() then
+        return
+    end
+    if isServerSide() then
+        self:applyMaxContracts(value)
+    elseif LivingMarketSettingsEvent ~= nil and g_client ~= nil then
+        g_client:getServerConnection():sendEvent(LivingMarketSettingsEvent.new(value or 0))
+    end
+end
+
 function LivingMarket:countActiveContracts(farmId)
     local count = 0
     for _, contract in ipairs(self.contracts) do
@@ -397,7 +447,7 @@ function LivingMarket:acceptContract(id, farmId)
     if contract == nil or contract.state ~= "offer" or farmId == nil or farmId == 0 then
         return false
     end
-    if self:countActiveContracts(farmId) >= self.CONTRACT_SETTINGS.maxActivePerFarm then
+    if self:countActiveContracts(farmId) >= self:getMaxActiveContracts() then
         return false
     end
     if not self:isStationOpenForFarm(farmId, contract.stationKey) then
@@ -669,6 +719,9 @@ end
 function LivingMarket:saveContractsToXML(xmlFile, baseKey)
     local now = self.getNowHour()
     setXMLInt(xmlFile, baseKey .. "#nextId", self.contractNextId)
+    if self.maxContractsSetting ~= nil then
+        setXMLInt(xmlFile, baseKey .. "#maxActive", self.maxContractsSetting)
+    end
     local i = 0
     for _, contract in ipairs(self.contracts) do
         local name = g_fillTypeManager:getFillTypeNameByIndex(contract.fillTypeIndex)
@@ -734,6 +787,11 @@ function LivingMarket:loadContractsFromXML(xmlFile, baseKey)
     self.reputation = {}
     local now = self.getNowHour()
     self.contractNextId = getXMLInt(xmlFile, baseKey .. "#nextId") or 1
+    self.maxContractsSetting = nil
+    local maxActive = getXMLInt(xmlFile, baseKey .. "#maxActive")
+    if maxActive ~= nil and maxActive >= 1 and maxActive ~= self.CONTRACT_SETTINGS.maxActivePerFarm then
+        self.maxContractsSetting = math.min(maxActive, self:getMaxContractsLimit())
+    end
     local i = 0
     while true do
         local key = string.format("%s.contract(%d)", baseKey, i)
@@ -827,6 +885,7 @@ function LivingMarket:resetContracts()
     self.contractNextId = 1
     self.contractTarget = nil
     self.contractOverride = nil
+    self.maxContractsSetting = nil
     self.contractsVersion = self.contractsVersion + 1
 end
 

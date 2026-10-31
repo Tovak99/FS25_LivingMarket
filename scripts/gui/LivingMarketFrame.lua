@@ -99,6 +99,7 @@ function LivingMarketFrame:initialize()
     end
 
     self:setupSortHeaders()
+    self:updateOptionsIcon()
 
     self:updateMenuButtons()
 end
@@ -964,8 +965,13 @@ function LivingMarketFrame:update(dt)
         self:refreshContracts()
     end
 
+    -- Optionen: Änderungen (z. B. vom Host im Mehrspieler) sofort zeigen
+    if self.viewMode == "options" and self.shownOptionsVersion ~= LivingMarket.contractsVersion then
+        self:refreshOptions()
+    end
+
     -- Uhr in Marktnachrichten, Verkäufen und Verträgen
-    if self.viewMode ~= "market" then
+    if self.viewMode ~= "market" and self.viewMode ~= "options" then
         self.clockTimer = (self.clockTimer or 0) - dt
         if self.clockTimer <= 0 then
             self.clockTimer = 250
@@ -1063,14 +1069,26 @@ function LivingMarketFrame:onClickViewContracts()
 end
 
 function LivingMarketFrame:setViewMode(mode)
-    if mode ~= "events" and mode ~= "sales" and mode ~= "contracts" then
+    if mode ~= "events" and mode ~= "sales" and mode ~= "contracts" and mode ~= "options" then
         mode = "market"
+    end
+    if mode ~= "options" then
+        self.lastViewMode = mode   -- dorthin führt das Kreuz auf der Optionsseite zurück
     end
     self.viewMode = mode
     local showMarket = mode == "market"
     local showEvents = mode == "events"
     local showSales = mode == "sales"
     local showContracts = mode == "contracts"
+    local showOptions = mode == "options"
+
+    if self.optionsArea ~= nil then
+        self.optionsArea:setVisible(showOptions)
+    end
+    if self.optionsBackText ~= nil then
+        self.optionsBackText:setVisible(showOptions)
+    end
+    self:updateOptionsIcon()
 
     for _, element in ipairs({ self.wareFrame, self.wareHeader, self.wareArea, self.detailPanel,
                                self.filterButton }) do
@@ -1126,8 +1144,10 @@ function LivingMarketFrame:setViewMode(mode)
         self:refreshEvents()
     elseif showSales then
         self:refreshSales()
-    else
+    elseif showContracts then
         self:refreshContracts()
+    else
+        self:refreshOptions()
     end
 
     local function paint(button, active)
@@ -1150,6 +1170,72 @@ function LivingMarketFrame:setViewMode(mode)
 end
 
 local EVENT_TYPE_LABELS = EVENT_LABELS
+
+-- ---------------------------------------------------------------------
+-- Optionen (Regler-Symbol oben rechts)
+-- ---------------------------------------------------------------------
+function LivingMarketFrame:onClickOptions()
+    if self.viewMode == "options" then
+        self:setViewMode(self.lastViewMode or "market")
+    else
+        self:setViewMode("options")
+    end
+end
+
+-- Regler-Symbol bzw. auf der Optionsseite Kreuz (grün hinterlegt wie die aktive Ansicht)
+function LivingMarketFrame:updateOptionsIcon()
+    local icon = self.optionsIcon
+    if icon == nil then
+        return
+    end
+    local active = self.viewMode == "options"
+    icon:setImageFilename(Utils.getFilename(active and "images/optionsClose.dds" or "images/options.dds", LivingMarket.modDir))
+    local c = active and VIEW_ACTIVE or VIEW_INACTIVE
+    if icon.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
+        icon:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
+    end
+end
+
+function LivingMarketFrame:refreshOptions()
+    self.shownOptionsVersion = LivingMarket.contractsVersion
+    local value = LivingMarket:getMaxActiveContracts()
+    local default = LivingMarket.CONTRACT_SETTINGS.maxActivePerFarm
+    local limit = LivingMarket:getMaxContractsLimit()
+    local canChange = LivingMarket:canChangeGameSettings()
+    if self.optMaxContractsValue ~= nil then
+        self.optMaxContractsValue:setText(tostring(value))
+    end
+    if self.optMaxContractsHint ~= nil then
+        local hint = string.format(g_i18n:getText("livingMarket_optMaxContractsHint"), default)
+        if not canChange then
+            hint = hint .. "  " .. g_i18n:getText("livingMarket_optHostOnly")
+        end
+        self.optMaxContractsHint:setText(hint)
+    end
+    local function enable(button, on)
+        if button ~= nil and button.setDisabled ~= nil then
+            button:setDisabled(not on)
+        end
+    end
+    enable(self.optMaxContractsMinus, canChange and value > 1)
+    enable(self.optMaxContractsPlus, canChange and value < limit)
+    enable(self.optMaxContractsDefault, canChange and value ~= default)
+end
+
+function LivingMarketFrame:onClickMaxContractsMinus()
+    LivingMarket:requestMaxContracts(math.max(1, LivingMarket:getMaxActiveContracts() - 1))
+    self:refreshOptions()
+end
+
+function LivingMarketFrame:onClickMaxContractsPlus()
+    LivingMarket:requestMaxContracts(math.min(LivingMarket:getMaxContractsLimit(), LivingMarket:getMaxActiveContracts() + 1))
+    self:refreshOptions()
+end
+
+function LivingMarketFrame:onClickMaxContractsDefault()
+    LivingMarket:requestMaxContracts(nil)
+    self:refreshOptions()
+end
 
 function LivingMarketFrame:onClickEventFilter()
     self.eventFilter = self.eventFilter == "stock" and "all" or "stock"
@@ -1501,8 +1587,8 @@ function LivingMarketFrame:onContractAction()
         end)
         return
     end
-    if LivingMarket:countActiveContracts(getOwnFarmId()) >= s.maxActivePerFarm then
-        LivingMarket:notify(string.format(g_i18n:getText("livingMarket_ctLimit"), s.maxActivePerFarm), true)
+    if LivingMarket:countActiveContracts(getOwnFarmId()) >= LivingMarket:getMaxActiveContracts() then
+        LivingMarket:notify(string.format(g_i18n:getText("livingMarket_ctLimit"), LivingMarket:getMaxActiveContracts()), true)
         return
     end
     local deadline = LivingMarket:formatEventTime(row.deadlineHour or (LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth()))

@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="Je hebt deze waar helemaal niet op voorraad!"/>
         <text name="livingMarket_ctCancelText" text="Contract echt opzeggen?&#10;Tot nu geleverd: %s van %s %s aan %s.&#10;&#10;Boete %s en minder aanzien bij %s."/>
         <text name="livingMarket_ctLimit" text="Je hebt al %d lopende contracten."/>
+        <text name="livingMarket_optTitle" text="Opties"/>
+        <text name="livingMarket_optSecContracts" text="Contracten"/>
+        <text name="livingMarket_optMaxContracts" text="Aantal contracten"/>
+        <text name="livingMarket_optMaxContractsHint" text="Hoeveel contracten een boerderij tegelijk kan hebben lopen. Geldt voor het hele spel. Standaard: %d"/>
+        <text name="livingMarket_optHostOnly" text="(alleen host/admin)"/>
+        <text name="livingMarket_optDefault" text="Standaard"/>
+        <text name="livingMarket_optBack" text="Terug"/>
         <text name="livingMarket_ctNewOffer" text="Nieuwe aanbesteding: %s zoekt %s %s"/>
         <text name="livingMarket_ctDone" text="Contract nagekomen: %s %s aan %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contract niet nagekomen: %s %s aan %s – boete %s"/>

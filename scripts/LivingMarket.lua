@@ -1566,6 +1566,9 @@ function LivingMarket.sendInitialClientState(mission, connection, user, farm)
     if LivingMarketContractListEvent ~= nil then
         connection:sendEvent(LivingMarketContractListEvent.new())
     end
+    if LivingMarketSettingsEvent ~= nil then
+        connection:sendEvent(LivingMarketSettingsEvent.new(LivingMarket.maxContractsSetting or 0))
+    end
     if LivingMarketFavoritesEvent ~= nil then
         LivingMarket:isFavorite(0)
         connection:sendEvent(LivingMarketFavoritesEvent.new(LivingMarket:getFavoriteNames()))

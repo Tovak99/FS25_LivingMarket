@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="Nie masz tego towaru na stanie!"/>
         <text name="livingMarket_ctCancelText" text="Na pewno wypowiedzieć umowę?&#10;Dostarczono: %s z %s %s do %s.&#10;&#10;Kara %s i niższa renoma u %s."/>
         <text name="livingMarket_ctLimit" text="Masz już %d aktywne umowy."/>
+        <text name="livingMarket_optTitle" text="Opcje"/>
+        <text name="livingMarket_optSecContracts" text="Umowy"/>
+        <text name="livingMarket_optMaxContracts" text="Liczba umów"/>
+        <text name="livingMarket_optMaxContractsHint" text="Ile umów gospodarstwo może mieć jednocześnie w toku. Dotyczy całej gry. Domyślnie: %d"/>
+        <text name="livingMarket_optHostOnly" text="(tylko host/admin)"/>
+        <text name="livingMarket_optDefault" text="Domyślne"/>
+        <text name="livingMarket_optBack" text="Wróć"/>
         <text name="livingMarket_ctNewOffer" text="Nowy przetarg: %s szuka %s %s"/>
         <text name="livingMarket_ctDone" text="Umowa wykonana: %s %s do %s – premia %s"/>
         <text name="livingMarket_ctFailed" text="Umowa niewykonana: %s %s do %s – kara %s"/>

@@ -69,6 +69,13 @@
         <text name="livingMarket_ctNoStock" text="You have none of this product in stock!"/>
         <text name="livingMarket_ctCancelText" text="Really cancel this contract?&#10;Delivered so far: %s of %s %s to %s.&#10;&#10;Penalty %s and lower standing with %s."/>
         <text name="livingMarket_ctLimit" text="You already have %d active contracts."/>
+        <text name="livingMarket_optTitle" text="Options"/>
+        <text name="livingMarket_optSecContracts" text="Contracts"/>
+        <text name="livingMarket_optMaxContracts" text="Number of contracts"/>
+        <text name="livingMarket_optMaxContractsHint" text="How many contracts a farm can have running at the same time. Applies to the whole game. Default: %d"/>
+        <text name="livingMarket_optHostOnly" text="(host/admin only)"/>
+        <text name="livingMarket_optDefault" text="Default"/>
+        <text name="livingMarket_optBack" text="Back"/>
         <text name="livingMarket_ctNewOffer" text="New tender: %s is looking for %s %s"/>
         <text name="livingMarket_ctDone" text="Contract fulfilled: %s %s to %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contract not fulfilled: %s %s to %s – penalty %s"/>
