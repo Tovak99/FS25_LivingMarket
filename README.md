@@ -2,7 +2,7 @@
 
 Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nicht mehr unbegrenzt an: Jede Station hat pro Ware einen **Bedarf**, der beim Verkauf sinkt und sich mit der Zeit langsam wieder auffüllt. Ziel ist ein lebendiger Markt mit Nachfrage, Engpässen, Preisänderungen und Angeboten.
 
-> Status: Entwicklungsversion 0.2.1.42 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
+> Status: Entwicklungsversion 0.2.1.60 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
 
 ## Funktionen
 
@@ -23,6 +23,8 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
   - Ansicht **Verkäufe**: die letzten 50 Verkäufe des eigenen Hofs (Zeit, Ware, Station, Menge, Preis, Erlös, Marktlage, Ereignis), auch Paletten und Ballen; Auftragsware zählt nicht
   - Ansicht **Verträge**: Stationen schreiben Lieferungen aus (Menge, Frist, Festpreis bis +10 %, Bonus); annehmen per Taste mit Rückfrage; Lieferung zum Festpreis ohne Marktlage; bei Nichterfüllung oder Kündigung 50 % Strafe auf die fehlende Menge
   - **Ansehen** je Hof und Station (1–5 Sterne) im Detailfenster und bei den Verträgen; steigt mit erfüllten, sinkt mit gescheiterten Verträgen und pendelt langsam zur Mitte zurück
+  - **Optionen** (Regler-Symbol oben rechts): Anzahl der Verträge – so viele Ausschreibungen gibt es gleichzeitig (Standard 6, höchstens 15), fehlende werden innerhalb eines Spieltags ersetzt; gilt für das ganze Spiel, im Mehrspieler nur Host/Admin
+  - Waren ohne Verkaufsstelle (z. B. Wartung, Strom, Wasser, Gärreste) bekommen keine Ereignisse und keine Verträge
 - **Schimpfwortfilter des Spiels abgeschaltet** (sonst wird z. B. „Aldi“ zu „Al$i“) – Idee aus „Disable Profanity Filter“ von Supermaschine
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
 - **Speichert den Bedarf im Spielstand** (`livingMarket.xml` im Savegame-Ordner)
