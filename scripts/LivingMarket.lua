@@ -799,6 +799,7 @@ function LivingMarket:getWareData()
                         price     = price,
                         factor    = self:getDemandFactor(station, fillTypeIndex),  -- Marktlage (Massenverkauf)
                         eventPrice = entry.eventPrice or 1,
+                        eventRefill = entry.eventRefill or 1,
                         eventType  = entry.eventType or 0,
                         basePrice = factor > 0 and price / factor or price,      -- Spielpreis ohne Marktlage und Ereignis
                         deviation = (ware.basePrice ~= nil and ware.basePrice > 0) and price / ware.basePrice or nil,   -- Preis / Grundpreis
@@ -1396,6 +1397,7 @@ function LivingMarket:collectSyncEntries(onlyDirty)
                         max           = entry.max,
                         refill        = entry.refill,
                         eventPrice    = entry.eventPrice or 1,
+                        eventRefill   = entry.eventRefill or 1,
                         eventType     = entry.eventType or 0
                     })
                 end
@@ -1417,6 +1419,7 @@ function LivingMarket:applySyncEntries(entries)
                 entry.max        = e.max
                 entry.refill     = e.refill
                 entry.eventPrice = e.eventPrice or 1
+                entry.eventRefill = e.eventRefill or 1
                 entry.eventType  = e.eventType or 0
             end
         end

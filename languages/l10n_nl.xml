@@ -27,6 +27,10 @@
         <text name="livingMarket_evLabelSurplus" text="Overschot"/>
         <text name="livingMarket_evLabelBoom" text="Gevraagd"/>
         <text name="livingMarket_evLabelSlump" text="Malaise"/>
+        <text name="livingMarket_evLabelDemand" text="Gewild"/>
+        <text name="livingMarket_evLabelSlow" text="Winkeldochter"/>
+        <text name="livingMarket_evDemand" text="Gewild: %s verkoopt %s sneller – aanvulling +%d %% voor %d maand(en)"/>
+        <text name="livingMarket_evSlow" text="Winkeldochter: %s raakt %s nauwelijks kwijt – aanvulling −%d %% voor %d maand(en)"/>
         <text name="livingMarket_eventsTitle" text="Marktnieuws"/>
         <text name="livingMarket_viewMarket" text="Markt"/>
         <text name="livingMarket_locButton" text="Opslaglocaties"/>
@@ -44,6 +48,7 @@
         <text name="livingMarket_scopeGlobal" text="Globaal"/>
         <text name="livingMarket_colStationEv" text="Verkooppunt"/>
         <text name="livingMarket_colDemand" text="Vraag"/>
+        <text name="livingMarket_colRefill" text="Aanvulling"/>
         <text name="livingMarket_colStart" text="Begin"/>
         <text name="livingMarket_colEnd" text="Einde"/>
         <text name="livingMarket_colStatus" text="Status"/>

@@ -17,6 +17,8 @@ LivingMarket.EVENT_SHORTAGE  = 1   -- Engpass (eine Station)
 LivingMarket.EVENT_SURPLUS   = 2   -- Überangebot (eine Station)
 LivingMarket.EVENT_BOOM      = 3   -- marktweit gefragt
 LivingMarket.EVENT_SLUMP     = 4   -- marktweit Überangebot
+LivingMarket.EVENT_DEMAND    = 5   -- Nachgefragt: Station füllt schneller auf (eine Station)
+LivingMarket.EVENT_SLOW      = 6   -- Ladenhüter: Station füllt langsamer auf (eine Station, nur Palettenware)
 
 LivingMarket.EVENT_SETTINGS = {
     minActive      = 10,     -- so viele Ereignisse sollen etwa gleichzeitig laufen (inkl. angekündigter)
@@ -26,21 +28,18 @@ LivingMarket.EVENT_SETTINGS = {
     minMonths      = 1,
     maxMonths      = 2,
     noise          = 0.10,   -- kleine Schwankung des Bedarfs ±10 %
-    refillNoise    = 0.25,   -- eigene Schwankung der Auffüllung ±25 %
-    weightShortage = 0.40,
-    weightSurplus  = 0.35,   -- Rest: marktweit
+    refillNoise    = 0.10,   -- eigene kleine Schwankung der Auffüllung ±10 %
+    minRefill      = 0.10,   -- Nachgefragt/Ladenhüter: Auffüllung ±10..50 %
+    maxRefill      = 0.50,
+    weightShortage = 0.30,
+    weightSurplus  = 0.25,
+    weightDemand   = 0.12,   -- Nachgefragt
+    weightSlow     = 0.08,   -- Ladenhüter (Rest: marktweit)
     maxFactor = {
         [1] = 1.5,   -- Engpass
         [2] = 0.6,   -- Überangebot
         [3] = 1.3,   -- Boom
         [4] = 0.7,   -- Flaute
-    },
-    -- zusätzlicher Faktor auf die Auffüllgeschwindigkeit (Anteil je Monat)
-    refillFactor = {
-        [1] = 1.5,   -- Engpass: Station verbraucht schneller
-        [2] = 0.5,   -- Überangebot: Lager leert sich kaum
-        [3] = 1.25,  -- Boom
-        [4] = 0.75,  -- Flaute
     },
 }
 
@@ -103,7 +102,7 @@ function LivingMarket:applyEventsToEntry(station, fillTypeIndex, entry)
             if matches then
                 entry.eventPrice = entry.eventPrice * event.price
                 entry.eventMax = entry.eventMax * event.maxFactor
-                entry.eventRefill = entry.eventRefill * (self.EVENT_SETTINGS.refillFactor[event.type] or 1)
+                entry.eventRefill = entry.eventRefill * (event.refillFactor or 1)
                 -- Stationsereignis hat Vorrang bei der Anzeige
                 if entry.eventType == self.EVENT_NONE or event.stationKey ~= nil then
                     entry.eventType = event.type
@@ -128,10 +127,10 @@ function LivingMarket:applyEventsToAll()
     end
     for station, data in pairs(self.stations) do
         for fillTypeIndex, entry in pairs(data) do
-            local oldPrice, oldMax, oldType = entry.eventPrice, entry.max, entry.eventType
+            local oldPrice, oldMax, oldRefill, oldType = entry.eventPrice, entry.max, entry.refill, entry.eventType
             self:applyEventsToEntry(station, fillTypeIndex, entry)
             self:recalcEntryLimits(entry, true)
-            if oldPrice ~= entry.eventPrice or oldMax ~= entry.max or oldType ~= entry.eventType then
+            if oldPrice ~= entry.eventPrice or oldMax ~= entry.max or oldRefill ~= entry.refill or oldType ~= entry.eventType then
                 self:markDirty(entry)
             end
         end
@@ -196,10 +195,15 @@ function LivingMarket:broadcastEventList()
 end
 
 function LivingMarket:announceEvent(event, phase)
-    local percent = math.floor(math.abs(event.price - 1) * 100 + 0.5)
+    local isRefillEvent = event.type == self.EVENT_DEMAND or event.type == self.EVENT_SLOW
+    local percent = math.floor(math.abs((isRefillEvent and (event.refillFactor or 1) or event.price) - 1) * 100 + 0.5)
     local key
     if phase == "end" then
         key = event.stationKey ~= nil and "livingMarket_evEndStation" or "livingMarket_evEndMarket"
+    elseif event.type == self.EVENT_DEMAND then
+        key = "livingMarket_evDemand"
+    elseif event.type == self.EVENT_SLOW then
+        key = "livingMarket_evSlow"
     elseif event.type == self.EVENT_SHORTAGE then
         key = "livingMarket_evShortage"
     elseif event.type == self.EVENT_SURPLUS then
@@ -210,7 +214,7 @@ function LivingMarket:announceEvent(event, phase)
         key = phase == "announce" and "livingMarket_evSlumpAnnounce" or "livingMarket_evSlumpStart"
     end
     local stationName = event.stationKey ~= nil and self:getEventStationName(event) or ""
-    local isWarning = event.type == self.EVENT_SURPLUS or event.type == self.EVENT_SLUMP
+    local isWarning = event.type == self.EVENT_SURPLUS or event.type == self.EVENT_SLUMP or event.type == self.EVENT_SLOW
     self:showNotification(key, stationName, event.fillTypeIndex, percent, event.months or 1, isWarning)
     -- Mitspieler bekommen die Meldung als Schlüssel + Werte und setzen sie in ihrer Sprache zusammen
     if g_server ~= nil and LivingMarketNotifyEvent ~= nil and g_currentMission.missionDynamicInfo ~= nil
@@ -231,15 +235,21 @@ function LivingMarket:hasEventFor(fillTypeIndex, stationKey)
     return false
 end
 
--- Zufällige Station und Ware für ein Stationsereignis
-function LivingMarket:pickStationWare()
+-- Palettenware (Ladenhüter nur bei diesen Waren)
+function LivingMarket.isPalletWare(fillTypeIndex)
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    return fillType ~= nil and fillType.palletFilename ~= nil
+end
+
+-- Zufällige Station und Ware für ein Stationsereignis (filter: optionale Bedingung für die Ware)
+function LivingMarket:pickStationWare(filter)
     local stations = self:collectStations()
-    for _ = 1, 20 do
+    for _ = 1, (filter ~= nil and 40 or 20) do
         local station = stations[math.random(1, math.max(1, #stations))]
         if station ~= nil and station.acceptedFillTypes ~= nil then
             local candidates = {}
             for fillTypeIndex, accepted in pairs(station.acceptedFillTypes) do
-                if accepted and self:getEntry(station, fillTypeIndex) ~= nil then
+                if accepted and (filter == nil or filter(fillTypeIndex)) and self:getEntry(station, fillTypeIndex) ~= nil then
                     table.insert(candidates, fillTypeIndex)
                 end
             end
@@ -342,6 +352,24 @@ function LivingMarket:createRandomEvent()
     local change = randomRange(s.minPrice, s.maxPrice)
     local now = self.getNowHour()
     local hoursPerMonth = self.getHoursPerMonth()
+
+    -- Nachgefragt / Ladenhüter: nur die Auffüllung ändert sich, Preis und Bedarf bleiben
+    local refillStart = s.weightShortage + s.weightSurplus
+    if roll >= refillStart and roll < refillStart + s.weightDemand + s.weightSlow then
+        local eventType = roll < refillStart + s.weightDemand and self.EVENT_DEMAND or self.EVENT_SLOW
+        local filter = eventType == self.EVENT_SLOW and self.isPalletWare or nil
+        local station, stationKey, fillTypeIndex = self:pickStationWare(filter)
+        if station == nil then
+            return nil
+        end
+        local refillChange = randomRange(s.minRefill, s.maxRefill)
+        return {   -- beginnt sofort
+            type = eventType, fillTypeIndex = fillTypeIndex, stationKey = stationKey,
+            price = 1, maxFactor = 1,
+            refillFactor = eventType == self.EVENT_DEMAND and (1 + refillChange) or (1 - refillChange),
+            months = months, startHour = now, endHour = now + months * hoursPerMonth, active = false,
+        }
+    end
 
     if roll < s.weightShortage + s.weightSurplus then
         local station, stationKey, fillTypeIndex = self:pickStationWare()
@@ -496,6 +524,9 @@ function LivingMarket:saveEventsToXML(xmlFile, baseKey)
         end
         setXMLFloat(xmlFile, key .. "#price", event.price)
         setXMLFloat(xmlFile, key .. "#maxFactor", event.maxFactor)
+        if event.refillFactor ~= nil and event.refillFactor ~= 1 then
+            setXMLFloat(xmlFile, key .. "#refillFactor", event.refillFactor)
+        end
         setXMLInt(xmlFile, key .. "#months", event.months or 1)
         setXMLInt(xmlFile, key .. "#startIn", math.floor(event.startHour - now))
         setXMLInt(xmlFile, key .. "#endIn", math.floor(event.endHour - now))
@@ -519,6 +550,7 @@ function LivingMarket:loadEventsFromXML(xmlFile, baseKey)
                 stationKey    = getXMLString(xmlFile, key .. "#station"),
                 price         = getXMLFloat(xmlFile, key .. "#price") or 1,
                 maxFactor     = getXMLFloat(xmlFile, key .. "#maxFactor") or 1,
+                refillFactor  = getXMLFloat(xmlFile, key .. "#refillFactor") or 1,
                 months        = getXMLInt(xmlFile, key .. "#months") or 1,
                 startIn       = getXMLInt(xmlFile, key .. "#startIn"),      -- ab 0.1.0.78
                 endIn         = getXMLInt(xmlFile, key .. "#endIn"),
@@ -556,6 +588,7 @@ function LivingMarket:getEventList()
             endHour       = event.endHour,
             pricePercent  = math.floor((event.price - 1) * 100 + 0.5),
             maxFactor     = event.maxFactor,
+            refillFactor  = event.refillFactor or 1,
             startText     = self:formatEventTime(event.startHour),
             endText       = self:formatEventTime(event.endHour),
             pending       = pending,

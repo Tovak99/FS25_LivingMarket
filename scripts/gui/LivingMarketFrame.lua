@@ -262,14 +262,23 @@ end
 
 -- Marktereignis einer Station: Text und Farbe (Engpass/Gefragt grün, Überangebot/Flaute rot)
 local EVENT_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
-                       [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
-local function getEventText(eventType, eventPrice)
+                       [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump",
+                       [5] = "livingMarket_evLabelDemand",   [6] = "livingMarket_evLabelSlow" }
+local function isPositiveEvent(eventType)
+    return eventType == 1 or eventType == 3 or eventType == 5
+end
+local function isRefillEvent(eventType)
+    return eventType == 5 or eventType == 6
+end
+-- Nachgefragt/Ladenhüter zeigen die Änderung der Auffüllung, alle anderen die Preisänderung
+local function getEventText(eventType, eventPrice, eventRefill)
     local label = EVENT_LABELS[eventType or 0]
     if label == nil then
         return nil, nil
     end
-    local percent = math.floor(((eventPrice or 1) - 1) * 100 + 0.5)
-    local color = (eventType == 1 or eventType == 3) and COLOR_GOOD or COLOR_LOW
+    local value = isRefillEvent(eventType) and eventRefill or eventPrice
+    local percent = math.floor(((value or 1) - 1) * 100 + 0.5)
+    local color = isPositiveEvent(eventType) and COLOR_GOOD or COLOR_LOW
     return string.format("%s %+d %%", g_i18n:getText(label), percent), color
 end
 
@@ -458,6 +467,7 @@ LivingMarketFrame.EVENT_COLUMNS = {
     station = { label = "livingMarket_colStationEv", isText = true  },
     price   = { label = "livingMarket_colPrice",     isText = false },
     demand  = { label = "livingMarket_colDemand",    isText = false },
+    refill  = { label = "livingMarket_colRefill",    isText = false },
     start   = { label = "livingMarket_colStart",     isText = true  },   -- früheste zuerst
     finish  = { label = "livingMarket_colEnd",       isText = true  },
     status  = { label = "livingMarket_colStatus",    isText = true  },   -- laufende zuerst
@@ -519,6 +529,8 @@ local function eventValue(row, key)
         return row.pricePercent
     elseif key == "demand" then
         return row.maxFactor
+    elseif key == "refill" then
+        return row.refillFactor
     elseif key == "start" then
         return row.startHour
     elseif key == "finish" then
@@ -910,8 +922,7 @@ function LivingMarketFrame:setViewMode(mode)
     self:updateMenuButtons()
 end
 
-local EVENT_TYPE_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
-                            [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
+local EVENT_TYPE_LABELS = EVENT_LABELS
 
 function LivingMarketFrame:onClickEventFilter()
     self.eventFilter = self.eventFilter == "stock" and "all" or "stock"
@@ -964,7 +975,7 @@ function LivingMarketFrame:populateEventCell(row, cell)
     if row == nil or cell:getAttribute("type") == nil then
         return
     end
-    local positive = row.type == LivingMarket.EVENT_SHORTAGE or row.type == LivingMarket.EVENT_BOOM
+    local positive = isPositiveEvent(row.type)
     local typeColor = positive and COLOR_GOOD or COLOR_LOW
     local main = row.pending and COLOR_MUTED_LIGHT or COLOR_TEXT
 
@@ -980,8 +991,12 @@ function LivingMarketFrame:populateEventCell(row, cell)
     put("type", g_i18n:getText(EVENT_TYPE_LABELS[row.type] or "livingMarket_evLabelShortage"), typeColor)
     put("ware", row.wareTitle, main)
     put("station", row.stationName, main)
-    put("price", string.format("%+d %%", row.pricePercent), typeColor)
-    put("demand", string.format("%d %%", math.floor(row.maxFactor * 100 + 0.5)), main)   -- z. B. 150 %
+    -- nur die Werte zeigen, die das Ereignis tatsächlich ändert
+    local refillEvent = isRefillEvent(row.type)
+    put("price", refillEvent and "-" or string.format("%+d %%", row.pricePercent), refillEvent and COLOR_MUTED or typeColor)
+    put("demand", refillEvent and "-" or string.format("%d %%", math.floor(row.maxFactor * 100 + 0.5)), refillEvent and COLOR_MUTED or main)   -- z. B. 150 %
+    put("refill", refillEvent and string.format("%+d %%", math.floor(((row.refillFactor or 1) - 1) * 100 + 0.5)) or "-",
+        refillEvent and typeColor or COLOR_MUTED)
     put("start", row.startText, row.pending and COLOR_MID or main)
     put("end", row.endText, main)
     put("status", g_i18n:getText(row.pending and "livingMarket_evPending" or "livingMarket_evRunning"),
@@ -1138,7 +1153,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     end
 
     stationText:setText(ware.best.name)
-    local _, eventColor = getEventText(ware.best.eventType, ware.best.eventPrice)
+    local _, eventColor = getEventText(ware.best.eventType, ware.best.eventPrice, ware.best.eventRefill)
     setColor(stationText, ware.isBestStation and COLOR_GOOD or eventColor or COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
     setColor(priceText, COLOR_TEXT)
@@ -1186,7 +1201,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")
     local eventText = cell:getAttribute("event")
     if eventText ~= nil then
-        local text, color = getEventText(station.eventType, station.eventPrice)
+        local text, color = getEventText(station.eventType, station.eventPrice, station.eventRefill)
         eventText:setText(text or "")
         setColor(eventText, isFull and COLOR_MUTED or color or COLOR_TEXT)
     end

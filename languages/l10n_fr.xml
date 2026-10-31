@@ -27,6 +27,10 @@
         <text name="livingMarket_evLabelSurplus" text="Excédent"/>
         <text name="livingMarket_evLabelBoom" text="Demandé"/>
         <text name="livingMarket_evLabelSlump" text="Marasme"/>
+        <text name="livingMarket_evLabelDemand" text="Demandé"/>
+        <text name="livingMarket_evLabelSlow" text="Invendu"/>
+        <text name="livingMarket_evDemand" text="Demandé : %s écoule %s plus vite – réappro. +%d %% pendant %d mois"/>
+        <text name="livingMarket_evSlow" text="Invendu : %s écoule mal %s – réappro. −%d %% pendant %d mois"/>
         <text name="livingMarket_eventsTitle" text="Infos marché"/>
         <text name="livingMarket_viewMarket" text="Marché"/>
         <text name="livingMarket_locButton" text="Lieux de stockage"/>
@@ -44,6 +48,7 @@
         <text name="livingMarket_scopeGlobal" text="Global"/>
         <text name="livingMarket_colStationEv" text="Point de vente"/>
         <text name="livingMarket_colDemand" text="Demande"/>
+        <text name="livingMarket_colRefill" text="Réappro."/>
         <text name="livingMarket_colStart" text="Début"/>
         <text name="livingMarket_colEnd" text="Fin"/>
         <text name="livingMarket_colStatus" text="Statut"/>
