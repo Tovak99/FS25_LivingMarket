@@ -33,7 +33,7 @@ LivingMarket.CONTRACT_SETTINGS = {
     maxActivePerFarm = 3,      -- laufende Verträge je Hof
     repStart         = 50,
     repFulfilled     = 2,
-    repFailed        = 20,
+    repFailed        = 10,
     repDriftPerMonth = 1,
     repMinStars      = 2,      -- darunter keine Angebote dieser Station
 }

@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="7">
+<livingMarket version="8">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -81,7 +81,7 @@
     <contracts enabled="true" minOffers="3" maxOffers="6" offerMonths="1" minMonths="1" maxMonths="3"
                minShare="0.30" maxShare="0.80" minMarkup="0.02" maxMarkup="0.05" reputationMarkup="0.03"
                eventMarkup="0.02" maxTotalMarkup="0.10" bonusRate="0.20" penaltyRate="0.50" maxActivePerFarm="3"
-               repFulfilled="2" repFailed="20" repDriftPerMonth="1" repMinStars="2"/>
+               repFulfilled="2" repFailed="10" repDriftPerMonth="1" repMinStars="2"/>
 
     <!-- Automatische Zuordnung für Karten- und Mod-Waren, die unten nicht aufgeführt sind:
          1. Schwad/Halmgut (…_WINDROW)          -> windrowGroup
