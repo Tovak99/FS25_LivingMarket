@@ -37,7 +37,7 @@
             <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="720px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
-            <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
+            <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
 
         <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (lm_wareArea).
@@ -80,7 +80,7 @@
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="770px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
-                <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
+                <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
 
             <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
@@ -156,9 +156,23 @@
         <Profile name="lm_tableFrameTop" extends="lm_rowBg">
             <anchors value="0 1 0 1"/>
             <pivot value="0 0"/>
-            <position value="37px 292px"/>
+            <position value="37px 182px"/>
             <size value="100% 100%"/>
-            <absoluteSizeOffset value="55px 304px"/>
+            <absoluteSizeOffset value="55px 194px"/>
+        </Profile>
+
+        <!-- Linie unter den Spaltenköpfen: genau so breit wie die Zeilen, ohne Verlauf -->
+        <Profile name="lm_headerLine" extends="lm_rowBg">
+            <anchors value="0 1 0 0"/>
+            <pivot value="0 0"/>
+            <position value="0px 0px"/>
+            <size value="100% 2px"/>
+            <absoluteSizeOffset value="0px 0px"/>
+            <startImageSize value="0px 0px"/>
+            <imageColor value="0.090 0.090 0.090 1"/>
+            <imageFocusedColor value="0.090 0.090 0.090 1"/>
+            <imageSelectedColor value="0.090 0.090 0.090 1"/>
+            <imageHighlightedColor value="0.090 0.090 0.090 1"/>
         </Profile>
 
         <Profile name="lm_tableFrameBottom" extends="lm_rowBg">
