@@ -324,13 +324,17 @@
                 <ThreePartBitmap profile="lm_optRowBg"/>
                 <Text profile="lm_optLabel" id="optMaxContractsLabel" text="$l10n_livingMarket_optMaxContracts"/>
                 <Text profile="lm_optHint" id="optMaxContractsHint" text=""/>
+                <!-- Schaltflächen: Fläche + Beschriftung (Text) + unsichtbarer Button; der Klick zählt nur auf der Fläche -->
                 <ThreePartBitmap profile="lm_optButtonBg" id="optMaxContractsMinusBg" position="-290px 0px"/>
-                <Button profile="lm_optButton" id="optMaxContractsMinus" position="-290px 0px" text="-" onClick="onClickMaxContractsMinus"/>
+                <Text profile="lm_optButtonText" id="optMaxContractsMinusText" position="-290px 0px" text="-"/>
+                <Button profile="lm_optButton" id="optMaxContractsMinus" position="-290px 0px" text="" onClick="onClickMaxContractsMinus"/>
                 <Text profile="lm_optValue" id="optMaxContractsValue" position="-220px 0px" text=""/>
                 <ThreePartBitmap profile="lm_optButtonBg" id="optMaxContractsPlusBg" position="-180px 0px"/>
-                <Button profile="lm_optButton" id="optMaxContractsPlus" position="-180px 0px" text="+" onClick="onClickMaxContractsPlus"/>
+                <Text profile="lm_optButtonText" id="optMaxContractsPlusText" position="-180px 0px" text="+"/>
+                <Button profile="lm_optButton" id="optMaxContractsPlus" position="-180px 0px" text="" onClick="onClickMaxContractsPlus"/>
                 <ThreePartBitmap profile="lm_optDefaultBg" id="optMaxContractsDefaultBg" position="-20px 0px"/>
-                <Button profile="lm_optDefaultButton" id="optMaxContractsDefault" position="-20px 0px" text="$l10n_livingMarket_optDefault" onClick="onClickMaxContractsDefault"/>
+                <Text profile="lm_optDefaultText" id="optMaxContractsDefaultText" position="-20px 0px" text="$l10n_livingMarket_optDefault"/>
+                <Button profile="lm_optButton" id="optMaxContractsDefault" position="-20px 0px" text="" onClick="onClickMaxContractsDefault"/>
             </GuiElement>
         </GuiElement>
     </GuiElement>
@@ -666,10 +670,10 @@
             <pivot value="0 1"/>
             <size value="100% 2px"/>
             <absoluteSizeOffset value="90px 0px"/>
-            <imageColor value="0.30 0.30 0.30 1"/>
-            <imageFocusedColor value="0.30 0.30 0.30 1"/>
-            <imageSelectedColor value="0.30 0.30 0.30 1"/>
-            <imageHighlightedColor value="0.30 0.30 0.30 1"/>
+            <imageColor value="0.10 0.10 0.10 1"/>
+            <imageFocusedColor value="0.10 0.10 0.10 1"/>
+            <imageSelectedColor value="0.10 0.10 0.10 1"/>
+            <imageHighlightedColor value="0.10 0.10 0.10 1"/>
         </Profile>
 
         <!-- Eine Einstellung: Kachel mit Name, Hinweis und Bedienelementen rechts -->
@@ -684,10 +688,10 @@
             <pivot value="0 0"/>
             <position value="0px 0px"/>
             <size value="100% 100%"/>
-            <imageColor value="0.14 0.14 0.14 1"/>
-            <imageFocusedColor value="0.14 0.14 0.14 1"/>
-            <imageSelectedColor value="0.14 0.14 0.14 1"/>
-            <imageHighlightedColor value="0.14 0.14 0.14 1"/>
+            <imageColor value="0.040 0.040 0.040 1"/>
+            <imageFocusedColor value="0.040 0.040 0.040 1"/>
+            <imageSelectedColor value="0.040 0.040 0.040 1"/>
+            <imageHighlightedColor value="0.040 0.040 0.040 1"/>
         </Profile>
         <Profile name="lm_optLabel" extends="lm_optTitle">
             <position value="16px -8px"/>
@@ -707,10 +711,10 @@
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
             <size value="40px 34px"/>
-            <imageColor value="0.30 0.30 0.30 1"/>
-            <imageFocusedColor value="0.30 0.30 0.30 1"/>
-            <imageSelectedColor value="0.30 0.30 0.30 1"/>
-            <imageHighlightedColor value="0.30 0.30 0.30 1"/>
+            <imageColor value="0.11 0.11 0.11 1"/>
+            <imageFocusedColor value="0.11 0.11 0.11 1"/>
+            <imageSelectedColor value="0.11 0.11 0.11 1"/>
+            <imageHighlightedColor value="0.11 0.11 0.11 1"/>
         </Profile>
         <Profile name="lm_optDefaultBg" extends="lm_optButtonBg">
             <size value="140px 34px"/>
@@ -729,9 +733,21 @@
             <textHighlightedColor value="0.47 0.64 0.11 1"/>
             <textDisabledColor value="0.40 0.40 0.40 1"/>
         </Profile>
-        <Profile name="lm_optDefaultButton" extends="lm_optButton">
+        <!-- Beschriftung der Schaltflächen (eigene Textfelder: die Button-Profile des Spiels sind fest 450 px breit) -->
+        <Profile name="lm_optButtonText" extends="fs25_textDefault">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <size value="40px 34px"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+            <textSize value="24px"/>
+            <textBold value="true"/>
+            <textColor value="1 1 1 1"/>
+        </Profile>
+        <Profile name="lm_optDefaultText" extends="lm_optButtonText">
             <size value="140px 34px"/>
             <textSize value="15px"/>
+            <textUpperCase value="true"/>
         </Profile>
         <Profile name="lm_optValue" extends="fs25_textDefault">
             <anchors value="1 1 0.5 0.5"/>

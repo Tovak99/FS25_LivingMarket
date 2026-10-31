@@ -805,7 +805,38 @@ local function limitHeaderHitArea(button)
     end
 end
 
+-- Unsichtbarer Button, der nur auf der Fläche eines anderen Elements klickbar ist
+-- (die Button-Profile des Spiels sind fest 450 px breit). Beim Überfahren wird die Beschriftung grün.
+local OPT_HOVER = { 0.47, 0.64, 0.11, 1 }
+local function bindAreaButton(button, area, label)
+    if button == nil or area == nil or button.areaBound then
+        return
+    end
+    button.areaBound = true
+    button.areaLabel = label
+    local originalMouseEvent = button.mouseEvent
+    button.mouseEvent = function(self, posX, posY, isDown, isUp, mouseButton, eventUsed)
+        local inside = area.absPosition ~= nil and area.absSize ~= nil
+            and posX >= area.absPosition[1] and posX <= area.absPosition[1] + area.absSize[1]
+            and posY >= area.absPosition[2] and posY <= area.absPosition[2] + area.absSize[2]
+        local hover = inside and not self.disabled and self:getIsVisible()
+        if label ~= nil and label.setTextColor ~= nil and hover ~= self.areaHover then
+            self.areaHover = hover
+            local c = hover and OPT_HOVER or (self.areaColor or { 1, 1, 1, 1 })
+            label:setTextColor(c[1], c[2], c[3], c[4])
+        end
+        if not inside then
+            return originalMouseEvent(self, -1, -1, isDown, isUp, mouseButton, eventUsed)
+        end
+        return originalMouseEvent(self, posX, posY, isDown, isUp, mouseButton, eventUsed)
+    end
+end
+
 function LivingMarketFrame:setupSortHeaders()
+    bindAreaButton(self.optionsButton, self.optionsIcon, nil)
+    bindAreaButton(self.optMaxContractsMinus, self.optMaxContractsMinusBg, self.optMaxContractsMinusText)
+    bindAreaButton(self.optMaxContractsPlus, self.optMaxContractsPlusBg, self.optMaxContractsPlusText)
+    bindAreaButton(self.optMaxContractsDefault, self.optMaxContractsDefaultBg, self.optMaxContractsDefaultText)
     limitHeaderHitArea(self.filterButton)
     limitHeaderHitArea(self.viewMarketButton)
     limitHeaderHitArea(self.eventFilterButton)
@@ -1213,8 +1244,18 @@ function LivingMarketFrame:refreshOptions()
         self.optMaxContractsHint:setText(hint)
     end
     local function enable(button, on)
-        if button ~= nil and button.setDisabled ~= nil then
+        if button == nil then
+            return
+        end
+        if button.setDisabled ~= nil then
             button:setDisabled(not on)
+        end
+        -- Beschriftung: weiß bzw. grau, wenn nicht möglich
+        button.areaColor = on and { 1, 1, 1, 1 } or { 0.40, 0.40, 0.40, 1 }
+        button.areaHover = nil
+        if button.areaLabel ~= nil and button.areaLabel.setTextColor ~= nil then
+            local c = button.areaColor
+            button.areaLabel:setTextColor(c[1], c[2], c[3], c[4])
         end
     end
     enable(self.optMaxContractsMinus, canChange and value > 1)
