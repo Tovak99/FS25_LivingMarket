@@ -754,7 +754,7 @@ function LivingMarketFrame:onToggleFavorite()
 end
 
 function LivingMarketFrame:onTestMonth()
-    LivingMarket:onPeriodChanged()
+    LivingMarket:simulateMonth()
     self:refreshData()
 end
 
@@ -851,15 +851,15 @@ function LivingMarketFrame:populateEventCell(row, cell)
     put("station", row.stationName, main)
     put("price", string.format("%+d %%", row.pricePercent), typeColor)
     put("demand", (string.gsub(string.format("x%.1f", row.maxFactor), "%.", ",")), main)
-    put("start", LivingMarket.getMonthName(row.startMonth), row.pending and COLOR_MID or main)
-    put("end", LivingMarket.getMonthName(row.endMonth), main)
+    put("start", row.startText, row.pending and COLOR_MID or main)
+    put("end", row.endText, main)
     put("status", g_i18n:getText(row.pending and "livingMarket_evPending" or "livingMarket_evRunning"),
         row.pending and COLOR_MID or COLOR_GOOD)
     setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
 end
 
 function LivingMarketFrame:onTestRefill()
-    LivingMarket:onHourChanged()
+    LivingMarket:simulateHours(1)
     self:refreshData()
 end
 

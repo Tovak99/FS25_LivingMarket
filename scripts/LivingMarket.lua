@@ -1219,6 +1219,12 @@ function LivingMarket:onHourChanged()
             end
         end
     end
+
+    -- Marktereignisse: fällige starten/beenden, gelegentlich neue (verteilt über den Monat)
+    local ok, err = pcall(self.tickEvents, self)
+    if not ok then
+        print("[LivingMarket] FEHLER bei den Marktereignissen: " .. tostring(err))
+    end
 end
 
 -- ---------------------------------------------------------------------

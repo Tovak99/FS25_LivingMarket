@@ -36,7 +36,7 @@ LivingMarket.EVENT_SETTINGS = {
     },
 }
 
-LivingMarket.events = {}   -- { type, fillTypeIndex, stationKey (nil = marktweit), price, maxFactor, months, startsIn }
+LivingMarket.events = {}   -- { type, fillTypeIndex, stationKey (nil = marktweit), price, maxFactor, months, startHour, endHour, active }
 
 local function log(fmt, ...)
     if LivingMarket.DEBUG then
@@ -77,7 +77,7 @@ function LivingMarket:applyEventsToEntry(station, fillTypeIndex, entry)
     end
     local stationKey = nil
     for _, event in ipairs(self.events) do
-        if event.startsIn <= 0 and event.fillTypeIndex == fillTypeIndex then
+        if event.active and event.fillTypeIndex == fillTypeIndex then
             local matches = event.stationKey == nil
             if not matches then
                 stationKey = stationKey or self:getStationKey(station)
@@ -100,7 +100,7 @@ function LivingMarket:applyEventsToAll()
     -- für marktweite Ereignisse alle Stationen mit dieser Ware anlegen
     local stations = self:collectStations()
     for _, event in ipairs(self.events) do
-        if event.startsIn <= 0 then
+        if event.active then
             for _, station in ipairs(stations) do
                 if station.acceptedFillTypes ~= nil and station.acceptedFillTypes[event.fillTypeIndex] then
                     self:getEntry(station, event.fillTypeIndex)
@@ -239,11 +239,73 @@ function LivingMarket:pickMarketWare()
     return candidates[math.random(1, #candidates)]
 end
 
+-- ---------------------------------------------------------------------
+-- Zeit: Ereignisse laufen in Spielstunden, damit Beginn und Ende über den
+-- Monat verteilt sind (nicht alle um 00:00 des Monatswechsels)
+-- ---------------------------------------------------------------------
+LivingMarket.testHourOffset = 0   -- Testknöpfe spulen hiermit vor
+
+function LivingMarket.getNowHour()
+    local env = g_currentMission ~= nil and g_currentMission.environment or nil
+    if env == nil then
+        return LivingMarket.testHourOffset
+    end
+    local day = env.currentMonotonicDay or env.currentDay or 0
+    return day * 24 + (env.currentHour or 0) + LivingMarket.testHourOffset
+end
+
+-- Zeitpunkt (absolute Stunde) als "Okt 14:00" bzw. "Okt 2. 14:00" bei mehreren Tagen je Monat
+function LivingMarket:formatEventTime(absHour)
+    local env = g_currentMission ~= nil and g_currentMission.environment or nil
+    local daysPerMonth = math.max(1, math.floor(self.getHoursPerMonth() / 24 + 0.5))
+    local hoursPerMonth = daysPerMonth * 24
+    local now = self.getNowHour()
+    local nowHourOfDay = (env ~= nil and env.currentHour or 0) + self.testHourOffset
+    local dayInMonth = env ~= nil and env.currentDayInPeriod or 1
+    local month = self.getCurrentMonth() or 1
+    -- Stunden seit Beginn des aktuellen Monats bis zum Zeitpunkt
+    local total = (dayInMonth - 1) * 24 + nowHourOfDay + (absHour - now)
+    local monthsAhead = math.floor(total / hoursPerMonth)
+    local rest = total - monthsAhead * hoursPerMonth
+    local day = math.floor(rest / 24) + 1
+    local hour = math.floor(rest % 24)
+    local text = self.getMonthName(self.wrapMonth(month + monthsAhead))
+    if daysPerMonth > 1 then
+        text = string.format("%s %d.", text, day)
+    end
+    return string.format("%s %02d:00", text, hour)
+end
+
+-- Gespeicherte/alte Angaben in absolute Stunden umrechnen
+function LivingMarket:normalizeEvents()
+    local now = self.getNowHour()
+    local hoursPerMonth = self.getHoursPerMonth()
+    for _, event in ipairs(self.events) do
+        if event.startHour == nil then
+            if event.startIn ~= nil then
+                event.startHour = now + event.startIn
+                event.endHour = now + (event.endIn or (event.startIn + event.months * hoursPerMonth))
+            else   -- alter Stand (Monate): ab jetzt umrechnen
+                local startIn = (event.startsIn or 0) * hoursPerMonth
+                event.startHour = now + startIn
+                event.endHour = event.startHour + (event.months or 1) * hoursPerMonth
+            end
+            event.active = event.startHour <= now
+            event.startIn, event.endIn, event.startsIn = nil, nil, nil
+        end
+    end
+end
+
+-- ---------------------------------------------------------------------
+-- Würfeln
+-- ---------------------------------------------------------------------
 function LivingMarket:createRandomEvent()
     local s = self.EVENT_SETTINGS
     local roll = math.random()
     local months = math.random(s.minMonths, s.maxMonths)
     local change = randomRange(s.minPrice, s.maxPrice)
+    local now = self.getNowHour()
+    local hoursPerMonth = self.getHoursPerMonth()
 
     if roll < s.weightShortage + s.weightSurplus then
         local station, stationKey, fillTypeIndex = self:pickStationWare()
@@ -251,13 +313,12 @@ function LivingMarket:createRandomEvent()
             return nil
         end
         local eventType = roll < s.weightShortage and self.EVENT_SHORTAGE or self.EVENT_SURPLUS
-        local event = {
+        return {   -- Stationsereignis: beginnt sofort
             type = eventType, fillTypeIndex = fillTypeIndex, stationKey = stationKey,
             price = eventType == self.EVENT_SHORTAGE and (1 + change) or (1 - change),
-            maxFactor = s.maxFactor[eventType], months = months, startsIn = 0,
-            startPeriod = self.getCurrentMonth(),
+            maxFactor = s.maxFactor[eventType], months = months,
+            startHour = now, endHour = now + months * hoursPerMonth, active = false,
         }
-        return event
     end
 
     local fillTypeIndex = self:pickMarketWare()
@@ -265,79 +326,138 @@ function LivingMarket:createRandomEvent()
         return nil
     end
     local eventType = math.random() < 0.5 and self.EVENT_BOOM or self.EVENT_SLUMP
+    local startHour = now + hoursPerMonth   -- marktweit: einen Monat vorher angekündigt
     return {
         type = eventType, fillTypeIndex = fillTypeIndex, stationKey = nil,
         price = eventType == self.EVENT_BOOM and (1 + change) or (1 - change),
         maxFactor = s.maxFactor[eventType], months = months,
-        startsIn = 1,   -- marktweit: einen Monat vorher angekündigt
-        startPeriod = self.wrapMonth((self.getCurrentMonth() or 1) + 1),
+        startHour = startHour, endHour = startHour + months * hoursPerMonth, active = false,
     }
 end
 
-function LivingMarket:addRandomEvents()
+function LivingMarket:rollEventTarget()
     local s = self.EVENT_SETTINGS
-    local target = math.random(s.minActive, s.maxActive)
-    local tries = 0
-    while #self.events < target and tries < 20 do
-        tries = tries + 1
-        local event = self:createRandomEvent()
-        if event ~= nil then
-            table.insert(self.events, event)
-            self:announceEvent(event, event.startsIn > 0 and "announce" or "start")
-        end
-    end
+    self.eventTarget = math.random(s.minActive, s.maxActive)
 end
 
--- Beim ersten Laden ohne gespeicherte Ereignisse
-function LivingMarket:initEvents()
-    if #self.events == 0 then
-        self:addRandomEvents()
+-- Ein neues Ereignis würfeln und melden (angekündigt oder sofort gestartet)
+function LivingMarket:spawnEvent()
+    local event = self:createRandomEvent()
+    if event == nil then
+        return false
     end
-    self:applyEventsToAll()
-    log("Marktereignisse aktiv: %d", #self.events)
+    table.insert(self.events, event)
+    if event.startHour > self.getNowHour() then
+        self:announceEvent(event, "announce")
+    end
+    return true
 end
 
--- Monatswechsel: Ereignisse weiterzählen, neue würfeln, Schwankungen neu
-function LivingMarket:onPeriodChanged()
-    if g_server == nil then
+-- Jede Spielstunde: fällige Ereignisse starten/beenden, gelegentlich neue würfeln.
+-- Neue Ereignisse kommen zufällig über den Monat verteilt, solange weniger als das Ziel laufen.
+function LivingMarket:tickEvents()
+    if g_server == nil or not self.eventsInitialized then
         return
     end
+    self:normalizeEvents()
+    local now = self.getNowHour()
+    local changed = false
+
     local kept = {}
     for _, event in ipairs(self.events) do
-        if event.startsIn > 0 then
-            event.startsIn = event.startsIn - 1
-            if event.startsIn <= 0 then
-                self:announceEvent(event, "start")
-            end
-            table.insert(kept, event)
+        if not event.active and now >= event.startHour then
+            event.active = true
+            self:announceEvent(event, "start")
+            changed = true
+        end
+        if event.active and now >= event.endHour then
+            self:announceEvent(event, "end")
+            changed = true
         else
-            event.months = event.months - 1
-            if event.months > 0 then
-                table.insert(kept, event)
-            else
-                self:announceEvent(event, "end")
-            end
+            table.insert(kept, event)
         end
     end
     self.events = kept
 
-    -- kleine Schwankungen neu würfeln
+    if self.eventTarget == nil then
+        self:rollEventTarget()
+    end
+    local missing = self.eventTarget - #self.events
+    if missing > 0 then
+        -- Chance je Stunde so, dass fehlende Ereignisse im Lauf von etwa einem Drittel Monat kommen
+        local window = math.max(4, self.getHoursPerMonth() / 3)
+        if math.random() < missing / window then
+            if self:spawnEvent() then
+                changed = true
+            end
+        end
+    end
+
+    -- sofort beginnende Ereignisse starten
+    for _, event in ipairs(self.events) do
+        if not event.active and now >= event.startHour then
+            event.active = true
+            self:announceEvent(event, "start")
+            changed = true
+        end
+    end
+
+    if changed then
+        self:applyEventsToAll()
+    end
+end
+
+-- Beim Laden: gespeicherte Ereignisse übernehmen bzw. das erste würfeln
+function LivingMarket:initEvents()
+    self:normalizeEvents()
+    self:rollEventTarget()
+    if #self.events == 0 then
+        self:spawnEvent()   -- eins sofort, der Rest kommt verteilt über die nächsten Stunden
+        for _, event in ipairs(self.events) do
+            if not event.active and event.startHour <= self.getNowHour() then
+                event.active = true
+                self:announceEvent(event, "start")
+            end
+        end
+    end
+    self:applyEventsToAll()
+    log("Marktereignisse: %d (Ziel %d)", #self.events, self.eventTarget)
+end
+
+-- Monatswechsel: nur noch kleine Schwankungen und neues Ziel für die Anzahl
+function LivingMarket:onPeriodChanged()
+    if g_server == nil then
+        return
+    end
     for _, data in pairs(self.stations) do
         for _, entry in pairs(data) do
             entry.noise = self:rollNoise()
         end
     end
-
-    self:addRandomEvents()
+    self:rollEventTarget()
     self:applyEventsToAll()
-    self.eventsInitialized = true
-    log("Monatswechsel: %d Marktereignisse", #self.events)
+    log("Monatswechsel: Schwankungen neu, Ziel %d Marktereignisse", self.eventTarget)
+end
+
+-- Testknöpfe: Stunden vorspulen (Auffüllen + Ereignisse), Monat = so viele Stunden + Monatswechsel
+function LivingMarket:simulateHours(hours)
+    for _ = 1, hours do
+        self.testHourOffset = self.testHourOffset + 1
+        self:onHourChanged()
+    end
+end
+
+function LivingMarket:simulateMonth()
+    self:simulateHours(self.getHoursPerMonth())
+    self:onPeriodChanged()
 end
 
 -- ---------------------------------------------------------------------
--- Speichern / Laden
+-- Speichern / Laden (Zeiten relativ zu jetzt, damit sie nach dem Laden passen)
 -- ---------------------------------------------------------------------
 function LivingMarket:saveEventsToXML(xmlFile, baseKey)
+    self:normalizeEvents()
+    local now = self.getNowHour()
     for i, event in ipairs(self.events) do
         local key = string.format("%s.event(%d)", baseKey, i - 1)
         setXMLInt(xmlFile, key .. "#type", event.type)
@@ -347,11 +467,9 @@ function LivingMarket:saveEventsToXML(xmlFile, baseKey)
         end
         setXMLFloat(xmlFile, key .. "#price", event.price)
         setXMLFloat(xmlFile, key .. "#maxFactor", event.maxFactor)
-        setXMLInt(xmlFile, key .. "#months", event.months)
-        setXMLInt(xmlFile, key .. "#startsIn", event.startsIn)
-        if event.startPeriod ~= nil then
-            setXMLInt(xmlFile, key .. "#startPeriod", event.startPeriod)
-        end
+        setXMLInt(xmlFile, key .. "#months", event.months or 1)
+        setXMLInt(xmlFile, key .. "#startIn", math.floor(event.startHour - now))
+        setXMLInt(xmlFile, key .. "#endIn", math.floor(event.endHour - now))
     end
 end
 
@@ -373,36 +491,31 @@ function LivingMarket:loadEventsFromXML(xmlFile, baseKey)
                 price         = getXMLFloat(xmlFile, key .. "#price") or 1,
                 maxFactor     = getXMLFloat(xmlFile, key .. "#maxFactor") or 1,
                 months        = getXMLInt(xmlFile, key .. "#months") or 1,
-                startsIn      = getXMLInt(xmlFile, key .. "#startsIn") or 0,
-                startPeriod   = getXMLInt(xmlFile, key .. "#startPeriod"),
+                startIn       = getXMLInt(xmlFile, key .. "#startIn"),      -- ab 0.1.0.78
+                endIn         = getXMLInt(xmlFile, key .. "#endIn"),
+                startsIn      = getXMLInt(xmlFile, key .. "#startsIn"),     -- ältere Versionen (Monate)
+                active        = false,
             })
         end
         i = i + 1
     end
-    -- gespeicherter Stand mit Ereignissen: nicht neu würfeln, nur anwenden
+    -- gespeicherter Stand: nicht neu würfeln, nur anwenden (initEvents kurz nach dem Laden)
     self.eventsInitialized = false
     self.eventInitTimer = 0
 end
 
 -- ---------------------------------------------------------------------
--- Liste für die Seite "Marktnachrichten"
+-- Liste für die Ansicht "Marktnachrichten"
 -- ---------------------------------------------------------------------
 function LivingMarket.wrapMonth(month)
     return ((math.floor(month) - 1) % 12) + 1
 end
 
 function LivingMarket:getEventList()
-    local current = self.getCurrentMonth() or 1
+    self:normalizeEvents()
     local rows = {}
     for _, event in ipairs(self.events or {}) do
-        local pending = event.startsIn > 0
-        local startMonth = event.startPeriod
-        if startMonth == nil then
-            startMonth = pending and self.wrapMonth(current + event.startsIn) or current
-        end
-        -- Ende: aktiv = aktueller Monat + verbleibende Monate - 1; angekündigt = Beginn + Dauer - 1
-        local endMonth = pending and self.wrapMonth(current + event.startsIn + event.months - 1)
-            or self.wrapMonth(current + event.months - 1)
+        local pending = not event.active
         local fillType = g_fillTypeManager:getFillTypeByIndex(event.fillTypeIndex)
         table.insert(rows, {
             type          = event.type,
@@ -411,13 +524,13 @@ function LivingMarket:getEventList()
             stationName   = event.stationKey ~= nil and self:getEventStationName(event) or g_i18n:getText("livingMarket_allStations"),
             pricePercent  = math.floor((event.price - 1) * 100 + 0.5),
             maxFactor     = event.maxFactor,
-            startMonth    = startMonth,
-            endMonth      = endMonth,
+            startText     = self:formatEventTime(event.startHour),
+            endText       = self:formatEventTime(event.endHour),
             pending       = pending,
-            sortKey       = (pending and 100 or 0) + event.startsIn * 12 + event.months,
+            sortKey       = pending and (1e9 + event.startHour) or event.endHour,
         })
     end
-    -- laufende zuerst (die bald enden oben), dann angekündigte
+    -- laufende zuerst (die bald enden oben), dann angekündigte (die bald beginnen oben)
     table.sort(rows, function(a, b)
         if a.sortKey ~= b.sortKey then
             return a.sortKey < b.sortKey

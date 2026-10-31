@@ -132,9 +132,9 @@
             <Text profile="lm_colHeaderRight" position="380px 0px" text="$l10n_livingMarket_colPrice"/>
             <Text profile="lm_colHeader" position="470px 0px" text="$l10n_livingMarket_colStationEv"/>
             <Text profile="lm_colHeaderRight" position="500px 0px" text="$l10n_livingMarket_colDemand"/>
-            <Text profile="lm_colHeader" position="1000px 0px" text="$l10n_livingMarket_colStart"/>
-            <Text profile="lm_colHeader" position="1110px 0px" text="$l10n_livingMarket_colEnd"/>
-            <Text profile="lm_colHeader" position="1220px 0px" text="$l10n_livingMarket_colStatus"/>
+            <Text profile="lm_colHeader" position="960px 0px" text="$l10n_livingMarket_colStart"/>
+            <Text profile="lm_colHeader" position="1100px 0px" text="$l10n_livingMarket_colEnd"/>
+            <Text profile="lm_colHeader" position="1240px 0px" text="$l10n_livingMarket_colStatus"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
 
@@ -148,9 +148,9 @@
                     <Text profile="lm_rowTextRight" name="price" position="380px 0px"/>
                     <Text profile="lm_rowText" name="station" position="470px 0px"/>
                     <Text profile="lm_rowTextRight" name="demand" position="500px 0px"/>
-                    <Text profile="lm_rowText" name="start" position="1000px 0px"/>
-                    <Text profile="lm_rowText" name="end" position="1110px 0px"/>
-                    <Text profile="lm_rowText" name="status" position="1220px 0px"/>
+                    <Text profile="lm_rowText" name="start" position="960px 0px"/>
+                    <Text profile="lm_rowText" name="end" position="1100px 0px"/>
+                    <Text profile="lm_rowText" name="status" position="1240px 0px"/>
                 </ListItem>
             </SmoothList>
             <GuiElement profile="lm_sliderArea">
