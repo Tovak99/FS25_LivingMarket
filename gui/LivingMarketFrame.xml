@@ -84,12 +84,13 @@
                 <!-- erste Spalte: Icon und Name der gewählten Ware -->
                 <Bitmap profile="lm_wareIcon" id="detailIcon" position="18px 0px" visible="false"/>
                 <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="190px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="330px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="470px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="600px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="720px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="850px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+                <!-- Spalten bündig unter der Warenliste: Liefermenge, Preis, Marktlage (unter Markt), Erlös -->
+                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="55px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="180px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="295px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="405px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="550px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="660px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
@@ -98,14 +99,14 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="190px 0px"/>
-                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 190 + 450 = 640) -->
-                    <Bitmap profile="lm_trendIcon" name="trend" position="645px 0px"/>
-                    <Text profile="lm_rowTextRight" name="market" position="330px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="470px 0px"/>
-                    <Text profile="lm_rowTextRight" name="max" position="600px 0px"/>
-                    <Text profile="lm_rowTextRight" name="share" position="720px 0px"/>
-                    <Text profile="lm_rowTextRight" name="revenue" position="850px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="55px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="180px 0px"/>
+                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
+                    <Bitmap profile="lm_trendIcon" name="trend" position="635px 0px"/>
+                    <Text profile="lm_rowTextRight" name="market" position="295px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="405px 0px"/>
+                    <Text profile="lm_rowTextRight" name="max" position="550px 0px"/>
+                    <Text profile="lm_rowTextRight" name="share" position="660px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
