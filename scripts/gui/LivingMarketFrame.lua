@@ -893,7 +893,7 @@ function LivingMarketFrame:populateEventCell(row, cell)
     put("ware", row.wareTitle, main)
     put("station", row.stationName, main)
     put("price", string.format("%+d %%", row.pricePercent), typeColor)
-    put("demand", (string.gsub(string.format("x%.1f", row.maxFactor), "%.", ",")), main)
+    put("demand", string.format("%d %%", math.floor(row.maxFactor * 100 + 0.5)), main)   -- z. B. 150 %
     put("start", row.startText, row.pending and COLOR_MID or main)
     put("end", row.endText, main)
     put("status", g_i18n:getText(row.pending and "livingMarket_evPending" or "livingMarket_evRunning"),
