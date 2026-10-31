@@ -76,6 +76,7 @@
         <text name="livingMarket_noContracts" text="Aucun appel d’offres pour le moment"/>
         <text name="livingMarket_noContractsStock" text="Aucun appel d’offres pour les produits en stock"/>
         <text name="livingMarket_contractLabel" text="Contrat"/>
+        <text name="livingMarket_colEffect" text="Effet"/>
         <text name="livingMarket_year" text="Année %d"/>
         <text name="livingMarket_colRefill" text="Écoulement"/>
         <text name="livingMarket_colStart" text="Début"/>

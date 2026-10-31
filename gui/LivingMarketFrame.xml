@@ -98,13 +98,15 @@
                 <Bitmap profile="lm_wareIcon" id="detailIcon" position="32px 0px" visible="false"/>
                 <Button profile="lm_sortHeader" id="detailTitle" position="66px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
                 <!-- Spalten bündig unter der Warenliste: Liefermenge, Preis, Marktlage (unter Markt), Erlös -->
-                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="55px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="180px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="295px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="405px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="550px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="660px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeader" id="detailStarsHeader" position="1150px 0px" text="$l10n_livingMarket_colReputation"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="175px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="300px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="415px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="525px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="660px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="755px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeader" id="detailEventHeader" position="215px 0px" text="$l10n_livingMarket_colEvent"/>
+                <Button profile="lm_sortHeaderRight" id="detailEffectHeader" position="75px 0px" text="$l10n_livingMarket_colEffect"/>
+                <Button profile="lm_sortHeader" id="detailStarsHeader" position="1225px 0px" text="$l10n_livingMarket_colReputation"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
@@ -113,18 +115,18 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="66px 0px"/>
-                    <!-- Marktereignis der Station in zwei Spalten: "Engpass" | "Preis +24 %" (rechte Kante 425) -->
+                    <!-- Marktereignis der Station in zwei Spalten: "Engpass" | "Preis +24 % · Bedarf +50 %" (rechte Kante 525) -->
                     <Text profile="lm_rowText" name="event" position="215px 0px"/>
-                    <Text profile="lm_rowTextRight" name="eventEffect" position="-25px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="55px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="180px 0px"/>
+                    <Text profile="lm_rowTextRight" name="eventEffect" position="75px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="175px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="300px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
-                    <Bitmap profile="lm_trendIcon" name="trend" position="635px 0px"/>
-                    <Text profile="lm_rowTextRight" name="market" position="295px 0px"/>
-                    <Text profile="lm_rowTextRight" name="revenue" position="405px 0px"/>
-                    <Text profile="lm_rowTextRight" name="max" position="550px 0px"/>
-                    <Text profile="lm_rowTextRight" name="share" position="660px 0px"/>
-                    <Bitmap profile="lm_starsIcon" name="stars" position="1150px 0px"/>
+                    <Bitmap profile="lm_trendIcon" name="trend" position="755px 0px"/>
+                    <Text profile="lm_rowTextRight" name="market" position="415px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="525px 0px"/>
+                    <Text profile="lm_rowTextRight" name="max" position="660px 0px"/>
+                    <Text profile="lm_rowTextRight" name="share" position="755px 0px"/>
+                    <Bitmap profile="lm_starsIcon" name="stars" position="1225px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->

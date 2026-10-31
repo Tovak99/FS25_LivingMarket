@@ -76,6 +76,7 @@
         <text name="livingMarket_noContracts" text="Zurzeit keine Ausschreibungen"/>
         <text name="livingMarket_noContractsStock" text="Keine Ausschreibungen für vorrätige Waren"/>
         <text name="livingMarket_contractLabel" text="Vertrag"/>
+        <text name="livingMarket_colEffect" text="Wirkung"/>
         <text name="livingMarket_year" text="Jahr %d"/>
         <text name="livingMarket_colRefill" text="Verkäufe"/>
         <text name="livingMarket_colStart" text="Beginn"/>

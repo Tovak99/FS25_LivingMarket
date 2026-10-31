@@ -319,7 +319,7 @@ local function isRefillEvent(eventType)
     return eventType == 5 or eventType == 6
 end
 -- Nachgefragt/Ladenhüter zeigen die Änderung der Auffüllung, alle anderen die Preisänderung
-local function getEventText(eventType, eventPrice, eventRefill)
+local function getEventText(eventType, eventPrice, eventRefill, eventMax)
     local label = EVENT_LABELS[eventType or 0]
     if label == nil then
         return nil, nil
@@ -328,9 +328,13 @@ local function getEventText(eventType, eventPrice, eventRefill)
     local value = refill and eventRefill or eventPrice
     local percent = math.floor(((value or 1) - 1) * 100 + 0.5)
     local color = isPositiveEvent(eventType) and COLOR_GOOD or COLOR_LOW
-    -- zwei Teile: Ereignis ("Engpass") und Wirkung ("Preis +24 %" bzw. "Verkäufe +23 %")
+    -- zwei Teile: Ereignis ("Engpass") und Wirkung ("Preis +24 % · Bedarf +50 %" bzw. "Verkäufe +23 %")
     local what = g_i18n:getText(refill and "livingMarket_colRefill" or "livingMarket_colPrice")
-    return g_i18n:getText(label), color, string.format("%s %+d %%", what, percent)
+    local effect = string.format("%s %+d %%", what, percent)
+    if not refill and eventMax ~= nil and math.abs(eventMax - 1) > 0.001 then
+        effect = string.format("%s · %s %+d %%", effect, g_i18n:getText("livingMarket_colDemand"), math.floor((eventMax - 1) * 100 + 0.5))
+    end
+    return g_i18n:getText(label), color, effect
 end
 
 local function formatPrice(pricePer1000)
@@ -1651,7 +1655,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")
     local eventText = cell:getAttribute("event")
     if eventText ~= nil then
-        local text, color, effect = getEventText(station.eventType, station.eventPrice, station.eventRefill)
+        local text, color, effect = getEventText(station.eventType, station.eventPrice, station.eventRefill, station.eventMax)
         eventText:setText(text or "")
         setColor(eventText, isFull and COLOR_MUTED or color or COLOR_TEXT)
         local effectText = cell:getAttribute("eventEffect")
@@ -1675,11 +1679,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
         -- Bedarf durch Ereignis erhöht (Engpass, Gefragt) grün, gesenkt (Überangebot, Flaute) rot,
         -- dann mit dem Faktor in Klammern, z. B. "115.500 l (150 %)"
         local eventMax = station.eventMax or 1
-        local maxLabel = LivingMarket.formatLiters(station.max)
-        if math.abs(eventMax - 1) > 0.001 then
-            maxLabel = string.format("%s (%d %%)", maxLabel, math.floor(eventMax * 100 + 0.5))
-        end
-        maxText:setText(maxLabel)
+        maxText:setText(LivingMarket.formatLiters(station.max))   -- Änderung steht in der Spalte Wirkung
         local maxColor = eventMax > 1.001 and COLOR_GOOD or (eventMax < 0.999 and COLOR_LOW or COLOR_TEXT)
         setColor(maxText, isFull and COLOR_MUTED or maxColor)
     end
