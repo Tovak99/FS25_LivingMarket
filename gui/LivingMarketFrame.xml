@@ -26,12 +26,12 @@
         <ThreePartBitmap profile="lm_tableFrameTop" id="wareFrame"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Button profile="lm_sortHeader" id="sortWare_title" position="60px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="30px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="240px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortWare_station" position="740px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="730px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="950px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_title" position="50px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="20px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_price" position="230px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_station" position="730px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="720px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
@@ -70,10 +70,10 @@
 
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
-                <Button profile="lm_sortHeader" id="detailTitle" position="60px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="520px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="780px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="950px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="510px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="770px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
@@ -146,12 +146,12 @@
         </Profile>
 
         <!-- Tabellenrahmen: etwas hellere Fläche, die rundum ein Stück über Kopfzeile und Liste
-             hinausragt. Maße aus Screenshots: Liste beginnt ca. 21px vom linken Seitenrand, ist
-             Seitenbreite - 90 breit; Kopfzeile beginnt 20px unter der Oberkante. -->
+             hinausragt. Maße aus Screenshots: Die Liste ist horizontal zentriert (Seitenbreite - 90,
+             also 45px Rand je Seite); Kopfzeile beginnt 20px unter der Oberkante. -->
         <Profile name="lm_tableFrameTop" extends="lm_rowBg">
             <anchors value="0 1 0 1"/>
             <pivot value="0 0"/>
-            <position value="13px 292px"/>
+            <position value="37px 292px"/>
             <size value="100% 100%"/>
             <absoluteSizeOffset value="55px 304px"/>
         </Profile>
@@ -159,7 +159,7 @@
         <Profile name="lm_tableFrameBottom" extends="lm_rowBg">
             <anchors value="0 1 0 1"/>
             <pivot value="0 0"/>
-            <position value="13px -8px"/>
+            <position value="37px -8px"/>
             <size value="100% 100%"/>
             <absoluteSizeOffset value="55px 4px"/>
         </Profile>
@@ -169,7 +169,7 @@
         <Profile name="lm_sliderArea">
             <anchors value="1 1 0 1"/>
             <pivot value="1 0"/>
-            <position value="-50px 0px"/>
+            <position value="-26px 0px"/>
             <size value="14px 100%"/>
             <absoluteSizeOffset value="0px 60px"/>
         </Profile>
