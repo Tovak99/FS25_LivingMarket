@@ -801,7 +801,8 @@ function LivingMarketFrame:populateStationCell(station, cell)
     -- Volle Stationen ausgegraut
     local main = isFull and COLOR_MUTED or COLOR_TEXT
     setColor(nameText, main)
-    setColor(priceText, main)
+    local basePrice = self.detailWare ~= nil and self.detailWare.basePrice or nil
+    setColor(priceText, isFull and COLOR_MUTED or priceColor(station.price, basePrice))
     setColor(amountText, main)
     setColor(shareText, isFull and COLOR_MUTED or shareColor(station.share))
     if marketText ~= nil then
