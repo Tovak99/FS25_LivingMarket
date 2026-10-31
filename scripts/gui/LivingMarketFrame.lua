@@ -304,6 +304,9 @@ function LivingMarketFrame:updateDetail(ware)
     self.detailStations = {}
     if ware ~= nil then
         for _, station in ipairs(ware.stations) do
+            -- Erlös, wenn der Lagerbestand (soweit möglich) an diese Station geht
+            local amount = math.min(ware.stock or 0, math.max(station.remaining, 0))
+            station.revenue = LivingMarket:estimateRevenue((station.basePrice or station.price) / 1000, station.remaining, station.max, amount)
             table.insert(self.detailStations, station)
         end
         self:sortStations(self.detailStations)
@@ -365,6 +368,7 @@ LivingMarketFrame.DETAIL_COLUMNS = {
     amount = { label = "livingMarket_colSellable",  isText = false },
     max    = { label = "livingMarket_colMax",       isText = false },
     share  = { label = "livingMarket_colShare",     isText = false },
+    revenue = { label = "livingMarket_colRevenue",  isText = false },
 }
 
 local function wareValue(ware, key)
@@ -414,6 +418,8 @@ local function stationValue(station, key)
         return station.remaining
     elseif key == "max" then
         return station.max
+    elseif key == "revenue" then
+        return station.revenue
     elseif key == "share" then
         return station.share
     end
@@ -880,6 +886,16 @@ function LivingMarketFrame:populateStationCell(station, cell)
     nameText:setText(station.name)
     priceText:setText(formatPrice(station.price))
     amountText:setText(LivingMarket.formatLiters(station.remaining))
+    local revenueText = cell:getAttribute("revenue")
+    if revenueText ~= nil then
+        if (station.revenue or 0) >= 1 then
+            revenueText:setText(LivingMarket.formatMoney(station.revenue))
+            setColor(revenueText, isFull and COLOR_MUTED or COLOR_GOOD)
+        else
+            revenueText:setText("-")
+            setColor(revenueText, COLOR_MUTED)
+        end
+    end
     local maxText = cell:getAttribute("max")
     if maxText ~= nil then
         maxText:setText(LivingMarket.formatLiters(station.max))

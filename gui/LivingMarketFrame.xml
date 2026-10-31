@@ -83,11 +83,12 @@
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Name der gewählten Ware -->
                 <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="350px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="490px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="635px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="780px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
-                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="190px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_market" position="330px 0px" text="$l10n_livingMarket_colMarket" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="470px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="600px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="720px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="850px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
@@ -96,13 +97,14 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="350px 0px"/>
-                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 350 + 450 = 800) -->
-                    <Bitmap profile="lm_trendIcon" name="trend" position="805px 0px"/>
-                    <Text profile="lm_rowTextRight" name="market" position="490px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="635px 0px"/>
-                    <Text profile="lm_rowTextRight" name="max" position="780px 0px"/>
-                    <Text profile="lm_rowTextRight" name="share" position="940px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="190px 0px"/>
+                    <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 190 + 450 = 640) -->
+                    <Bitmap profile="lm_trendIcon" name="trend" position="645px 0px"/>
+                    <Text profile="lm_rowTextRight" name="market" position="330px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="470px 0px"/>
+                    <Text profile="lm_rowTextRight" name="max" position="600px 0px"/>
+                    <Text profile="lm_rowTextRight" name="share" position="720px 0px"/>
+                    <Text profile="lm_rowTextRight" name="revenue" position="850px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
