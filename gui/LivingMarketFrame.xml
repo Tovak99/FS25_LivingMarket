@@ -19,7 +19,7 @@
             <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
             <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
             <!-- Filter der Verträge (Alle Angebote / Vorrätig): rechts am Platz des Suchfelds (dort ausgeblendet) -->
-            <Button profile="lm_filterButton" id="contractFilterButton" position="-64px 0px" text="" onClick="onClickContractFilter" visible="false"/>
+            <Button profile="lm_filterButton" id="contractFilterButton" position="-104px 0px" text="" onClick="onClickContractFilter" visible="false"/>
 
             <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
             <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
@@ -345,8 +345,8 @@
         <Profile name="lm_searchInput" extends="fs25_settingsTextInput">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-64px 0px"/>
-            <size value="240px 48px"/>
+            <position value="-104px 0px"/>
+            <size value="220px 48px"/>
             <!-- Text linksbündig wie der Hinweistext; mittig gesetzt zeichnet das Spiel
                  den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
             <textAlignment value="left"/>
@@ -356,7 +356,7 @@
         <Profile name="lm_clockText" extends="fs25_textDefault">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-64px 0px"/>
+            <position value="-104px 0px"/>
             <size value="420px 40px"/>
             <textAlignment value="right"/>
             <textVerticalAlignment value="middle"/>
@@ -366,12 +366,12 @@
         </Profile>
 
         <Profile name="lm_clockTextSmall" extends="lm_clockText">
-            <position value="-315px 0px"/>
+            <position value="-335px 0px"/>
             <textSize value="17px"/>
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
-            <size value="205px 30px"/>
+            <size value="185px 30px"/>
             <position value="15px 0px"/>
             <textAlignment value="left"/>
             <textVerticalAlignment value="middle"/>
@@ -510,7 +510,7 @@
         <Profile name="lm_filterButton" extends="lm_sortHeader">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-325px 0px"/>
+            <position value="-345px 0px"/>
             <textAlignment value="right"/>
             <textSize value="17px"/>
             <textColor value="0.212 0.376 0.012 1"/>
