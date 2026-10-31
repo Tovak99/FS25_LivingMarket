@@ -537,6 +537,18 @@ function LivingMarket:getWareData()
         end
     end
 
+    -- Marktpreis des aktuellen Monats (Grundpreis × Monatsfaktor) für Markt und Preis-Pfeil
+    local currentMonth = LivingMarket.getCurrentMonth()
+    for _, ware in ipairs(wares) do
+        ware.marketPrice = ware.basePrice
+        if ware.year ~= nil and currentMonth ~= nil and ware.year.prices[currentMonth] ~= nil then
+            ware.marketPrice = ware.year.prices[currentMonth]
+        end
+        for _, station in ipairs(ware.stations) do
+            station.deviation = (ware.marketPrice ~= nil and ware.marketPrice > 0) and station.price / ware.marketPrice or nil
+        end
+    end
+
     -- Stationen je Ware nach Preis sortieren, beste Station mit freiem Bedarf bestimmen
     for _, ware in ipairs(wares) do
         table.sort(ware.stations, function(a, b)

@@ -407,7 +407,7 @@ local function wareValue(ware, key)
         end
         return (ware.year.maxMonth - current) % 12
     elseif key == "deviation" then
-        return (ware.best ~= nil and ware.basePrice ~= nil and ware.basePrice > 0) and ware.best.price / ware.basePrice or nil
+        return (ware.best ~= nil and ware.marketPrice ~= nil and ware.marketPrice > 0) and ware.best.price / ware.marketPrice or nil
     elseif key == "sellable" then
         return ware.sellable
     elseif key == "revenue" then
@@ -862,14 +862,14 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     setColor(stationText, ware.isBestStation and COLOR_GOOD or COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
     setColor(priceText, COLOR_TEXT)
-    setTrendIcon(cell:getAttribute("trend"), ware.best.price, ware.basePrice)
+    setTrendIcon(cell:getAttribute("trend"), ware.best.price, ware.marketPrice)
     if marketText ~= nil then
         local text, color = getMarketText(ware.best.factor)
         marketText:setText(text)
         setColor(marketText, color)
     end
     if deviationText ~= nil then
-        local text, color = getDeviationText(ware.best.price, ware.basePrice)
+        local text, color = getDeviationText(ware.best.price, ware.marketPrice)
         deviationText:setText(text)
         setColor(deviationText, color)
     end
@@ -924,7 +924,8 @@ function LivingMarketFrame:populateStationCell(station, cell)
     -- Volle Stationen ausgegraut
     local main = isFull and COLOR_MUTED or COLOR_TEXT
     setColor(nameText, main)
-    local basePrice = self.detailWare ~= nil and self.detailWare.basePrice or nil
+    -- Vergleich mit dem Marktpreis des aktuellen Monats
+    local basePrice = self.detailWare ~= nil and (self.detailWare.marketPrice or self.detailWare.basePrice) or nil
     setColor(priceText, main)
     setTrendIcon(cell:getAttribute("trend"), station.price, basePrice)
     setColor(amountText, main)
