@@ -1425,6 +1425,7 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
         put("bonus", (row.money >= 0 and "+" or "−") .. LivingMarket.formatMoney(math.abs(row.money)), row.money >= 0 and COLOR_GOOD or COLOR_LOW)
         put("deadline", LivingMarket:formatEventTime(row.endHour or 0), muted)
         put("stock", "", muted)
+        put("repValue", string.format("(%d)", math.floor((row.reputation or 50) + 0.5)), muted)
         local cs = LivingMarket.CONTRACT_SETTINGS
         if done then
             put("repGain", string.format("+%d", cs.repFulfilled), COLOR_GOOD)
@@ -1451,6 +1452,7 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
     put("station", row.stationName, base)
     -- mögliche Änderung des Ansehens: + bei Erfüllung / − bei Nichterfüllung
     local cs = LivingMarket.CONTRACT_SETTINGS
+    put("repValue", string.format("(%d)", math.floor((row.reputation or 50) + 0.5)), base)
     put("repGain", string.format("+%d / −%d", cs.repFulfilled, cs.repFailed), isSelected and COLOR_ON_GREEN or COLOR_MUTED_LIGHT)
     if row.isActive then
         put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
@@ -1743,6 +1745,11 @@ function LivingMarketFrame:populateStationCell(station, cell)
 
     nameText:setText(station.name)
     setStarsIcon(cell:getAttribute("stars"), station.stars)
+    local repText = cell:getAttribute("repValue")
+    if repText ~= nil then
+        repText:setText(string.format("(%d)", math.floor((station.reputation or 50) + 0.5)))
+        setColor(repText, COLOR_MUTED_LIGHT)
+    end
     priceText:setText(formatPrice(station.price))
     local deliverable = station.deliverable or station.remaining
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")

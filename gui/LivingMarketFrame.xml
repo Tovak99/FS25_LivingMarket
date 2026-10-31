@@ -129,6 +129,7 @@
                     <Text profile="lm_rowTextRight" name="max" position="660px 0px"/>
                     <Text profile="lm_rowTextRight" name="share" position="755px 0px"/>
                     <Bitmap profile="lm_starsIcon" name="stars" position="1225px 0px"/>
+                    <Text profile="lm_rowText" name="repValue" position="1308px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
@@ -236,11 +237,12 @@
                     <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
                     <Text profile="lm_rowText" name="station" position="360px 0px"/>
                     <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
-                    <Text profile="lm_rowText" name="repGain" position="658px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
-                    <Text profile="lm_rowTextRight" name="bonus" position="600px 0px"/>
-                    <Text profile="lm_rowText" name="deadline" position="1075px 0px"/>
+                    <Text profile="lm_rowText" name="repValue" position="653px 0px"/>
+                    <Text profile="lm_rowText" name="repGain" position="693px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="420px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="530px 0px"/>
+                    <Text profile="lm_rowTextRight" name="bonus" position="640px 0px"/>
+                    <Text profile="lm_rowText" name="deadline" position="1110px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="870px 0px"/>
                 </ListItem>
             </SmoothList>
@@ -257,10 +259,10 @@
             <Button profile="lm_sortHeader" id="contractHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
             <Button profile="lm_sortHeader" id="contractHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
             <Button profile="lm_sortHeader" id="contractHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_bonus" position="600px 0px" text="$l10n_livingMarket_colBonus"/>
-            <Button profile="lm_sortHeader" id="contractHead_deadline" position="1075px 0px" text="$l10n_livingMarket_colDeadline"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_amount" position="420px 0px" text="$l10n_livingMarket_colAmount"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_price" position="530px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_bonus" position="640px 0px" text="$l10n_livingMarket_colBonus"/>
+            <Button profile="lm_sortHeader" id="contractHead_deadline" position="1110px 0px" text="$l10n_livingMarket_colDeadline"/>
             <Button profile="lm_sortHeaderRight" id="contractHead_stock" position="870px 0px" text="$l10n_livingMarket_colStock"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
@@ -275,10 +277,10 @@
                 <Button profile="lm_sortHeader" id="historyHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
                 <Button profile="lm_sortHeader" id="historyHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
                 <Button profile="lm_sortHeader" id="historyHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
-                <Button profile="lm_sortHeaderRight" id="historyHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
-                <Button profile="lm_sortHeaderRight" id="historyHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
-                <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="650px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
-                <Button profile="lm_sortHeader" id="historyHead_end" position="1125px 0px" text="$l10n_livingMarket_ctEnded"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_amount" position="420px 0px" text="$l10n_livingMarket_colAmount"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_price" position="530px 0px" text="$l10n_livingMarket_colPrice"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="680px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
+                <Button profile="lm_sortHeader" id="historyHead_end" position="1145px 0px" text="$l10n_livingMarket_ctEnded"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
             <SmoothList profile="fs25_settingsControlsList" id="historyList" absoluteSizeOffset="90px 60px" selectOnClick="false">
@@ -289,11 +291,12 @@
                     <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
                     <Text profile="lm_rowText" name="station" position="360px 0px"/>
                     <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
-                    <Text profile="lm_rowText" name="repGain" position="658px 0px"/>
-                    <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
-                    <Text profile="lm_rowTextRight" name="bonus" position="650px 0px"/>
-                    <Text profile="lm_rowText" name="deadline" position="1125px 0px"/>
+                    <Text profile="lm_rowText" name="repValue" position="653px 0px"/>
+                    <Text profile="lm_rowText" name="repGain" position="693px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="420px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="530px 0px"/>
+                    <Text profile="lm_rowTextRight" name="bonus" position="680px 0px"/>
+                    <Text profile="lm_rowText" name="deadline" position="1145px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="870px 0px"/>
                 </ListItem>
             </SmoothList>

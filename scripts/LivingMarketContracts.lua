@@ -595,6 +595,7 @@ function LivingMarket:getContractRows(farmId)
                 deadlineHour  = contract.deadlineHour,
                 offerEndHour  = contract.offerEndHour,
                 stars         = self.getReputationStars(reputation),
+                reputation    = reputation,
                 sortKey       = own and (contract.deadlineHour or 0) or (1e9 + (contract.offerEndHour or 0)),
             })
         end
@@ -617,6 +618,7 @@ function LivingMarket:getContractRows(farmId)
                 money         = entry.money,
                 endHour       = entry.endHour,
                 stars         = self.getReputationStars(self:getReputation(farmId, entry.stationKey)),
+                reputation    = self:getReputation(farmId, entry.stationKey),
                 sortKey       = 3e9 - (entry.endHour or 0),
             })
         end
@@ -628,6 +630,11 @@ function LivingMarket:getContractRows(farmId)
         return a.id < b.id
     end)
     return rows
+end
+
+-- Ansehen-Wert (0..100) für das Detailfenster
+function LivingMarket:getStationReputation(farmId, station)
+    return self:getReputation(farmId, self:getStationKey(station))
 end
 
 -- Ansehen für das Detailfenster (Stationen der Marktansicht)

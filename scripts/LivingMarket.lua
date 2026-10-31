@@ -897,6 +897,7 @@ function LivingMarket:getWareData()
                         max       = entry.max,
                         share     = entry.max > 0 and entry.remaining / entry.max or 0,
                         stars     = self.getStationStars ~= nil and self:getStationStars(self:getFarmId(), station) or 3,   -- Ansehen des eigenen Hofs
+                        reputation = self.getStationReputation ~= nil and self:getStationReputation(self:getFarmId(), station) or 50,
                     })
                 end
             end
