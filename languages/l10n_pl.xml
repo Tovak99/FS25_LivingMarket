@@ -3,8 +3,9 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Żywy rynek"/>
         <text name="livingMarket_title" text="Żywy rynek"/>
-        <text name="livingMarket_info" text="Najlepszy punkt = najwyższa cena przy wolnym popycie. Popyt odnawia się o %d %% co godzinę gry."/>
+        <text name="livingMarket_info" text="Najlepszy punkt = najwyższa cena przy wolnym popycie. Popyt odnawia się o %d %% co godzinę gry. Poniżej 50 %% popytu cena spada, do -50 %%."/>
         <text name="livingMarket_colShare" text="Wolne"/>
+        <text name="livingMarket_colMarket" text="Rynek"/>
         <text name="livingMarket_none" text="Nie znaleziono punktów sprzedaży"/>
         <text name="livingMarket_unknownStation" text="Punkt sprzedaży"/>
         <text name="livingMarket_searchHint" text="Szukaj towaru lub punktu …"/>

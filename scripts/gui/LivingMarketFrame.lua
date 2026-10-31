@@ -142,6 +142,15 @@ local function shareColor(share)
     return COLOR_LOW
 end
 
+-- Marktabweichung vom Normalpreis: "-12 %" rot, "+5 %" grün, unverändert "-"
+local function getMarketText(factor)
+    local percent = math.floor(((factor or 1) - 1) * 100 + 0.5)
+    if percent == 0 then
+        return "-", COLOR_MUTED
+    end
+    return string.format("%+d %%", percent), percent < 0 and COLOR_LOW or COLOR_GOOD
+end
+
 local function formatPrice(pricePer1000)
     return LivingMarket.formatMoney(pricePer1000)
 end
@@ -285,12 +294,14 @@ LivingMarketFrame.WARE_COLUMNS = {
     stock    = { label = "livingMarket_colStock",       isText = false },
     station  = { label = "livingMarket_colBestStation", isText = true  },
     price    = { label = "livingMarket_colPrice",       isText = false },
+    market   = { label = "livingMarket_colMarket",      isText = false },
     sellable = { label = "livingMarket_colSellable",    isText = false },
     revenue  = { label = "livingMarket_colRevenue",     isText = false },
 }
 LivingMarketFrame.DETAIL_COLUMNS = {
     name   = { label = nil,                         isText = true  },   -- Überschrift = Name der Ware
     price  = { label = "livingMarket_colPrice",     isText = false },
+    market = { label = "livingMarket_colMarket",    isText = false },
     amount = { label = "livingMarket_colFreeMax",   isText = false },
     share  = { label = "livingMarket_colShare",     isText = false },
 }
@@ -304,6 +315,8 @@ local function wareValue(ware, key)
         return ware.best ~= nil and LivingMarket.toLower(ware.best.name) or nil
     elseif key == "price" then
         return ware.best ~= nil and ware.best.price or nil
+    elseif key == "market" then
+        return ware.best ~= nil and ware.best.factor or nil
     elseif key == "sellable" then
         return ware.sellable
     elseif key == "revenue" then
@@ -316,6 +329,8 @@ local function stationValue(station, key)
         return station.searchKey
     elseif key == "price" then
         return station.price
+    elseif key == "market" then
+        return station.factor
     elseif key == "amount" then
         return station.remaining
     elseif key == "share" then
@@ -685,6 +700,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
 
     local stationText = cell:getAttribute("station")
     local priceText = cell:getAttribute("price")
+    local marketText = cell:getAttribute("market")
     local sellableText = cell:getAttribute("sellable")
     local revenueText = cell:getAttribute("revenue")
 
@@ -694,6 +710,10 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
         setColor(stationText, COLOR_LOW)
         priceText:setText("-")
         setColor(priceText, COLOR_TEXT)
+        if marketText ~= nil then
+            marketText:setText("-")
+            setColor(marketText, COLOR_MUTED)
+        end
         sellableText:setText("-")
         setColor(sellableText, COLOR_TEXT)
         revenueText:setText("-")
@@ -705,6 +725,11 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     setColor(stationText, COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
     setColor(priceText, COLOR_TEXT)
+    if marketText ~= nil then
+        local text, color = getMarketText(ware.best.factor)
+        marketText:setText(text)
+        setColor(marketText, color)
+    end
 
     if ware.sellable >= 1 then
         sellableText:setText(LivingMarket.formatLiters(ware.sellable))
@@ -729,6 +754,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
     local priceText = cell:getAttribute("price")
     local amountText = cell:getAttribute("amount")
     local shareText = cell:getAttribute("share")
+    local marketText = cell:getAttribute("market")
 
     nameText:setText(station.name)
     priceText:setText(formatPrice(station.price))
@@ -741,4 +767,9 @@ function LivingMarketFrame:populateStationCell(station, cell)
     setColor(priceText, main)
     setColor(amountText, main)
     setColor(shareText, isFull and COLOR_MUTED or shareColor(station.share))
+    if marketText ~= nil then
+        local text, color = getMarketText(station.factor)
+        marketText:setText(text)
+        setColor(marketText, isFull and COLOR_MUTED or color)
+    end
 end

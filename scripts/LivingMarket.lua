@@ -251,6 +251,51 @@ function LivingMarket:collectStations()
 end
 
 -- Aktueller Verkaufspreis je 1000 Liter an dieser Station (wie im Preise-Menü des Spiels)
+-- ---------------------------------------------------------------------
+-- Preis abhängig vom freien Bedarf
+-- Ab PRICE_FULL_SHARE frei: Normalpreis. Darunter fällt der Preis immer schneller
+-- (quadratisch) bis auf PRICE_MIN_FACTOR bei PRICE_MIN_SHARE frei und weniger.
+-- ---------------------------------------------------------------------
+LivingMarket.PRICE_FULL_SHARE = 0.50   -- ab 50 % freiem Bedarf voller Preis
+LivingMarket.PRICE_MIN_SHARE  = 0.10   -- ab 10 % und weniger der Tiefstpreis
+LivingMarket.PRICE_MIN_FACTOR = 0.50   -- Tiefstpreis = 50 % des Normalpreises
+LivingMarket.PRICE_CURVE      = 2      -- 1 = gleichmäßig, 2 = erst langsam, dann immer schneller
+
+function LivingMarket:getFactorForShare(share)
+    if share >= self.PRICE_FULL_SHARE then
+        return 1
+    elseif share <= self.PRICE_MIN_SHARE then
+        return self.PRICE_MIN_FACTOR
+    end
+    local t = (self.PRICE_FULL_SHARE - share) / (self.PRICE_FULL_SHARE - self.PRICE_MIN_SHARE)
+    return 1 - (1 - self.PRICE_MIN_FACTOR) * t ^ self.PRICE_CURVE
+end
+
+-- Faktor auf den Spielpreis für diese Station und Ware (1 = unverändert)
+function LivingMarket:getPriceFactor(station, fillTypeIndex)
+    local entry = self:getEntry(station, fillTypeIndex)
+    if entry == nil or entry.max <= 0 then
+        return 1
+    end
+    return self:getFactorForShare(entry.remaining / entry.max)
+end
+
+-- Erlös für eine Menge schätzen: der Preis sinkt während des Abladens mit,
+-- deshalb in Schritten rechnen statt Menge × aktueller Preis
+function LivingMarket:estimateRevenue(basePricePerLiter, remaining, max, amount)
+    if amount <= 0 or max <= 0 then
+        return 0
+    end
+    local steps = 40
+    local stepAmount = amount / steps
+    local revenue = 0
+    for i = 1, steps do
+        local level = remaining - (i - 0.5) * stepAmount
+        revenue = revenue + stepAmount * basePricePerLiter * self:getFactorForShare(math.max(level, 0) / max)
+    end
+    return revenue
+end
+
 function LivingMarket:getPricePer1000(station, fillTypeIndex)
     if station.getEffectiveFillTypePrice ~= nil then
         local ok, pricePerLiter = pcall(station.getEffectiveFillTypePrice, station, fillTypeIndex)
@@ -319,10 +364,14 @@ function LivingMarket:getWareData()
                         byFillType[fillTypeIndex] = ware
                         table.insert(wares, ware)
                     end
+                    local price  = self:getPricePer1000(station, fillTypeIndex)   -- enthält schon den Marktfaktor
+                    local factor = self:getPriceFactor(station, fillTypeIndex)
                     table.insert(ware.stations, {
                         name      = stationName,
                         searchKey = LivingMarket.toLower(stationName),
-                        price     = self:getPricePer1000(station, fillTypeIndex),
+                        price     = price,
+                        factor    = factor,
+                        basePrice = factor > 0 and price / factor or price,      -- Preis ohne Marktfaktor
                         remaining = entry.remaining,
                         max       = entry.max,
                         share     = entry.max > 0 and entry.remaining / entry.max or 0
@@ -351,7 +400,7 @@ function LivingMarket:getWareData()
 
         if ware.best ~= nil then
             ware.sellable = math.min(ware.stock, ware.best.remaining)
-            ware.revenue  = ware.sellable * ware.best.price / 1000
+            ware.revenue  = self:estimateRevenue(ware.best.basePrice / 1000, ware.best.remaining, ware.best.max, ware.sellable)
         else
             ware.sellable = 0
             ware.revenue  = 0
@@ -637,6 +686,15 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
     return moved
 end
 
+-- Preis: Spielpreis × Marktfaktor. Gilt für den Verkaufserlös und jede Preisanzeige.
+function LivingMarket.getEffectiveFillTypePrice(station, superFunc, fillTypeIndex, ...)
+    local price = superFunc(station, fillTypeIndex, ...)
+    if price == nil or fillTypeIndex == nil then
+        return price
+    end
+    return price * LivingMarket:getPriceFactor(station, fillTypeIndex)
+end
+
 function LivingMarket.onStationDelete(station)
     LivingMarket.stations[station] = nil
     LivingMarket.stationKind[station] = nil
@@ -647,6 +705,11 @@ if SellingStation ~= nil then
     SellingStation.getFreeCapacity      = Utils.overwrittenFunction(SellingStation.getFreeCapacity, LivingMarket.getFreeCapacity)
     SellingStation.addFillLevelFromTool = Utils.overwrittenFunction(SellingStation.addFillLevelFromTool, LivingMarket.addFillLevelFromTool)
     SellingStation.delete               = Utils.prependedFunction(SellingStation.delete, LivingMarket.onStationDelete)
+    if SellingStation.getEffectiveFillTypePrice ~= nil then
+        SellingStation.getEffectiveFillTypePrice = Utils.overwrittenFunction(SellingStation.getEffectiveFillTypePrice, LivingMarket.getEffectiveFillTypePrice)
+    else
+        print("[LivingMarket] WARNUNG: getEffectiveFillTypePrice nicht gefunden - Preise bleiben unverändert")
+    end
 else
     print("[LivingMarket] WARNUNG: Klasse SellingStation nicht gefunden - Begrenzung inaktiv")
 end

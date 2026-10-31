@@ -3,8 +3,9 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Marché vivant"/>
         <text name="livingMarket_title" text="Marché vivant"/>
-        <text name="livingMarket_info" text="Meilleur point de vente = prix le plus élevé avec demande libre. La demande se reconstitue de %d %% par heure de jeu."/>
+        <text name="livingMarket_info" text="Meilleur point de vente = prix le plus élevé avec demande libre. La demande se reconstitue de %d %% par heure de jeu. Sous 50 %% de demande, le prix baisse, jusqu'à -50 %%."/>
         <text name="livingMarket_colShare" text="Libre"/>
+        <text name="livingMarket_colMarket" text="Marché"/>
         <text name="livingMarket_none" text="Aucun point de vente trouvé"/>
         <text name="livingMarket_unknownStation" text="Point de vente"/>
         <text name="livingMarket_searchHint" text="Chercher produit ou point de vente …"/>

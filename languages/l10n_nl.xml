@@ -3,8 +3,9 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Levende markt"/>
         <text name="livingMarket_title" text="Levende markt"/>
-        <text name="livingMarket_info" text="Beste verkooppunt = hoogste prijs met vrije vraag. De vraag vult elk speluur met %d %% aan."/>
+        <text name="livingMarket_info" text="Beste verkooppunt = hoogste prijs met vrije vraag. De vraag vult elk speluur met %d %% aan. Onder 50 %% vraag daalt de prijs, tot -50 %%."/>
         <text name="livingMarket_colShare" text="Vrij"/>
+        <text name="livingMarket_colMarket" text="Markt"/>
         <text name="livingMarket_none" text="Geen verkooppunten gevonden"/>
         <text name="livingMarket_unknownStation" text="Verkooppunt"/>
         <text name="livingMarket_searchHint" text="Zoek product of verkooppunt …"/>

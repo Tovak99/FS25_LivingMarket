@@ -7,6 +7,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 ## Funktionen
 
 - **Begrenzter Bedarf** pro Verkaufsstelle und Ware, Auffüllen jede Spielstunde
+- **Preis folgt dem Bedarf:** ab 50 % freiem Bedarf Normalpreis, darunter immer stärker fallend bis −50 % (bei 10 % und weniger)
 - **Ausgenommen:** Produktionen, Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
 - **Eigene Seite im Ingame-Menü (ESC)**
   - eine Zeile pro Ware: Lager, beste Station (höchster Preis *mit freiem Bedarf*), Preis je 1000 l, verkaufbare Menge, Erlös

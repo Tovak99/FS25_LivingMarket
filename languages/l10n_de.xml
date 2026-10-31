@@ -3,8 +3,9 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Lebendiger Markt"/>
         <text name="livingMarket_title" text="Lebendiger Markt"/>
-        <text name="livingMarket_info" text="Beste Station = höchster Preis mit freiem Bedarf. Der Bedarf füllt sich jede Spielstunde um %d %% auf."/>
+        <text name="livingMarket_info" text="Beste Station = höchster Preis mit freiem Bedarf. Der Bedarf füllt sich jede Spielstunde um %d %% auf. Unter 50 %% Bedarf sinkt der Preis, bis -50 %%."/>
         <text name="livingMarket_colShare" text="Frei"/>
+        <text name="livingMarket_colMarket" text="Markt"/>
         <text name="livingMarket_none" text="Keine Verkaufsstellen gefunden"/>
         <text name="livingMarket_unknownStation" text="Verkaufsstelle"/>
         <text name="livingMarket_searchHint" text="Ware oder Station suchen …"/>
