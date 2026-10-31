@@ -498,10 +498,10 @@ end
 function LivingMarket:initEvents()
     self:normalizeEvents()
     self:rollEventTarget()
-    if #self.events == 0 and self.EVENT_SETTINGS.enabled then
-        -- Neues Spiel bzw. erster Start mit dem Mod: sofort die Mindestanzahl erzeugen (ohne Meldungsflut),
-        -- weitere bis zum Monatsziel kommen verteilt über den Monat
-        local wanted = math.max(1, math.min(self.EVENT_SETTINGS.minActive, self.eventTarget))
+    local wanted = math.min(self.EVENT_SETTINGS.minActive, self.eventTarget)
+    if #self.events < wanted and self.EVENT_SETTINGS.enabled then
+        -- Beim Laden (auch neues Spiel / erster Start mit dem Mod): sofort auf die Mindestanzahl
+        -- auffüllen (ohne Meldungsflut), weitere bis zum Monatsziel kommen verteilt über den Monat
         self.silentEvents = true
         local attempts = 0
         while #self.events < wanted and attempts < wanted * 3 do
