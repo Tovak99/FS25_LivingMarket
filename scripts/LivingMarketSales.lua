@@ -4,13 +4,14 @@
 -- Erfasst wird beim eigentlichen Verkauf (SellingStation.sellFillType), damit alles
 -- mitkommt, was an einer Verkaufsstelle Geld bringt: Schüttgut, Flüssiges, Paletten,
 -- Ballen ... Lieferungen für laufende Aufträge werden nicht erfasst.
--- Ein Abladevorgang (gleicher Hof, Station und Ware kurz hintereinander) wird zu
--- einem Eintrag zusammengefasst.
+-- Ein Abladevorgang (gleicher Hof, Station und Ware ohne längere Pause) wird zu
+-- einem Eintrag zusammengefasst – auch wenn dazwischen andere Waren verkauft werden
+-- (z. B. Paletten verschiedener Waren abwechselnd).
 -- Server führt die Liste, speichert sie im Spielstand und schickt sie an die Mitspieler.
 -- =====================================================================
 
 LivingMarket.SALES_MAX        = 50      -- Einträge je Hof
-LivingMarket.SALES_MERGE_TIME = 10000   -- ms: Verkäufe so kurz hintereinander gehören zu einem Abladevorgang
+LivingMarket.SALES_MERGE_TIME = 30000   -- ms: gleiche Station + Ware ohne längere Pause = ein Abladevorgang
 
 LivingMarket.sales        = {}   -- [farmId] = { sale, ... } neueste zuerst
 LivingMarket.saleNextId   = 1
@@ -67,9 +68,16 @@ function LivingMarket:recordSale(station, farmId, fillTypeIndex, liters, money)
     end
     local stationKey = self:getStationKey(station)
     local now = g_time or 0
-    local sale = list[1]
-    if sale ~= nil and sale.stationKey == stationKey and sale.fillTypeIndex == fillTypeIndex
-        and sale.realTime ~= nil and now - sale.realTime < self.SALES_MERGE_TIME then
+    -- laufenden Abladevorgang derselben Station und Ware suchen (nicht nur den obersten Eintrag)
+    local sale = nil
+    for _, existing in ipairs(list) do
+        if existing.stationKey == stationKey and existing.fillTypeIndex == fillTypeIndex
+            and existing.realTime ~= nil and now - existing.realTime < self.SALES_MERGE_TIME then
+            sale = existing
+            break
+        end
+    end
+    if sale ~= nil then
         sale.liters = sale.liters + liters
         sale.money = sale.money + (money or 0)
         sale.realTime = now
