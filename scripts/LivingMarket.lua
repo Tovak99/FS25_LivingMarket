@@ -65,33 +65,60 @@ local function isSellingStation(station)
     return false
 end
 
--- Gehört die Verkaufsstelle zu einer Produktion? Dann wird sie nicht begrenzt.
-local function isProductionStation(station)
+-- Gehört die Verkaufsstelle zu einer Produktion? Ergebnis: das Objekt, dem sie gehört
+-- (Gebäude oder Produktion), sonst nil
+local function getProductionOwner(station)
     local placeable = station.owningPlaceable
     if placeable ~= nil and placeable.spec_productionPoint ~= nil then
-        return true
+        return placeable
     end
 
     local manager = g_currentMission ~= nil and g_currentMission.productionChainManager or nil
     if manager ~= nil and manager.productionPoints ~= nil then
         for _, productionPoint in pairs(manager.productionPoints) do
             if productionPoint.sellingStation == station or productionPoint.unloadingStation == station then
-                return true
+                return productionPoint.owningPlaceable or productionPoint
             end
         end
     end
-    return false
+    return nil
 end
 
--- Nur reine Verkaufsstellen (keine Produktionen) werden begrenzt.
--- Ergebnis wird pro Station zwischengespeichert, weil die Abfrage beim Abladen oft kommt.
-function LivingMarket:isLimitedStation(station)
-    local cached = self.stationKind[station]
-    if cached == nil then
-        cached = isSellingStation(station) and not isProductionStation(station)
-        self.stationKind[station] = cached
+-- Gehört das Objekt einem Hof (Spieler)? Produktionen der Karte gehören niemandem.
+local function isOwnedByFarm(object)
+    if object == nil then
+        return false
     end
-    return cached
+    local farmId = nil
+    if object.getOwnerFarmId ~= nil then
+        local ok, value = pcall(object.getOwnerFarmId, object)
+        farmId = ok and value or nil
+    end
+    farmId = farmId or object.ownerFarmId
+    local spectator = FarmManager ~= nil and FarmManager.SPECTATOR_FARM_ID or 15
+    return farmId ~= nil and farmId ~= 0 and farmId ~= spectator
+end
+
+-- Begrenzt werden Verkaufsstellen der Karte und fremde Produktionen (z. B. die BGA der Karte).
+-- Ausgenommen sind Produktionen, die einem Hof gehören: dort liefert man eigene Zutaten an.
+-- Die Art wird zwischengespeichert, der Besitz bei jeder Abfrage geprüft (Gebäude kann gekauft werden).
+function LivingMarket:isLimitedStation(station)
+    local kind = self.stationKind[station]
+    if kind == nil then
+        if not isSellingStation(station) then
+            kind = false
+        else
+            local owner = getProductionOwner(station)
+            kind = owner ~= nil and owner or true   -- true = reine Verkaufsstelle, Objekt = Produktion
+        end
+        self.stationKind[station] = kind
+    end
+    if kind == false then
+        return false
+    elseif kind == true then
+        return true
+    end
+    return not isOwnedByFarm(kind)
 end
 
 local function readStationName(station)

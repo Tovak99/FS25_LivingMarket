@@ -14,7 +14,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
   - Überangebot an einer Station: weniger Bedarf, Preis −10–25 %
   - marktweit gefragt oder Flaute für eine Ware (einen Monat vorher angekündigt)
   - dazu kleine Schwankungen des Bedarfs (±10 %) zu jedem Monat
-- **Ausgenommen:** Produktionen, Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
+- **Ausgenommen:** eigene Produktionen (Produktionen der Karte, z. B. die BGA, zählen als Verkaufsstelle), Geld/Bargeld (Bank) und Lieferungen für laufende Aufträge
 - **Eigene Seite im Ingame-Menü (ESC)**
   - eine Zeile pro Ware: Lager, beste Station (höchster Preis *mit freiem Bedarf*), Preis je 1000 l, verkaufbare Menge, Erlös
   - Detailfenster mit allen Stationen der gewählten Ware: Preis, Frei / Maximum
