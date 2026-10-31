@@ -338,6 +338,7 @@ LivingMarketFrame.WARE_COLUMNS = {
     stock    = { label = "livingMarket_colStock",       isText = false },
     station  = { label = "livingMarket_colBestStation", isText = true  },
     basePrice = { label = "livingMarket_colBasePrice",  isText = false },
+    highPrice = { label = "livingMarket_colHighPrice",  isText = false },
     deviation = { label = "livingMarket_colDeviation",  isText = false },
     price    = { label = "livingMarket_colPrice",       isText = false },
     sellable = { label = "livingMarket_colSellable",    isText = false },
@@ -364,6 +365,8 @@ local function wareValue(ware, key)
         return ware.best ~= nil and ware.best.factor or nil
     elseif key == "basePrice" then
         return ware.basePrice
+    elseif key == "highPrice" then
+        return ware.year ~= nil and ware.year.max or nil
     elseif key == "deviation" then
         return (ware.best ~= nil and ware.basePrice ~= nil and ware.basePrice > 0) and ware.best.price / ware.basePrice or nil
     elseif key == "sellable" then
@@ -757,6 +760,16 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     setColor(cell:getAttribute("title"), COLOR_TEXT)
     cell:getAttribute("stock"):setText(ware.stock >= 1 and LivingMarket.formatLiters(ware.stock) or "-")
     setColor(cell:getAttribute("stock"), COLOR_TEXT)
+
+    local highPriceText = cell:getAttribute("highPrice")
+    if highPriceText ~= nil then
+        if ware.year ~= nil then
+            highPriceText:setText(string.format("%s (%s)", formatPrice(ware.year.max), LivingMarket.getMonthName(ware.year.maxMonth)))
+        else
+            highPriceText:setText("-")
+        end
+        setColor(highPriceText, COLOR_TEXT)
+    end
 
     local basePriceText = cell:getAttribute("basePrice")
     if basePriceText ~= nil then

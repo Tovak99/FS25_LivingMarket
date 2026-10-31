@@ -7,6 +7,7 @@
         <text name="livingMarket_colMarket" text="Pressure"/>
         <text name="livingMarket_colDeviation" text="Market"/>
         <text name="livingMarket_colBasePrice" text="Base price"/>
+        <text name="livingMarket_colHighPrice" text="Peak price"/>
         <text name="livingMarket_none" text="No selling stations found"/>
         <text name="livingMarket_unknownStation" text="Selling station"/>
         <text name="livingMarket_searchHint" text="Search goods or station …"/>

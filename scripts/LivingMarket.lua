@@ -416,6 +416,17 @@ function LivingMarket:getYearPrices(fillTypeIndex)
     return result
 end
 
+-- Monatsname zum Monat der Preiskurve (1 = erster Monat im Preismenü, meist März)
+function LivingMarket.getMonthName(month)
+    if g_i18n ~= nil and g_i18n.formatPeriod ~= nil then
+        local ok, name = pcall(g_i18n.formatPeriod, g_i18n, month, true)
+        if ok and name ~= nil and name ~= "" then
+            return name
+        end
+    end
+    return tostring(month)
+end
+
 function LivingMarket:getBasePricePer1000(fillTypeIndex)
     self:logPriceDebug()
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
@@ -496,6 +507,7 @@ function LivingMarket:getWareData()
                             searchKey     = LivingMarket.toLower(title),
                             stock         = stock[fillTypeIndex] or 0,
                             basePrice     = self:getBasePricePer1000(fillTypeIndex),
+                            year          = self:getYearPrices(fillTypeIndex),     -- Höchstpreis und bester Monat
                             stations      = {}
                         }
                         byFillType[fillTypeIndex] = ware

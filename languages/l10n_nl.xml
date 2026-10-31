@@ -7,6 +7,7 @@
         <text name="livingMarket_colMarket" text="Druk"/>
         <text name="livingMarket_colDeviation" text="Markt"/>
         <text name="livingMarket_colBasePrice" text="Basisprijs"/>
+        <text name="livingMarket_colHighPrice" text="Topprijs"/>
         <text name="livingMarket_none" text="Geen verkooppunten gevonden"/>
         <text name="livingMarket_unknownStation" text="Verkooppunt"/>
         <text name="livingMarket_searchHint" text="Zoek product of verkooppunt …"/>
