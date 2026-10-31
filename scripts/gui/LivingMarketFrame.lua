@@ -964,8 +964,8 @@ function LivingMarketFrame:update(dt)
         self:refreshContracts()
     end
 
-    -- Uhr in den Marktnachrichten
-    if self.viewMode == "events" then
+    -- Uhr in Marktnachrichten, Verkäufen und Verträgen
+    if self.viewMode ~= "market" then
         self.clockTimer = (self.clockTimer or 0) - dt
         if self.clockTimer <= 0 then
             self.clockTimer = 250
@@ -982,6 +982,9 @@ function LivingMarketFrame:updateClock()
     local env = g_currentMission ~= nil and g_currentMission.environment or nil
     if env == nil then
         self.clockText:setText("")
+        if self.clockTextSmall ~= nil then
+            self.clockTextSmall:setText("")
+        end
         return
     end
     local minutes = math.floor((env.dayTime or 0) / 60000)
@@ -992,7 +995,11 @@ function LivingMarketFrame:updateClock()
         dateText = string.format("%d. %s", env.currentDayInPeriod or 1, month)
     end
     local yearText = string.format(g_i18n:getText("livingMarket_year"), env.currentYear or 1)
-    self.clockText:setText(string.format("%s, %s · %s", dateText, yearText, timeText))
+    local text = string.format("%s, %s · %s", dateText, yearText, timeText)
+    self.clockText:setText(text)
+    if self.clockTextSmall ~= nil then
+        self.clockTextSmall:setText(text)
+    end
 end
 
 -- ---------------------------------------------------------------------
@@ -1078,9 +1085,12 @@ function LivingMarketFrame:setViewMode(mode)
     if self.emptyText ~= nil and not showMarket then
         self.emptyText:setVisible(false)
     end
+    if self.clockTextSmall ~= nil then
+        self.clockTextSmall:setVisible(showSales or showContracts)
+    end
     if self.clockText ~= nil then
         self.clockText:setVisible(showEvents)
-        if showEvents then
+        if not showMarket then
             self.clockTimer = 0
             self:updateClock()
         end

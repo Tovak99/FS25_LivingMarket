@@ -9,10 +9,10 @@
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
             <!-- Ansicht umschalten: Markt / Marktnachrichten / Verkäufe (aktive Ansicht grün; Position = rechte Textkante) -->
-            <Button profile="lm_viewButton" id="viewMarketButton" position="-895px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
-            <Button profile="lm_viewButton" id="viewEventsButton" position="-730px 0px" text="$l10n_livingMarket_viewNews" onClick="onClickViewEvents"/>
-            <Button profile="lm_viewButton" id="viewSalesButton" position="-601px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
-            <Button profile="lm_viewButton" id="viewContractsButton" position="-466px 0px" text="$l10n_livingMarket_viewContracts" onClick="onClickViewContracts"/>
+            <Button profile="lm_viewButton" id="viewMarketButton" position="-920px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
+            <Button profile="lm_viewButton" id="viewEventsButton" position="-755px 0px" text="$l10n_livingMarket_viewNews" onClick="onClickViewEvents"/>
+            <Button profile="lm_viewButton" id="viewSalesButton" position="-626px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
+            <Button profile="lm_viewButton" id="viewContractsButton" position="-491px 0px" text="$l10n_livingMarket_viewContracts" onClick="onClickViewContracts"/>
 
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
@@ -23,6 +23,8 @@
 
             <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
             <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
+            <!-- in Verkäufen und Verträgen links neben Suchfeld bzw. Filter -->
+            <Text profile="lm_clockTextSmall" id="clockTextSmall" text="" visible="false"/>
 
             <!-- Suchfeld rechtsbündig neben dem Titel -->
             <TextInput profile="lm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">
@@ -326,6 +328,11 @@
             <textSize value="20px"/>
             <textBold value="true"/>
             <textColor value="1 1 1 1"/>
+        </Profile>
+
+        <Profile name="lm_clockTextSmall" extends="lm_clockText">
+            <position value="-315px 0px"/>
+            <textSize value="17px"/>
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
