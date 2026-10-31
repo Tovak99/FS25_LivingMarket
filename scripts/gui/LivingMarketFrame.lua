@@ -214,16 +214,29 @@ function LivingMarketFrame:getFilteredWares()
             stockOk = LivingMarket:isFavorite(ware.fillTypeIndex)
         end
         local searchOk = not searching or string.find(ware.searchKey, query, 1, true) ~= nil
+        local row = ware
         if stockOk and searching and not searchOk then
+            -- Suche trifft eine Station: Zeile zeigt die Werte dieser Station, auch wenn sie nicht die beste ist
+            local match = nil
             for _, station in ipairs(ware.stations) do
                 if string.find(station.searchKey, query, 1, true) ~= nil then
-                    searchOk = true
-                    break
+                    -- mehrere Treffer (z. B. mehrere Tankstellen): höchster Preis mit freiem Bedarf zuerst
+                    if match == nil or (match.remaining < 1 and station.remaining >= 1)
+                        or ((match.remaining >= 1) == (station.remaining >= 1) and station.price > match.price) then
+                        match = station
+                    end
                 end
+            end
+            if match ~= nil then
+                searchOk = true
+                row = setmetatable({}, { __index = ware })
+                row.best = match
+                row.sellable = math.min(ware.stock, math.max(match.remaining, 0))
+                row.revenue = LivingMarket:estimateRevenue(match.basePrice / 1000, match.remaining, match.max, row.sellable)
             end
         end
         if stockOk and searchOk then
-            table.insert(result, ware)
+            table.insert(result, row)
         end
     end
     self:sortWares(result)
