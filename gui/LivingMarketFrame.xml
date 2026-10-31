@@ -8,6 +8,10 @@
             </Bitmap>
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
+            <!-- Ansicht umschalten: Markt / Marktnachrichten (aktive Ansicht grün) -->
+            <Button profile="lm_viewButton" id="viewMarketButton" position="-860px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
+            <Button profile="lm_viewButton" id="viewEventsButton" position="-620px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
+
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
 
@@ -26,7 +30,7 @@
         <!-- Rahmen hinter Kopfzeile und Warenliste -->
         <ThreePartBitmap profile="lm_tableFrameTop" id="wareFrame"/>
 
-        <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
+        <GuiElement profile="fs25_settingsControlsListHeader" id="wareHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
             <Button profile="lm_sortHeader" id="favHeader" position="14px 0px" text="*"/>
             <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
             <!-- Reihenfolge: * · Ware · Lager · Verkaufbar · Preis / 1000 l · Markt · Erlös · Beste Station · Bester Preis · Bester Monat -->
@@ -44,7 +48,7 @@
 
         <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (lm_wareArea).
              Die Liste darin verhält sich wie vorher auf der ganzen Seite. -->
-        <GuiElement profile="lm_wareArea">
+        <GuiElement profile="lm_wareArea" id="wareArea">
             <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
@@ -118,9 +122,49 @@
                 </ThreePartBitmap>
             </GuiElement>
         </GuiElement>
+
+        <!-- ============ Ansicht Marktnachrichten (ganze Höhe, anfangs ausgeblendet) ============ -->
+        <ThreePartBitmap profile="lm_tableFrameFull" id="eventFrame" visible="false"/>
+
+        <GuiElement profile="fs25_settingsControlsListHeader" id="eventHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
+            <Text profile="lm_colHeader" position="20px 0px" text="$l10n_livingMarket_colEvent"/>
+            <Text profile="lm_colHeader" position="204px 0px" text="$l10n_livingMarket_colWare"/>
+            <Text profile="lm_colHeaderRight" position="380px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Text profile="lm_colHeader" position="470px 0px" text="$l10n_livingMarket_colStationEv"/>
+            <Text profile="lm_colHeaderRight" position="500px 0px" text="$l10n_livingMarket_colDemand"/>
+            <Text profile="lm_colHeader" position="1000px 0px" text="$l10n_livingMarket_colStart"/>
+            <Text profile="lm_colHeader" position="1110px 0px" text="$l10n_livingMarket_colEnd"/>
+            <Text profile="lm_colHeader" position="1220px 0px" text="$l10n_livingMarket_colStatus"/>
+            <ThreePartBitmap profile="lm_headerLine"/>
+        </GuiElement>
+
+        <GuiElement profile="lm_eventsArea" id="eventArea" visible="false">
+            <SmoothList profile="fs25_settingsControlsList" id="eventList" absoluteSizeOffset="90px 60px" selectOnClick="false">
+                <ListItem profile="lm_listItem" name="event">
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
+                    <Text profile="lm_rowTextBold" name="type" position="20px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="170px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="204px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="380px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="470px 0px"/>
+                    <Text profile="lm_rowTextRight" name="demand" position="500px 0px"/>
+                    <Text profile="lm_rowText" name="start" position="1000px 0px"/>
+                    <Text profile="lm_rowText" name="end" position="1110px 0px"/>
+                    <Text profile="lm_rowText" name="status" position="1220px 0px"/>
+                </ListItem>
+            </SmoothList>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="eventSlider" dataElementId="eventList"/>
+                </ThreePartBitmap>
+            </GuiElement>
+        </GuiElement>
+
+        <Text profile="lm_emptyText" id="eventEmptyText" text="$l10n_livingMarket_noEvents" visible="false"/>
     </GuiElement>
 
     <GUIProfiles>
+
         <!-- Suchfeld: rechts in der Kopfzeile verankert. Breite/Abstand hier anpassen. -->
         <Profile name="lm_searchInput" extends="fs25_settingsTextInput">
             <anchors value="1 1 0.5 0.5"/>
@@ -345,6 +389,20 @@
             <textAlignment value="left"/>
             <textSize value="20px"/>
             <textColor value="0.8 0.8 0.8 1"/>
+        </Profile>
+
+        <!-- Umschalter Markt / Marktnachrichten (wie der Filter, Farbe setzt der Code) -->
+        <Profile name="lm_viewButton" extends="lm_filterButton">
+            <textSize value="19px"/>
+        </Profile>
+
+        <!-- Marktnachrichten: ganze Seitenhöhe (kein Detailfenster) -->
+        <Profile name="lm_eventsArea" extends="lm_wareArea">
+            <absoluteSizeOffset value="0px 0px"/>
+        </Profile>
+        <Profile name="lm_tableFrameFull" extends="lm_tableFrameTop">
+            <position value="37px -8px"/>
+            <absoluteSizeOffset value="55px 4px"/>
         </Profile>
     </GUIProfiles>
 </GUI>

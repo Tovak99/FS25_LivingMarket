@@ -2,7 +2,6 @@
 <l10n>
     <texts>
         <text name="ui_LivingMarketFrame" text="Lebendiger Markt"/>
-        <text name="ui_LivingMarketEventsFrame" text="Marktnachrichten"/>
         <text name="livingMarket_title" text="Lebendiger Markt"/>
         <text name="livingMarket_colShare" text="Frei"/>
         <text name="livingMarket_colMarket" text="Marktlage"/>
@@ -32,6 +31,7 @@
         <text name="livingMarket_evLabelSlump" text="Flaute"/>
         <text name="livingMarket_testMonth" text="Test: Monatswechsel"/>
         <text name="livingMarket_eventsTitle" text="Marktnachrichten"/>
+        <text name="livingMarket_viewMarket" text="Markt"/>
         <text name="livingMarket_colEvent" text="Ereignis"/>
         <text name="livingMarket_colStationEv" text="Station"/>
         <text name="livingMarket_colDemand" text="Bedarf"/>

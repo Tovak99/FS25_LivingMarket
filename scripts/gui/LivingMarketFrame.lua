@@ -19,6 +19,7 @@ local COLOR_MID   = { 0.890, 0.604, 0.051, 1 }
 local COLOR_LOW   = { 0.890, 0.100, 0.073, 1 }
 local COLOR_TEXT  = { 1, 1, 1, 1 }
 local COLOR_MUTED = { 0.184, 0.184, 0.184, 1 }
+local COLOR_MUTED_LIGHT = { 0.30, 0.30, 0.30, 1 }
 
 function LivingMarketFrame.new(target, customMt)
     local self = TabbedMenuFrameElement.new(target, customMt or LivingMarketFrame_mt)
@@ -28,6 +29,8 @@ function LivingMarketFrame.new(target, customMt)
     self.selectedFillType = nil   -- gewählte Ware (bleibt beim Aktualisieren erhalten)
     self.searchText = ""
     self.filterMode = "stock"     -- Filter: "all" = alle Waren, "stock" = lagernd, "fav" = Favoriten
+    self.viewMode = "market"      -- Ansicht: "market" = Warenliste + Details, "events" = Marktnachrichten
+    self.eventRows = {}
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
     self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
@@ -71,6 +74,10 @@ function LivingMarketFrame:initialize()
     self.wareList:setDelegate(self)
     self.detailList:setDataSource(self)
     self.detailList:setDelegate(self)
+    if self.eventList ~= nil then
+        self.eventList:setDataSource(self)
+        self.eventList:setDelegate(self)
+    end
 
     self:setupSortHeaders()
 
@@ -81,7 +88,7 @@ function LivingMarketFrame:onFrameOpen()
     LivingMarketFrame:superClass().onFrameOpen(self)
 
     -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
-    for _, frame in ipairs({ self.wareFrame, self.detailFrame }) do
+    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame }) do
         if frame ~= nil and frame.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
             local c = LivingMarketFrame.FRAME_COLOR
             frame:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
@@ -95,7 +102,11 @@ function LivingMarketFrame:onFrameOpen()
     if self.detailSlider ~= nil then
         self.detailSlider:setDataElement(self.detailList)
     end
+    if self.eventSlider ~= nil then
+        self.eventSlider:setDataElement(self.eventList)
+    end
     self:refreshData()
+    self:setViewMode(self.viewMode)
 end
 
 function LivingMarketFrame:onFrameClose()
@@ -230,6 +241,12 @@ function LivingMarketFrame:refreshData()
 
     self:updateSearchHint()
     self:rebuildWareList()
+    if self.viewMode == "events" then
+        if self.emptyText ~= nil then
+            self.emptyText:setVisible(false)
+        end
+        self:refreshEvents()
+    end
 end
 
 -- Waren nach Lagerbestand und Suchbegriff filtern.
@@ -581,6 +598,8 @@ end
 
 function LivingMarketFrame:setupSortHeaders()
     limitHeaderHitArea(self.filterButton)
+    limitHeaderHitArea(self.viewMarketButton)
+    limitHeaderHitArea(self.viewEventsButton)
     limitHeaderHitArea(self.detailTitle)
     for key in pairs(self.WARE_COLUMNS) do
         limitHeaderHitArea(self["sortWare_" .. key])
@@ -739,6 +758,106 @@ function LivingMarketFrame:onTestMonth()
     self:refreshData()
 end
 
+-- ---------------------------------------------------------------------
+-- Ansicht umschalten: Markt / Marktnachrichten
+-- ---------------------------------------------------------------------
+local VIEW_ACTIVE   = { 0.212, 0.376, 0.012, 1 }   -- LS-Grün
+local VIEW_INACTIVE = { 0.85, 0.85, 0.85, 1 }
+
+function LivingMarketFrame:onClickViewMarket()
+    self:setViewMode("market")
+end
+
+function LivingMarketFrame:onClickViewEvents()
+    self:setViewMode("events")
+end
+
+function LivingMarketFrame:setViewMode(mode)
+    self.viewMode = mode
+    local showMarket = mode ~= "events"
+
+    for _, element in ipairs({ self.wareFrame, self.wareHeader, self.wareArea, self.detailPanel,
+                               self.filterButton, self.searchInput }) do
+        if element ~= nil then
+            element:setVisible(showMarket)
+        end
+    end
+    if self.emptyText ~= nil and not showMarket then
+        self.emptyText:setVisible(false)
+    end
+    for _, element in ipairs({ self.eventFrame, self.eventHeader, self.eventArea }) do
+        if element ~= nil then
+            element:setVisible(not showMarket)
+        end
+    end
+
+    if showMarket then
+        self:rebuildWareList()   -- setzt auch den Hinweis bei leerer Liste
+        if self.eventEmptyText ~= nil then
+            self.eventEmptyText:setVisible(false)
+        end
+    else
+        self:refreshEvents()
+    end
+
+    local function paint(button, active)
+        if button ~= nil then
+            local c = active and VIEW_ACTIVE or VIEW_INACTIVE
+            button:setTextColor(c[1], c[2], c[3], c[4])
+            if button.setTextSelectedColor ~= nil then
+                button:setTextSelectedColor(c[1], c[2], c[3], c[4])
+            end
+            if button.setTextFocusedColor ~= nil then
+                button:setTextFocusedColor(c[1], c[2], c[3], c[4])
+            end
+        end
+    end
+    paint(self.viewMarketButton, showMarket)
+    paint(self.viewEventsButton, not showMarket)
+    self:updateMenuButtons()
+end
+
+function LivingMarketFrame:refreshEvents()
+    self.eventRows = LivingMarket:getEventList()
+    if self.eventEmptyText ~= nil then
+        self.eventEmptyText:setVisible(self.viewMode == "events" and #self.eventRows == 0)
+    end
+    if self.eventList ~= nil then
+        self.eventList:reloadData(true)
+    end
+end
+
+-- Eine Zeile der Marktnachrichten
+local EVENT_TYPE_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
+                            [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump" }
+
+function LivingMarketFrame:populateEventCell(row, cell)
+    if row == nil or cell:getAttribute("type") == nil then
+        return
+    end
+    local positive = row.type == LivingMarket.EVENT_SHORTAGE or row.type == LivingMarket.EVENT_BOOM
+    local typeColor = positive and COLOR_GOOD or COLOR_LOW
+    local main = row.pending and COLOR_MUTED_LIGHT or COLOR_TEXT
+
+    local function put(name, text, color)
+        local element = cell:getAttribute(name)
+        if element ~= nil then
+            element:setText(text or "")
+            setTextColorAll(element, color or COLOR_TEXT)
+        end
+    end
+    put("type", g_i18n:getText(EVENT_TYPE_LABELS[row.type] or "livingMarket_evLabelShortage"), typeColor)
+    put("ware", row.wareTitle, main)
+    put("station", row.stationName, main)
+    put("price", string.format("%+d %%", row.pricePercent), typeColor)
+    put("demand", (string.gsub(string.format("x%.1f", row.maxFactor), "%.", ",")), main)
+    put("start", LivingMarket.getMonthName(row.startMonth), row.pending and COLOR_MID or main)
+    put("end", LivingMarket.getMonthName(row.endMonth), main)
+    put("status", g_i18n:getText(row.pending and "livingMarket_evPending" or "livingMarket_evRunning"),
+        row.pending and COLOR_MID or COLOR_GOOD)
+    setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
+end
+
 function LivingMarketFrame:onTestRefill()
     LivingMarket:onHourChanged()
     self:refreshData()
@@ -749,11 +868,14 @@ function LivingMarketFrame:updateMenuButtons()
 
     self.menuButtonInfo = { self.backButtonInfo }
     local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
+    if self.viewMode == "events" then
+        ware = nil   -- in den Marktnachrichten keine Favoriten-Taste
+    end
     if ware ~= nil then
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
         table.insert(self.menuButtonInfo, self.favButtonInfo)
     end
-    if self:isSearching() then
+    if self:isSearching() and self.viewMode ~= "events" then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
     end
     -- Testknopf nur im Debug-Modus und nur, wo der Bedarf verwaltet wird (Server/Einzelspieler)
@@ -776,11 +898,16 @@ end
 function LivingMarketFrame:getNumberOfItemsInSection(list, section)
     if list == self.wareList then
         return #self.visibleWares
+    elseif list == self.eventList then
+        return #self.eventRows
     end
     return #self.detailStations
 end
 
 function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
+    if list == self.eventList then
+        return "event"
+    end
     return list == self.wareList and "ware" or "station"
 end
 
@@ -798,6 +925,11 @@ local function setRowBackground(bg, index, isSelected)
 end
 
 function LivingMarketFrame:populateCellForItemInSection(list, section, index, cell)
+    if list == self.eventList then
+        setRowBackground(cell:getAttribute("bg"), index, false)
+        self:populateEventCell(self.eventRows[index], cell)
+        return
+    end
     local isSelected = list == self.wareList and index == self.selectedWareIndex
     setRowBackground(cell:getAttribute("bg"), index, isSelected)
 

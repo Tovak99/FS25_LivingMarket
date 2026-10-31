@@ -1423,54 +1423,6 @@ function LivingMarket:addMenuPage()
 
     inGameMenu:rebuildTabList()
     log("Menüseite angelegt")
-
-    local ok, err = pcall(self.addEventsPage, self, frame)
-    if not ok then
-        print("[LivingMarket] FEHLER beim Anlegen der Seite Marktnachrichten: " .. tostring(err))
-    end
-end
-
--- Zweite Seite "Marktnachrichten" direkt hinter der Hauptseite
-LivingMarket.EVENTS_PAGE_NAME = "pageLivingMarketEvents"
-
-function LivingMarket:addEventsPage(mainFrame)
-    local inGameMenu = g_inGameMenu
-    local pageName = self.EVENTS_PAGE_NAME
-    if inGameMenu[pageName] ~= nil then
-        return
-    end
-
-    local frame = LivingMarketEventsFrame.new()
-    frame.customEnvironment = self.modName
-    g_gui:loadGui(self.modDir .. "gui/LivingMarketEventsFrame.xml", "LivingMarketEventsFrame", frame, true)
-    frame:initialize()
-
-    local posElement, posPage, posFrame
-    local i = findIndex(inGameMenu.pagingElement.elements, function(e) return e == mainFrame end)
-    posElement = i and i + 1
-    i = findIndex(inGameMenu.pagingElement.pages, function(p) return p.element == mainFrame end)
-    posPage = i and i + 1
-    i = findIndex(inGameMenu.pageFrames, function(f) return f == mainFrame end)
-    posFrame = i and i + 1
-
-    inGameMenu.controlIDs[pageName] = nil
-    inGameMenu[pageName] = frame
-    inGameMenu.pagingElement:addElement(frame)
-    inGameMenu:exposeControlsAsFields(pageName)
-
-    moveTo(inGameMenu.pagingElement.elements, function(e) return e == frame end, posElement)
-    moveTo(inGameMenu.pagingElement.pages, function(p) return p.element == frame end, posPage)
-
-    inGameMenu.pagingElement:updateAbsolutePosition()
-    inGameMenu.pagingElement:updatePageMapping()
-
-    inGameMenu:registerPage(frame, posFrame, function() return true end)
-
-    local iconFile = Utils.getFilename("images/newsIcon.dds", self.modDir)
-    inGameMenu:addPageTab(frame, iconFile, GuiUtils.getUVs({0, 0, 128, 128}, {128, 128}))
-
-    inGameMenu:rebuildTabList()
-    log("Seite Marktnachrichten angelegt")
 end
 
 -- ---------------------------------------------------------------------
