@@ -4,7 +4,8 @@
         <text name="ui_LivingMarketFrame" text="Mercado vivo"/>
         <text name="livingMarket_title" text="Mercado vivo"/>
         <text name="livingMarket_colShare" text="Libre"/>
-        <text name="livingMarket_colMarket" text="Mercado"/>
+        <text name="livingMarket_colMarket" text="Presión"/>
+        <text name="livingMarket_colDeviation" text="Mercado"/>
         <text name="livingMarket_colBasePrice" text="Precio base"/>
         <text name="livingMarket_none" text="No se encontraron puntos de venta"/>
         <text name="livingMarket_unknownStation" text="Punto de venta"/>

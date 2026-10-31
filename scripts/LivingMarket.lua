@@ -449,6 +449,7 @@ function LivingMarket:getWareData()
                         price     = price,
                         factor    = factor,
                         basePrice = factor > 0 and price / factor or price,      -- Preis ohne Marktfaktor
+                        deviation = (ware.basePrice ~= nil and ware.basePrice > 0) and price / ware.basePrice or nil,   -- Preis / Grundpreis
                         remaining = entry.remaining,
                         max       = entry.max,
                         share     = entry.max > 0 and entry.remaining / entry.max or 0
