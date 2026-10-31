@@ -8,7 +8,7 @@
         <text name="livingMarket_colDeviation" text="Markt"/>
         <text name="livingMarket_colBasePrice" text="Grundpreis"/>
         <text name="livingMarket_colHighPrice" text="Saisonhoch"/>
-        <text name="livingMarket_colBestMonth" text="Bester Monat"/>
+        <text name="livingMarket_colBestMonth" text="Monat"/>
         <text name="livingMarket_none" text="Keine Verkaufsstellen gefunden"/>
         <text name="livingMarket_unknownStation" text="Verkaufsstelle"/>
         <text name="livingMarket_searchHint" text="Ware oder Station suchen …"/>

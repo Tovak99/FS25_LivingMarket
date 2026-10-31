@@ -8,7 +8,7 @@
         <text name="livingMarket_colDeviation" text="Mercado"/>
         <text name="livingMarket_colBasePrice" text="Precio base"/>
         <text name="livingMarket_colHighPrice" text="Máximo de temporada"/>
-        <text name="livingMarket_colBestMonth" text="Mejor mes"/>
+        <text name="livingMarket_colBestMonth" text="Mes"/>
         <text name="livingMarket_none" text="No se encontraron puntos de venta"/>
         <text name="livingMarket_unknownStation" text="Punto de venta"/>
         <text name="livingMarket_searchHint" text="Buscar producto o punto de venta …"/>
