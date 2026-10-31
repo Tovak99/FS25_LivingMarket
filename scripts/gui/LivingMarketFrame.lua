@@ -41,6 +41,7 @@ function LivingMarketFrame.new(target, customMt)
     self.favButtonInfo = {}
     self.testRefillButtonInfo = {}
     self.testMonthButtonInfo = {}
+    self.locationButtonInfo = {}
 
     return self
 end
@@ -53,8 +54,13 @@ function LivingMarketFrame:initialize()
         text = g_i18n:getText("livingMarket_testRefill"),
         callback = function() self:onTestRefill() end
     }
-    self.testMonthButtonInfo = {
+    self.locationButtonInfo = {
         inputAction = InputAction.MENU_ACTIVATE,
+        text = g_i18n:getText("livingMarket_locButton"),
+        callback = function() self:onShowLocations() end
+    }
+    self.testMonthButtonInfo = {
+        inputAction = InputAction.MENU_ACCEPT,
         text = g_i18n:getText("livingMarket_testMonth"),
         callback = function() self:onTestMonth() end
     }
@@ -753,6 +759,14 @@ function LivingMarketFrame:onToggleFavorite()
     self:rebuildWareList()
 end
 
+-- Fenster "Lagerorte" für die gewählte Ware
+function LivingMarketFrame:onShowLocations()
+    local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
+    if ware ~= nil and LivingMarketLocationDialog ~= nil then
+        LivingMarketLocationDialog.show(ware.fillTypeIndex, ware.title)
+    end
+end
+
 function LivingMarketFrame:onTestMonth()
     LivingMarket:simulateMonth()
     self:refreshData()
@@ -872,6 +886,7 @@ function LivingMarketFrame:updateMenuButtons()
         ware = nil   -- in den Marktnachrichten keine Favoriten-Taste
     end
     if ware ~= nil then
+        table.insert(self.menuButtonInfo, self.locationButtonInfo)
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
         table.insert(self.menuButtonInfo, self.favButtonInfo)
     end
@@ -881,7 +896,7 @@ function LivingMarketFrame:updateMenuButtons()
     -- Testknopf nur im Debug-Modus und nur, wo der Bedarf verwaltet wird (Server/Einzelspieler)
     if LivingMarket.DEBUG and g_server ~= nil then
         table.insert(self.menuButtonInfo, self.testRefillButtonInfo)
-        if InputAction.MENU_ACTIVATE ~= nil then
+        if InputAction.MENU_ACCEPT ~= nil then
             table.insert(self.menuButtonInfo, self.testMonthButtonInfo)
         end
     end

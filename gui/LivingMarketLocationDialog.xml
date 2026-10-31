@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!-- Fenster "Lagerorte" über dem ESC-Menü (Aufbau wie die Dialoge des Spiels) -->
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="lm_locDialog" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" id="dialogTitleElement" text="" position="0px -30px"/>
+            <Bitmap profile="lm_locHeaderBox">
+                <Text profile="lm_locHeader" position="0px 2px" size="400px 32px" text="$l10n_livingMarket_locColPlace"/>
+                <Text profile="lm_locHeaderRight" position="400px 2px" size="155px 32px" text="$l10n_livingMarket_locColAmount"/>
+                <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px"/>
+            </Bitmap>
+            <SmoothList profile="lm_locList" id="locationList" focusInit="onOpen">
+                <ListItem profile="lm_locListItem" name="location">
+                    <Text profile="lm_locCell" name="place"/>
+                    <Text profile="lm_locCellRight" position="400px 0px" name="amount"/>
+                </ListItem>
+            </SmoothList>
+            <ThreePartBitmap profile="lm_locSliderBox">
+                <Slider profile="fs25_listSlider" dataElementId="locationList"/>
+            </ThreePartBitmap>
+            <Text profile="lm_locEmpty" id="emptyText" text="$l10n_livingMarket_locNone" visible="false"/>
+        </GuiElement>
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonOK" id="tagButton" text="$l10n_livingMarket_locTag" onClick="onClickTag"/>
+            <Button profile="buttonBack" text="$l10n_livingMarket_locClose" onClick="onClickBack"/>
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="lm_locDialog" extends="fs25_dialogBg">
+            <size value="630px 800px"/>
+        </Profile>
+        <Profile name="lm_locHeaderBox" extends="emptyPanel" with="anchorTopLeft">
+            <size value="555px 50px"/>
+            <position value="20px -50px"/>
+            <imageColor value="0 0 0 0"/>
+        </Profile>
+        <Profile name="lm_locHeader" extends="baseReference">
+            <size value="155px 32px"/>
+            <imageColor value="0 0 0 0"/>
+            <textSize value="16px"/>
+            <textBold value="true"/>
+            <textUpperCase value="true"/>
+            <textColor value="0.85 0.85 0.85 1"/>
+            <textAlignment value="left"/>
+            <textVerticalAlignment value="middle"/>
+        </Profile>
+        <Profile name="lm_locHeaderRight" extends="lm_locHeader">
+            <textAlignment value="right"/>
+        </Profile>
+        <Profile name="lm_locList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
+            <size value="555px 600px"/>
+            <position value="20px -100px"/>
+        </Profile>
+        <Profile name="lm_locListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="40px"/>
+            <imageColor value="$preset_fs25_colorGrey"/>
+            <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+        </Profile>
+        <Profile name="lm_locCell" extends="baseReference" with="anchorStretchingYLeft">
+            <size value="400px 40px"/>
+            <position value="10px 0px"/>
+            <textSize value="15px"/>
+            <textAlignment value="left"/>
+            <textVerticalAlignment value="middle"/>
+            <textColor value="$preset_fs25_colorMainLight"/>
+            <textSelectedColor value="$preset_fs25_colorMainDark"/>
+        </Profile>
+        <Profile name="lm_locCellRight" extends="lm_locCell">
+            <size value="145px 40px"/>
+            <textAlignment value="right"/>
+        </Profile>
+        <Profile name="lm_locSliderBox" extends="fs25_listSliderBox" with="anchorTopRight">
+            <position value="-15px -100px"/>
+            <size value="6px 600px"/>
+        </Profile>
+        <Profile name="lm_locEmpty" extends="baseReference" with="anchorTopLeft">
+            <size value="555px 40px"/>
+            <position value="30px -110px"/>
+            <textSize value="16px"/>
+            <textColor value="0.8 0.8 0.8 1"/>
+            <textAlignment value="left"/>
+        </Profile>
+    </GUIProfiles>
+</GUI>

@@ -32,6 +32,15 @@
         <text name="livingMarket_testMonth" text="Prueba: cambio de mes"/>
         <text name="livingMarket_eventsTitle" text="Noticias del mercado"/>
         <text name="livingMarket_viewMarket" text="Mercado"/>
+        <text name="livingMarket_locButton" text="Almacenes"/>
+        <text name="livingMarket_locTitle" text="Almacenes: %s"/>
+        <text name="livingMarket_locColPlace" text="Lugar"/>
+        <text name="livingMarket_locColAmount" text="Cantidad"/>
+        <text name="livingMarket_locTag" text="Marcar"/>
+        <text name="livingMarket_locUntag" text="Quitar marca"/>
+        <text name="livingMarket_locClose" text="Cerrar"/>
+        <text name="livingMarket_locNone" text="No tienes nada de esto en stock."/>
+        <text name="livingMarket_locPallets" text="Palés"/>
         <text name="livingMarket_colEvent" text="Evento"/>
         <text name="livingMarket_colStationEv" text="Punto de venta"/>
         <text name="livingMarket_colDemand" text="Demanda"/>

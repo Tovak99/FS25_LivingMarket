@@ -856,6 +856,9 @@ local function describe(object, fallback)
     return fallback
 end
 
+-- Wird beim Sammeln der Lagerorte gesetzt: function(fillTypeIndex, menge, name, gebäude)
+local locationCollector = nil
+
 -- sources (nur zur Fehlersuche): [fillTypeIndex] = { "Quelle: Menge", ... }
 local function addStock(stock, fillTypeIndex, amount, sources, sourceName)
     if fillTypeIndex ~= nil and amount ~= nil and amount > 0 then
@@ -874,9 +877,13 @@ local function addStorage(stock, storage, farmId, visited, sources, kind, onlyFi
         return
     end
     visited[storage] = true
-    local name = kind .. " '" .. describe(owner or storage, "?") .. "'"
+    local displayName = describe(owner or storage, "?")
+    local name = kind .. " '" .. displayName .. "'"
     for fillTypeIndex, level in pairs(storage.fillLevels or {}) do
         if (onlyFillTypes == nil or onlyFillTypes[fillTypeIndex]) and (skipFillTypes == nil or not skipFillTypes[fillTypeIndex]) then
+            if locationCollector ~= nil and level ~= nil and level > 0 then
+                locationCollector(fillTypeIndex, level, displayName, owner)
+            end
             addStock(stock, fillTypeIndex, level, sources, name)
         end
     end
@@ -1006,6 +1013,9 @@ function LivingMarket:getFarmStock()
             for _, fillUnit in ipairs(spec.fillUnits) do
                 local isConsumable = consumers ~= nil and fillUnit.fillType ~= nil and consumers[fillUnit.fillType] ~= nil
                 if not isConsumable then
+                    if locationCollector ~= nil and fillUnit.fillLevel ~= nil and fillUnit.fillLevel > 0 then
+                        locationCollector(fillUnit.fillType, fillUnit.fillLevel, nil, vehicle)   -- Name: "Paletten"
+                    end
                     addStock(stock, fillUnit.fillType, fillUnit.fillLevel, sources, "Palette '" .. describe(vehicle, "?") .. "'")
                 end
             end
@@ -1029,6 +1039,53 @@ function LivingMarket:getFarmStock()
     end
 
     return stock
+end
+
+-- Kartenmarkierung eines Gebäudes/einer Produktion/einer Palette (falls vorhanden)
+local function findHotspot(object)
+    if object == nil then
+        return nil
+    end
+    if object.mapHotspot ~= nil then
+        return object.mapHotspot
+    end
+    for _, candidate in ipairs({ object, object.owningPlaceable }) do
+        local spec = candidate ~= nil and candidate.spec_hotspots or nil
+        for _, hotspot in ipairs(spec ~= nil and spec.mapHotspots or {}) do
+            if hotspot.worldX ~= nil and hotspot.worldZ ~= nil then
+                return hotspot
+            end
+        end
+    end
+    return nil
+end
+
+-- Alle Lagerorte einer Ware (gleiche Regeln wie der Lagerbestand), größte zuerst.
+-- Ergebnis: { { name, level, hotspot }, ... }; lose Paletten als eine Zeile "Paletten"
+function LivingMarket:getStockLocations(fillTypeIndex)
+    local byKey, list = {}, {}
+    local palletsLabel = g_i18n:getText("livingMarket_locPallets")
+    locationCollector = function(ft, level, name, owner)
+        if ft ~= fillTypeIndex then
+            return
+        end
+        local isPallet = name == nil
+        local key = isPallet and "pallets" or tostring(owner or name)
+        local row = byKey[key]
+        if row == nil then
+            row = { name = isPallet and palletsLabel or name, level = 0, hotspot = (not isPallet) and findHotspot(owner) or nil }
+            byKey[key] = row
+            table.insert(list, row)
+        end
+        row.level = row.level + level
+    end
+    local ok, err = pcall(self.getFarmStock, self)
+    locationCollector = nil
+    if not ok then
+        print("[LivingMarket] FEHLER beim Ermitteln der Lagerorte: " .. tostring(err))
+    end
+    table.sort(list, function(a, b) return a.level > b.level end)
+    return list
 end
 
 function LivingMarket.formatLiters(liters)
@@ -1729,6 +1786,11 @@ function LivingMarket:loadMap(name)
     local okLoad, errLoad = pcall(self.loadFromSavegame, self)
     if not okLoad then
         print("[LivingMarket] FEHLER beim Laden des Spielstands: " .. tostring(errLoad))
+    end
+
+    local okDialog, errDialog = pcall(LivingMarketLocationDialog.register)
+    if not okDialog then
+        print("[LivingMarket] FEHLER beim Anlegen des Fensters Lagerorte: " .. tostring(errDialog))
     end
 
     local ok, err = pcall(self.addMenuPage, self)

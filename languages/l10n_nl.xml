@@ -32,6 +32,15 @@
         <text name="livingMarket_testMonth" text="Test: maandwissel"/>
         <text name="livingMarket_eventsTitle" text="Marktnieuws"/>
         <text name="livingMarket_viewMarket" text="Markt"/>
+        <text name="livingMarket_locButton" text="Opslaglocaties"/>
+        <text name="livingMarket_locTitle" text="Opslaglocaties: %s"/>
+        <text name="livingMarket_locColPlace" text="Locatie"/>
+        <text name="livingMarket_locColAmount" text="Hoeveelheid"/>
+        <text name="livingMarket_locTag" text="Markeren"/>
+        <text name="livingMarket_locUntag" text="Markering verwijderen"/>
+        <text name="livingMarket_locClose" text="Sluiten"/>
+        <text name="livingMarket_locNone" text="Je hebt hier niets van op voorraad."/>
+        <text name="livingMarket_locPallets" text="Pallets"/>
         <text name="livingMarket_colEvent" text="Gebeurtenis"/>
         <text name="livingMarket_colStationEv" text="Verkooppunt"/>
         <text name="livingMarket_colDemand" text="Vraag"/>
