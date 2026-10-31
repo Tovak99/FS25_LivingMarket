@@ -37,6 +37,7 @@ function LivingMarketFrame.new(target, customMt)
     self.saleRows = {}
     self.contractFilter = "all"   -- Verträge: "all" = alle Angebote, "stock" = nur vorrätige Waren
     self.contractRows = {}
+    self.historyRows = {}
     self.selectedContractIndex = 1
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
@@ -91,6 +92,10 @@ function LivingMarketFrame:initialize()
     if self.contractList ~= nil then
         self.contractList:setDataSource(self)
         self.contractList:setDelegate(self)
+    end
+    if self.historyList ~= nil then
+        self.historyList:setDataSource(self)
+        self.historyList:setDelegate(self)
     end
 
     self:setupSortHeaders()
@@ -157,7 +162,7 @@ function LivingMarketFrame:onFrameOpen()
     self:applyUiState()
 
     -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
-    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame, self.saleFrame, self.contractFrame }) do
+    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame, self.saleFrame, self.contractFrame, self.historyFrame }) do
         if frame ~= nil and frame.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
             local c = LivingMarketFrame.FRAME_COLOR
             frame:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
@@ -179,6 +184,9 @@ function LivingMarketFrame:onFrameOpen()
     end
     if self.contractSlider ~= nil then
         self.contractSlider:setDataElement(self.contractList)
+    end
+    if self.historySlider ~= nil then
+        self.historySlider:setDataElement(self.historyList)
     end
     self:refreshData()
     self:setViewMode(self.viewMode)
@@ -1087,7 +1095,7 @@ function LivingMarketFrame:setViewMode(mode)
             element:setVisible(showSales)
         end
     end
-    for _, element in ipairs({ self.contractFrame, self.contractHeader, self.contractArea, self.contractFilterButton }) do
+    for _, element in ipairs({ self.contractFrame, self.contractHeader, self.contractArea, self.contractFilterButton, self.historyPanel }) do
         if element ~= nil then
             element:setVisible(showContracts)
         end
@@ -1317,14 +1325,23 @@ end
 function LivingMarketFrame:refreshContracts()
     self.shownContractsVersion = LivingMarket.contractsVersion
     local selectedId = self.contractRows[self.selectedContractIndex] ~= nil and self.contractRows[self.selectedContractIndex].id or nil
-    local rows = {}
+    local rows, history = {}, {}
     for _, row in ipairs(LivingMarket:getContractRows(getOwnFarmId())) do
         row.stock = self:getStockFor(row.fillTypeIndex)
-        if row.isActive or row.isHistory or self.contractFilter ~= "stock" or row.stock >= 1 then
+        if row.isHistory then
+            table.insert(history, row)   -- untere Tabelle
+        elseif row.isActive or self.contractFilter ~= "stock" or row.stock >= 1 then
             table.insert(rows, row)
         end
     end
     self.contractRows = rows
+    self.historyRows = history
+    if self.historyEmptyText ~= nil then
+        self.historyEmptyText:setVisible(self.viewMode == "contracts" and #history == 0)
+    end
+    if self.historyList ~= nil then
+        self.historyList:reloadData(true)
+    end
     self.selectedContractIndex = 1
     for i, row in ipairs(rows) do
         if row.id == selectedId then
@@ -1498,6 +1515,8 @@ function LivingMarketFrame:getNumberOfItemsInSection(list, section)
         return #self.saleRows
     elseif list == self.contractList then
         return #self.contractRows
+    elseif list == self.historyList then
+        return #self.historyRows
     end
     return #self.detailStations
 end
@@ -1509,6 +1528,8 @@ function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
         return "sale"
     elseif list == self.contractList then
         return "contract"
+    elseif list == self.historyList then
+        return "history"
     end
     return list == self.wareList and "ware" or "station"
 end
@@ -1538,6 +1559,10 @@ function LivingMarketFrame:populateCellForItemInSection(list, section, index, ce
     elseif list == self.contractList then
         setRowBackground(cell:getAttribute("bg"), index, index == self.selectedContractIndex)
         self:populateContractCell(self.contractRows[index], cell, index == self.selectedContractIndex)
+        return
+    elseif list == self.historyList then
+        setRowBackground(cell:getAttribute("bg"), index, false)
+        self:populateContractCell(self.historyRows[index], cell, false)
         return
     end
     local isSelected = list == self.wareList and index == self.selectedWareIndex

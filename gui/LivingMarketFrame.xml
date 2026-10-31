@@ -222,7 +222,7 @@
         <Text profile="lm_emptyText" id="saleEmptyText" text="$l10n_livingMarket_noSales" visible="false"/>
 
         <!-- ============ Ansicht Verträge (Ausschreibungen + eigene laufende Verträge) ============ -->
-        <ThreePartBitmap profile="lm_tableFrameFull" id="contractFrame" visible="false"/>
+        <ThreePartBitmap profile="lm_tableFrameTop" id="contractFrame" visible="false"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" id="contractHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
             <Button profile="lm_sortHeader" id="contractHead_status" position="20px 0px" text="$l10n_livingMarket_colStatus"/>
@@ -237,7 +237,7 @@
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
 
-        <GuiElement profile="lm_eventsArea" id="contractArea" visible="false">
+        <GuiElement profile="lm_wareArea" id="contractArea" visible="false">
             <SmoothList profile="fs25_settingsControlsList" id="contractList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickContract">
                 <ListItem profile="lm_listItem" name="contract">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
@@ -261,6 +261,43 @@
         </GuiElement>
 
         <Text profile="lm_emptyText" id="contractEmptyText" text="$l10n_livingMarket_noContracts" visible="false"/>
+
+        <!-- Unten: abgeschlossene Verträge (wie das Detailfenster der Marktansicht) -->
+        <GuiElement profile="lm_detailArea" id="historyPanel" visible="false">
+            <ThreePartBitmap profile="lm_tableFrameBottom" id="historyFrame"/>
+            <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
+                <Button profile="lm_sortHeader" id="historyHead_status" position="20px 0px" text="$l10n_livingMarket_ctHistoryTitle"/>
+                <Button profile="lm_sortHeader" id="historyHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
+                <Button profile="lm_sortHeader" id="historyHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
+                <Button profile="lm_sortHeader" id="historyHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="600px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
+                <Button profile="lm_sortHeader" id="historyHead_end" position="1075px 0px" text="$l10n_livingMarket_colEnd"/>
+                <ThreePartBitmap profile="lm_headerLine"/>
+            </GuiElement>
+            <SmoothList profile="fs25_settingsControlsList" id="historyList" absoluteSizeOffset="90px 60px" selectOnClick="false">
+                <ListItem profile="lm_listItem" name="history">
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
+                    <Text profile="lm_rowTextBold" name="status" position="20px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="120px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="360px 0px"/>
+                    <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
+                    <Text profile="lm_rowTextRight" name="bonus" position="600px 0px"/>
+                    <Text profile="lm_rowText" name="deadline" position="1075px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="870px 0px"/>
+                </ListItem>
+            </SmoothList>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="historySlider" dataElementId="historyList"/>
+                </ThreePartBitmap>
+            </GuiElement>
+            <Text profile="lm_emptyText" id="historyEmptyText" text="$l10n_livingMarket_ctNoHistory" visible="false"/>
+        </GuiElement>
     </GuiElement>
 
     <GUIProfiles>

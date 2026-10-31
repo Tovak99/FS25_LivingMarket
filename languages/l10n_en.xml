@@ -80,6 +80,9 @@
         <text name="livingMarket_ctResultDone" text="Fulfilled"/>
         <text name="livingMarket_ctResultFailed" text="Failed"/>
         <text name="livingMarket_ctResultCancelled" text="Cancelled"/>
+        <text name="livingMarket_ctHistoryTitle" text="Completed"/>
+        <text name="livingMarket_ctBonusPenalty" text="Bonus / penalty"/>
+        <text name="livingMarket_ctNoHistory" text="No completed contracts yet"/>
         <text name="livingMarket_year" text="Year %d"/>
         <text name="livingMarket_colRefill" text="Turnover"/>
         <text name="livingMarket_colStart" text="Start"/>
