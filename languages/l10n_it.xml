@@ -77,7 +77,7 @@
         <text name="livingMarket_noContractsStock" text="Nessuna gara per merci in magazzino"/>
         <text name="livingMarket_contractLabel" text="Contratto"/>
         <text name="livingMarket_year" text="Anno %d"/>
-        <text name="livingMarket_colRefill" text="Rifornim."/>
+        <text name="livingMarket_colRefill" text="Smercio"/>
         <text name="livingMarket_colStart" text="Inizio"/>
         <text name="livingMarket_colEnd" text="Fine"/>
         <text name="livingMarket_colStatus" text="Stato"/>

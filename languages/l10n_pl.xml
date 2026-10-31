@@ -77,7 +77,7 @@
         <text name="livingMarket_noContractsStock" text="Brak przetargów na towary na stanie"/>
         <text name="livingMarket_contractLabel" text="Umowa"/>
         <text name="livingMarket_year" text="Rok %d"/>
-        <text name="livingMarket_colRefill" text="Uzupełn."/>
+        <text name="livingMarket_colRefill" text="Zbyt"/>
         <text name="livingMarket_colStart" text="Początek"/>
         <text name="livingMarket_colEnd" text="Koniec"/>
         <text name="livingMarket_colStatus" text="Status"/>
