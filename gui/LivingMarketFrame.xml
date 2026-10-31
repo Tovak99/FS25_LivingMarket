@@ -26,7 +26,8 @@
         <ThreePartBitmap profile="lm_tableFrameTop" id="wareFrame"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
-            <Button profile="lm_sortHeader" id="sortWare_title" position="50px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="favHeader" position="14px 0px" text="*"/>
+            <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="20px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_price" position="230px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortWare_station" position="730px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
@@ -42,8 +43,9 @@
             <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
-                    <Bitmap profile="lm_wareIcon" name="icon"/>
-                    <Text profile="lm_rowTextBold" name="title" position="50px 0px"/>
+                    <Text profile="lm_rowTextBold" name="fav" position="14px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="32px 0px"/>
+                    <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="20px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="230px 0px"/>
                     <Text profile="lm_rowText" name="station" position="730px 0px"/>

@@ -36,6 +36,7 @@ function LivingMarketFrame.new(target, customMt)
     self.backButtonInfo = {}
     self.stockButtonInfo = {}
     self.clearSearchButtonInfo = {}
+    self.favButtonInfo = {}
 
     return self
 end
@@ -46,6 +47,11 @@ function LivingMarketFrame:initialize()
         inputAction = InputAction.MENU_EXTRA_2,
         text = g_i18n:getText("livingMarket_showAll"),
         callback = function() self:onToggleStockOnly() end
+    }
+    self.favButtonInfo = {
+        inputAction = InputAction.MENU_EXTRA_1,
+        text = g_i18n:getText("livingMarket_favAdd"),
+        callback = function() self:onToggleFavorite() end
     }
     self.clearSearchButtonInfo = {
         inputAction = InputAction.MENU_CANCEL,
@@ -169,7 +175,8 @@ function LivingMarketFrame:getFilteredWares()
     local result = {}
 
     for _, ware in ipairs(self.wares) do
-        local stockOk = not self.stockOnly or ware.stock >= 1
+        -- Favoriten bleiben auch bei „Nur Lagerbestand“ sichtbar
+        local stockOk = not self.stockOnly or ware.stock >= 1 or LivingMarket:isFavorite(ware.fillTypeIndex)
         local searchOk = not searching or string.find(ware.searchKey, query, 1, true) ~= nil
         if stockOk and searching and not searchOk then
             for _, station in ipairs(ware.stations) do
@@ -252,6 +259,7 @@ function LivingMarketFrame:onListSelectionChanged(list, section, index)
     end
     if ware ~= self.detailWare then
         self:updateDetail(ware)
+        self:updateMenuButtons()
     end
     if index ~= self.selectedWareIndex then
         -- grüne Markierung umsetzen: sichtbare Zeilen neu befüllen
@@ -573,6 +581,17 @@ function LivingMarketFrame:onToggleStockOnly()
     self:rebuildWareList()
 end
 
+-- Gewählte Ware als Favorit markieren bzw. Markierung entfernen
+function LivingMarketFrame:onToggleFavorite()
+    local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
+    if ware == nil then
+        return
+    end
+    self.selectedFillType = ware.fillTypeIndex
+    LivingMarket:toggleFavorite(ware.fillTypeIndex)
+    self:rebuildWareList()
+end
+
 function LivingMarketFrame:updateMenuButtons()
     -- Text zeigt, wohin umgeschaltet wird
     if self.stockOnly then
@@ -582,6 +601,11 @@ function LivingMarketFrame:updateMenuButtons()
     end
 
     self.menuButtonInfo = { self.backButtonInfo, self.stockButtonInfo }
+    local ware = self.visibleWares ~= nil and self.visibleWares[self.selectedWareIndex] or nil
+    if ware ~= nil then
+        self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
+        table.insert(self.menuButtonInfo, self.favButtonInfo)
+    end
     if self:isSearching() then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
     end
@@ -638,6 +662,13 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     -- In der gewählten (grünen) Zeile ist jede Schrift dunkel
     local function setColor(textElement, c)
         setTextColorAll(textElement, isSelected and COLOR_ON_GREEN or c)
+    end
+
+    local favText = cell:getAttribute("fav")
+    if favText ~= nil then
+        local isFav = LivingMarket:isFavorite(ware.fillTypeIndex)
+        favText:setText(isFav and "*" or "-")
+        setColor(favText, isFav and COLOR_MID or COLOR_MUTED)
     end
 
     setWareIcon(cell:getAttribute("icon"), ware.fillTypeIndex)

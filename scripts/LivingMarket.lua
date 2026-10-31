@@ -856,6 +856,106 @@ function LivingMarket:addMenuPage()
 end
 
 -- ---------------------------------------------------------------------
+-- Favoriten (je Spieler, gelten für alle Spielstände)
+-- Datei: <Benutzerprofil>/modSettings/FS25_LivingMarket.xml
+-- ---------------------------------------------------------------------
+LivingMarket.favorites = nil   -- [fillTypeName] = true; wird beim ersten Zugriff geladen
+
+function LivingMarket:getSettingsPath()
+    local dir = g_modSettingsDirectory
+    if dir == nil and getUserProfileAppPath ~= nil then
+        dir = getUserProfileAppPath() .. "modSettings/"
+    end
+    if dir == nil then
+        return nil
+    end
+    if string.sub(dir, -1) ~= "/" then
+        dir = dir .. "/"
+    end
+    if createFolder ~= nil then
+        createFolder(dir)
+    end
+    return dir .. "FS25_LivingMarket.xml"
+end
+
+function LivingMarket:loadFavorites()
+    self.favorites = {}
+    local path = self:getSettingsPath()
+    if path == nil or not fileExists(path) then
+        return
+    end
+    local xmlFile = loadXMLFile("LivingMarketSettings", path)
+    if xmlFile == nil or xmlFile == 0 then
+        return
+    end
+    local i = 0
+    while true do
+        local key = string.format("livingMarket.favorites.fillType(%d)", i)
+        if not hasXMLProperty(xmlFile, key) then
+            break
+        end
+        local name = getXMLString(xmlFile, key .. "#name")
+        if name ~= nil and name ~= "" then
+            self.favorites[name] = true
+        end
+        i = i + 1
+    end
+    delete(xmlFile)
+    log("Favoriten geladen: %d", i)
+end
+
+function LivingMarket:saveFavorites()
+    local path = self:getSettingsPath()
+    if path == nil then
+        return
+    end
+    local xmlFile = createXMLFile("LivingMarketSettings", path, "livingMarket")
+    if xmlFile == nil or xmlFile == 0 then
+        log("WARNUNG: %s konnte nicht geschrieben werden", path)
+        return
+    end
+    local names = {}
+    for name in pairs(self.favorites or {}) do
+        table.insert(names, name)
+    end
+    table.sort(names)
+    for i, name in ipairs(names) do
+        setXMLString(xmlFile, string.format("livingMarket.favorites.fillType(%d)#name", i - 1), name)
+    end
+    saveXMLFile(xmlFile)
+    delete(xmlFile)
+end
+
+function LivingMarket:isFavorite(fillTypeIndex)
+    if self.favorites == nil then
+        local ok, err = pcall(self.loadFavorites, self)
+        if not ok then
+            print("[LivingMarket] FEHLER beim Laden der Favoriten: " .. tostring(err))
+        end
+        self.favorites = self.favorites or {}
+    end
+    local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+    return name ~= nil and self.favorites[name] == true
+end
+
+function LivingMarket:toggleFavorite(fillTypeIndex)
+    local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+    if name == nil then
+        return
+    end
+    local isFav = self:isFavorite(fillTypeIndex)
+    if isFav then
+        self.favorites[name] = nil
+    else
+        self.favorites[name] = true
+    end
+    local ok, err = pcall(self.saveFavorites, self)
+    if not ok then
+        print("[LivingMarket] FEHLER beim Speichern der Favoriten: " .. tostring(err))
+    end
+end
+
+-- ---------------------------------------------------------------------
 -- Spielstand: Restbedarf speichern und laden
 -- Datei: <Spielstand-Ordner>/livingMarket.xml
 -- Je Eintrag: Restbedarf, Maximum, Auffüllrate. Gespeichert wird nur, was vom Standard abweicht.

@@ -11,6 +11,8 @@
         <text name="livingMarket_noResults" text="Sin resultados para «%s»"/>
         <text name="livingMarket_clearSearch" text="Borrar búsqueda"/>
         <text name="livingMarket_stockOnly" text="Solo existencias"/>
+        <text name="livingMarket_favAdd" text="Añadir a favoritos"/>
+        <text name="livingMarket_favRemove" text="Quitar de favoritos"/>
         <text name="livingMarket_showAll" text="Mostrar todos los productos"/>
         <text name="livingMarket_stockLabel" text="Existencias: %s"/>
         <text name="livingMarket_noStock" text="No tienes nada en existencias que se pueda vender aquí."/>
