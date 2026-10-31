@@ -3,7 +3,7 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Lebendiger Markt"/>
         <text name="livingMarket_title" text="Lebendiger Markt"/>
-        <text name="livingMarket_colShare" text="Frei"/>
+        <text name="livingMarket_colShare" text="Offen"/>
         <text name="livingMarket_colMarket" text="Marktlage"/>
         <text name="livingMarket_colDeviation" text="Markt"/>
         <text name="livingMarket_colBasePrice" text="Grundpreis"/>

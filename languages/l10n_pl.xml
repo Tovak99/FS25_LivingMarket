@@ -3,7 +3,7 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Żywy rynek"/>
         <text name="livingMarket_title" text="Żywy rynek"/>
-        <text name="livingMarket_colShare" text="Wolne"/>
+        <text name="livingMarket_colShare" text="Otwarte"/>
         <text name="livingMarket_colMarket" text="Presja"/>
         <text name="livingMarket_colDeviation" text="Rynek"/>
         <text name="livingMarket_colBasePrice" text="Cena bazowa"/>

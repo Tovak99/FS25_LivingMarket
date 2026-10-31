@@ -3,7 +3,7 @@
     <texts>
         <text name="ui_LivingMarketFrame" text="Mercato vivo"/>
         <text name="livingMarket_title" text="Mercato vivo"/>
-        <text name="livingMarket_colShare" text="Libero"/>
+        <text name="livingMarket_colShare" text="Aperto"/>
         <text name="livingMarket_colMarket" text="Pressione"/>
         <text name="livingMarket_colDeviation" text="Mercato"/>
         <text name="livingMarket_colBasePrice" text="Prezzo base"/>
