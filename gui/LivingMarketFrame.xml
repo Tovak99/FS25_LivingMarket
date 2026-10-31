@@ -38,9 +38,9 @@
         <!-- Rahmen oben: ganze Seite minus Platz für das Detailfenster (lm_wareArea).
              Die Liste darin verhält sich wie vorher auf der ganzen Seite. -->
         <GuiElement profile="lm_wareArea">
-            <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickWare">
+            <SmoothList profile="fs25_settingsControlsList" id="wareList" absoluteSizeOffset="110px 60px" selectOnClick="false" onClick="onClickWare">
                 <ListItem profile="lm_listItem" name="ware">
-                    <ThreePartBitmap profile="fs25_settingsControlsListItemBg" name="bg"/>
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Bitmap profile="lm_wareIcon" name="icon"/>
                     <Text profile="lm_rowTextBold" name="title" position="50px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="20px 0px"/>
@@ -51,9 +51,9 @@
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
-            <GuiElement profile="lm_sliderDockedBg">
-                <ThreePartBitmap profile="fs25_sliderDockedBox">
-                    <Slider profile="fs25_sliderDocked" id="wareSlider" dataElementId="wareList"/>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="wareSlider" dataElementId="wareList"/>
                 </ThreePartBitmap>
             </GuiElement>
         </GuiElement>
@@ -76,9 +76,9 @@
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
-            <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
+            <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="110px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="station">
-                    <ThreePartBitmap profile="fs25_settingsControlsListItemBg" name="bg"/>
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="510px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="770px 0px"/>
@@ -86,9 +86,9 @@
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
-            <GuiElement profile="lm_sliderDockedBg">
-                <ThreePartBitmap profile="fs25_sliderDockedBox">
-                    <Slider profile="fs25_sliderDocked" id="detailSlider" dataElementId="detailList"/>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="detailSlider" dataElementId="detailList"/>
                 </ThreePartBitmap>
             </GuiElement>
         </GuiElement>
@@ -138,10 +138,15 @@
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
+        <!-- Zeilenhintergrund ohne das Endstück (das ist ein Verlauf nach rechts) -->
+        <Profile name="lm_rowBg" extends="fs25_settingsControlsListItemBg">
+            <endImageSize value="0px 0px"/>
+        </Profile>
+
         <!-- Tabellenrahmen: etwas hellere Fläche, die rundum ein Stück über Kopfzeile und Liste
              hinausragt. Maße aus Screenshots: Liste beginnt ca. 21px vom linken Seitenrand, ist
              Seitenbreite - 90 breit; Kopfzeile beginnt 20px unter der Oberkante. -->
-        <Profile name="lm_tableFrameTop" extends="fs25_settingsControlsListItemBg">
+        <Profile name="lm_tableFrameTop" extends="lm_rowBg">
             <anchors value="0 1 0 1"/>
             <pivot value="0 0"/>
             <position value="13px 292px"/>
@@ -149,7 +154,7 @@
             <absoluteSizeOffset value="74px 304px"/>
         </Profile>
 
-        <Profile name="lm_tableFrameBottom" extends="fs25_settingsControlsListItemBg">
+        <Profile name="lm_tableFrameBottom" extends="lm_rowBg">
             <anchors value="0 1 0 1"/>
             <pivot value="0 0"/>
             <position value="13px -8px"/>
@@ -157,12 +162,30 @@
             <absoluteSizeOffset value="74px 4px"/>
         </Profile>
 
-        <!-- Scrollbalken rechts im jeweiligen Rahmen. Als GuiElement statt ThreePartBitmap:
-             übernimmt nur Lage/Größe, ohne den dunklen Verlauf über dem Zeilenende. -->
-        <Profile name="lm_sliderDockedBg" extends="fs25_sliderDockedBg">
-            <anchors value="1 1 0.5 0.5"/>
-            <pivot value="1 0.5"/>
-            <position value="75px -30px"/>
+        <!-- Scrollbalken: rechts im Tabellenrahmen, so hoch wie die Liste (60px unter der
+             Oberkante des Bereichs, bis zur Unterkante). Breite/Abstand hier anpassen. -->
+        <Profile name="lm_sliderArea">
+            <anchors value="1 1 0 1"/>
+            <pivot value="1 0"/>
+            <position value="-66px 0px"/>
+            <size value="14px 100%"/>
+            <absoluteSizeOffset value="0px 60px"/>
+        </Profile>
+
+        <Profile name="lm_sliderBox" extends="fs25_sliderDockedBox">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="0px 0px"/>
+            <size value="100% 100%"/>
+            <absoluteSizeOffset value="0px 0px"/>
+        </Profile>
+
+        <Profile name="lm_slider" extends="fs25_sliderDocked">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="0px 0px"/>
+            <size value="100% 100%"/>
+            <absoluteSizeOffset value="0px 0px"/>
         </Profile>
 
         <!-- Spaltenköpfe mit derselben Geometrie wie die Zeilentexte, damit sie exakt über den Werten stehen -->
