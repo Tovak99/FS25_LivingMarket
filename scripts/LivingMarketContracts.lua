@@ -43,6 +43,8 @@ LivingMarket.EVENT_CONTRACT = 100   -- Markierung in der Verkaufsliste
 LivingMarket.contracts       = {}   -- { id, state = "offer"|"active", stationKey, stationName, fillTypeIndex, amount, basePrice, markup, eventMarkup, months, offerEndHour, farmId, price, bonus, deadlineHour, delivered }
 LivingMarket.contractNextId  = 1
 LivingMarket.reputation      = {}   -- [farmId] = { [stationKey] = 0..100 }
+LivingMarket.contractHistory = {}   -- abgeschlossene Verträge, neueste zuerst: { id, farmId, result = "done"|"failed"|"cancelled", stationKey, stationName, fillTypeIndex, amount, delivered, price, money, endHour }
+LivingMarket.CONTRACT_HISTORY_MAX = 20   -- je Hof
 LivingMarket.contractsVersion = 0
 LivingMarket.contractOverride = nil  -- während einer Vertragslieferung: { station, fillTypeIndex, pricePerLiter }
 
@@ -302,6 +304,33 @@ function LivingMarket:findContract(id)
     return nil
 end
 
+-- Abgeschlossenen Vertrag in den Verlauf (je Hof die letzten 20)
+local function addToHistory(contract, result, money)
+    table.insert(LivingMarket.contractHistory, 1, {
+        id            = contract.id,
+        farmId        = contract.farmId,
+        result        = result,
+        stationKey    = contract.stationKey,
+        stationName   = contract.stationName,
+        fillTypeIndex = contract.fillTypeIndex,
+        amount        = contract.amount,
+        delivered     = contract.delivered or 0,
+        price         = contract.price or 0,
+        money         = money or 0,
+        endHour       = LivingMarket.getNowHour(),
+    })
+    local count = 0
+    for i = 1, #LivingMarket.contractHistory do
+        local entry = LivingMarket.contractHistory[i]
+        if entry ~= nil and entry.farmId == contract.farmId then
+            count = count + 1
+            if count > LivingMarket.CONTRACT_HISTORY_MAX then
+                table.remove(LivingMarket.contractHistory, i)
+            end
+        end
+    end
+end
+
 local function removeContract(contract)
     local _, index = LivingMarket:findContract(contract.id)
     if index ~= nil then
@@ -346,6 +375,7 @@ function LivingMarket:failContract(contract, cancelled)
     addFarmMoney(contract.farmId, -penalty)
     self:changeReputation(contract.farmId, contract.stationKey, -self.CONTRACT_SETTINGS.repFailed)
     self:announceContract(contract.farmId, cancelled and "livingMarket_ctCancelled" or "livingMarket_ctFailed", contract, penalty)
+    addToHistory(contract, cancelled and "cancelled" or "failed", -penalty)
     removeContract(contract)
     self:contractsChanged()
 end
@@ -366,6 +396,7 @@ function LivingMarket:completeContract(contract)
     addFarmMoney(contract.farmId, contract.bonus or 0)
     self:changeReputation(contract.farmId, contract.stationKey, self.CONTRACT_SETTINGS.repFulfilled)
     self:announceContract(contract.farmId, "livingMarket_ctDone", contract, contract.bonus or 0)
+    addToHistory(contract, "done", contract.bonus or 0)
     removeContract(contract)
     self:contractsChanged()
 end
@@ -528,6 +559,28 @@ function LivingMarket:getContractRows(farmId)
             })
         end
     end
+    -- abgeschlossene Verträge des Hofs (neueste zuerst, unter Angeboten und laufenden)
+    for _, entry in ipairs(self.contractHistory) do
+        if entry.farmId == farmId then
+            local fillType = g_fillTypeManager:getFillTypeByIndex(entry.fillTypeIndex)
+            table.insert(rows, {
+                id            = entry.id,
+                isHistory     = true,
+                result        = entry.result,
+                fillTypeIndex = entry.fillTypeIndex,
+                wareTitle     = fillType ~= nil and (fillType.title or fillType.name) or "?",
+                stationName   = entry.stationName,
+                stationKey    = entry.stationKey,
+                amount        = entry.amount,
+                delivered     = entry.delivered,
+                price         = entry.price,
+                money         = entry.money,
+                endHour       = entry.endHour,
+                stars         = self.getReputationStars(self:getReputation(farmId, entry.stationKey)),
+                sortKey       = 3e9 - (entry.endHour or 0),
+            })
+        end
+    end
     table.sort(rows, function(a, b)
         if a.sortKey ~= b.sortKey then
             return a.sortKey < b.sortKey
@@ -573,6 +626,24 @@ function LivingMarket:saveContractsToXML(xmlFile, baseKey)
                 setXMLInt(xmlFile, key .. "#offerEndIn", math.floor((contract.offerEndHour or now) - now))
             end
             i = i + 1
+        end
+    end
+    local now2 = self.getNowHour()
+    for h, entry in ipairs(self.contractHistory) do
+        local name = g_fillTypeManager:getFillTypeNameByIndex(entry.fillTypeIndex)
+        if name ~= nil then
+            local key = string.format("%s.history(%d)", baseKey, h - 1)
+            setXMLInt(xmlFile, key .. "#id", entry.id)
+            setXMLInt(xmlFile, key .. "#farm", entry.farmId or 0)
+            setXMLString(xmlFile, key .. "#result", entry.result)
+            setXMLString(xmlFile, key .. "#station", entry.stationKey or "")
+            setXMLString(xmlFile, key .. "#stationName", entry.stationName or "")
+            setXMLString(xmlFile, key .. "#fillType", name)
+            setXMLFloat(xmlFile, key .. "#amount", entry.amount)
+            setXMLFloat(xmlFile, key .. "#delivered", entry.delivered)
+            setXMLFloat(xmlFile, key .. "#price", entry.price)
+            setXMLFloat(xmlFile, key .. "#money", entry.money)
+            setXMLInt(xmlFile, key .. "#hoursAgo", math.max(0, math.floor(now2 - (entry.endHour or now2))))
         end
     end
     local r = 0
@@ -628,6 +699,32 @@ function LivingMarket:loadContractsFromXML(xmlFile, baseKey)
         end
         i = i + 1
     end
+    self.contractHistory = {}
+    local h = 0
+    while true do
+        local key = string.format("%s.history(%d)", baseKey, h)
+        if not hasXMLProperty(xmlFile, key) then
+            break
+        end
+        local name = getXMLString(xmlFile, key .. "#fillType")
+        local fillTypeIndex = name ~= nil and g_fillTypeManager:getFillTypeIndexByName(name) or nil
+        if fillTypeIndex ~= nil then
+            table.insert(self.contractHistory, {
+                id            = getXMLInt(xmlFile, key .. "#id") or 0,
+                farmId        = getXMLInt(xmlFile, key .. "#farm") or 0,
+                result        = getXMLString(xmlFile, key .. "#result") or "done",
+                stationKey    = getXMLString(xmlFile, key .. "#station"),
+                stationName   = getXMLString(xmlFile, key .. "#stationName") or "?",
+                fillTypeIndex = fillTypeIndex,
+                amount        = getXMLFloat(xmlFile, key .. "#amount") or 0,
+                delivered     = getXMLFloat(xmlFile, key .. "#delivered") or 0,
+                price         = getXMLFloat(xmlFile, key .. "#price") or 0,
+                money         = getXMLFloat(xmlFile, key .. "#money") or 0,
+                endHour       = now - (getXMLInt(xmlFile, key .. "#hoursAgo") or 0),
+            })
+        end
+        h = h + 1
+    end
     local r = 0
     while true do
         local key = string.format("%s.reputation(%d)", baseKey, r)
@@ -648,6 +745,7 @@ end
 
 function LivingMarket:resetContracts()
     self.contracts = {}
+    self.contractHistory = {}
     self.reputation = {}
     self.contractNextId = 1
     self.contractTarget = nil

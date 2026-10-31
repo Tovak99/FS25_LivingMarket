@@ -1320,7 +1320,7 @@ function LivingMarketFrame:refreshContracts()
     local rows = {}
     for _, row in ipairs(LivingMarket:getContractRows(getOwnFarmId())) do
         row.stock = self:getStockFor(row.fillTypeIndex)
-        if row.isActive or self.contractFilter ~= "stock" or row.stock >= 1 then
+        if row.isActive or row.isHistory or self.contractFilter ~= "stock" or row.stock >= 1 then
             table.insert(rows, row)
         end
     end
@@ -1373,6 +1373,23 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
             setTextColorAll(element, isSelected and COLOR_ON_GREEN or (color or COLOR_TEXT))
         end
     end
+    if row.isHistory then
+        -- abgeschlossener Vertrag: Ergebnis, gelieferte Menge, Bonus (+) bzw. Strafe (−), Ende
+        local done = row.result == "done"
+        local statusKey = done and "livingMarket_ctResultDone" or (row.result == "cancelled" and "livingMarket_ctResultCancelled" or "livingMarket_ctResultFailed")
+        local muted = isSelected and COLOR_ON_GREEN or COLOR_MUTED_LIGHT
+        put("status", g_i18n:getText(statusKey), done and COLOR_GOOD or COLOR_LOW)
+        put("ware", row.wareTitle, muted)
+        put("station", row.stationName, muted)
+        put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), muted)
+        put("price", formatPrice(row.price), muted)
+        put("bonus", (row.money >= 0 and "+" or "−") .. LivingMarket.formatMoney(math.abs(row.money)), row.money >= 0 and COLOR_GOOD or COLOR_LOW)
+        put("deadline", LivingMarket:formatEventTime(row.endHour or 0), muted)
+        put("stock", "", muted)
+        setStarsIcon(cell:getAttribute("stars"), row.stars)
+        setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
+        return
+    end
     put("status", g_i18n:getText(row.isActive and "livingMarket_ctActive" or "livingMarket_ctOffer"), row.isActive and COLOR_GOOD or COLOR_MID)
     put("ware", row.wareTitle, base)
     put("station", row.stationName, base)
@@ -1404,7 +1421,7 @@ end
 -- Taste "Vertrag annehmen" / "Vertrag kündigen"
 function LivingMarketFrame:onContractAction()
     local row = self.contractRows[self.selectedContractIndex]
-    if row == nil then
+    if row == nil or row.isHistory then
         return
     end
     local s = LivingMarket.CONTRACT_SETTINGS
@@ -1454,7 +1471,7 @@ function LivingMarketFrame:updateMenuButtons()
     end
     if self.viewMode == "contracts" then
         local row = self.contractRows[self.selectedContractIndex]
-        if row ~= nil then
+        if row ~= nil and not row.isHistory then
             self.contractButtonInfo.text = g_i18n:getText(row.isActive and "livingMarket_ctCancel" or "livingMarket_ctAccept")
             table.insert(self.menuButtonInfo, self.contractButtonInfo)
         end

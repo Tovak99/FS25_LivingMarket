@@ -275,6 +275,23 @@ function LivingMarketContractListEvent:writeStream(streamId, connection)
         streamWriteString(streamId, entries[i].stationKey)
         streamWriteFloat32(streamId, entries[i].value)
     end
+    -- abgeschlossene Verträge
+    local history = LivingMarket.contractHistory or {}
+    streamWriteUInt16(streamId, math.min(#history, 2000))
+    for i = 1, math.min(#history, 2000) do
+        local e = history[i]
+        streamWriteInt32(streamId, e.id or 0)
+        streamWriteUInt8(streamId, e.farmId or 0)
+        streamWriteString(streamId, e.result or "done")
+        streamWriteString(streamId, e.stationKey or "")
+        streamWriteString(streamId, e.stationName or "")
+        streamWriteUIntN(streamId, e.fillTypeIndex, FillTypeManager.SEND_NUM_BITS)
+        streamWriteFloat32(streamId, e.amount or 0)
+        streamWriteFloat32(streamId, e.delivered or 0)
+        streamWriteFloat32(streamId, e.price or 0)
+        streamWriteFloat32(streamId, e.money or 0)
+        streamWriteInt32(streamId, math.floor((e.endHour or now) - now))
+    end
 end
 
 function LivingMarketContractListEvent:readStream(streamId, connection)
@@ -312,6 +329,23 @@ function LivingMarketContractListEvent:readStream(streamId, connection)
         self.reputation[farmId] = self.reputation[farmId] or {}
         self.reputation[farmId][stationKey] = value
     end
+    self.history = {}
+    local historyCount = streamReadUInt16(streamId)
+    for _ = 1, historyCount do
+        local e = {}
+        e.id            = streamReadInt32(streamId)
+        e.farmId        = streamReadUInt8(streamId)
+        e.result        = streamReadString(streamId)
+        e.stationKey    = streamReadString(streamId)
+        e.stationName   = streamReadString(streamId)
+        e.fillTypeIndex = streamReadUIntN(streamId, FillTypeManager.SEND_NUM_BITS)
+        e.amount        = streamReadFloat32(streamId)
+        e.delivered     = streamReadFloat32(streamId)
+        e.price         = streamReadFloat32(streamId)
+        e.money         = streamReadFloat32(streamId)
+        e.endHour       = now + streamReadInt32(streamId)
+        table.insert(self.history, e)
+    end
     self:run(connection)
 end
 
@@ -319,6 +353,7 @@ function LivingMarketContractListEvent:run(connection)
     if connection:getIsServer() and g_server == nil then
         LivingMarket.contracts = self.contracts
         LivingMarket.reputation = self.reputation
+        LivingMarket.contractHistory = self.history or {}
         LivingMarket.contractsVersion = (LivingMarket.contractsVersion or 0) + 1
     end
 end

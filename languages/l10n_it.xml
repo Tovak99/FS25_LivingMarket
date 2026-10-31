@@ -77,6 +77,9 @@
         <text name="livingMarket_noContractsStock" text="Nessuna gara per merci in magazzino"/>
         <text name="livingMarket_contractLabel" text="Contratto"/>
         <text name="livingMarket_colEffect" text="Effetto"/>
+        <text name="livingMarket_ctResultDone" text="Adempiuto"/>
+        <text name="livingMarket_ctResultFailed" text="Non adempiuto"/>
+        <text name="livingMarket_ctResultCancelled" text="Disdetto"/>
         <text name="livingMarket_year" text="Anno %d"/>
         <text name="livingMarket_colRefill" text="Smercio"/>
         <text name="livingMarket_colStart" text="Inizio"/>

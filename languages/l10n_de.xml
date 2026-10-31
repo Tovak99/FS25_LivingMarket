@@ -77,6 +77,9 @@
         <text name="livingMarket_noContractsStock" text="Keine Ausschreibungen für vorrätige Waren"/>
         <text name="livingMarket_contractLabel" text="Vertrag"/>
         <text name="livingMarket_colEffect" text="Auswirkung"/>
+        <text name="livingMarket_ctResultDone" text="Erfüllt"/>
+        <text name="livingMarket_ctResultFailed" text="Nicht erfüllt"/>
+        <text name="livingMarket_ctResultCancelled" text="Gekündigt"/>
         <text name="livingMarket_year" text="Jahr %d"/>
         <text name="livingMarket_colRefill" text="Verkäufe"/>
         <text name="livingMarket_colStart" text="Beginn"/>

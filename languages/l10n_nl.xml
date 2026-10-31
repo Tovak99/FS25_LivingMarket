@@ -77,6 +77,9 @@
         <text name="livingMarket_noContractsStock" text="Geen aanbestedingen voor waren op voorraad"/>
         <text name="livingMarket_contractLabel" text="Contract"/>
         <text name="livingMarket_colEffect" text="Effect"/>
+        <text name="livingMarket_ctResultDone" text="Nagekomen"/>
+        <text name="livingMarket_ctResultFailed" text="Niet nagekomen"/>
+        <text name="livingMarket_ctResultCancelled" text="Opgezegd"/>
         <text name="livingMarket_year" text="Jaar %d"/>
         <text name="livingMarket_colRefill" text="Afzet"/>
         <text name="livingMarket_colStart" text="Begin"/>

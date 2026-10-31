@@ -77,6 +77,9 @@
         <text name="livingMarket_noContractsStock" text="No tenders for products in stock"/>
         <text name="livingMarket_contractLabel" text="Contract"/>
         <text name="livingMarket_colEffect" text="Effect"/>
+        <text name="livingMarket_ctResultDone" text="Fulfilled"/>
+        <text name="livingMarket_ctResultFailed" text="Failed"/>
+        <text name="livingMarket_ctResultCancelled" text="Cancelled"/>
         <text name="livingMarket_year" text="Year %d"/>
         <text name="livingMarket_colRefill" text="Turnover"/>
         <text name="livingMarket_colStart" text="Start"/>
