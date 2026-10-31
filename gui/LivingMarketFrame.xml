@@ -222,22 +222,10 @@
         <Text profile="lm_emptyText" id="saleEmptyText" text="$l10n_livingMarket_noSales" visible="false"/>
 
         <!-- ============ Ansicht Verträge (Ausschreibungen + eigene laufende Verträge) ============ -->
-        <ThreePartBitmap profile="lm_tableFrameTop" id="contractFrame" visible="false"/>
-
-        <GuiElement profile="fs25_settingsControlsListHeader" id="contractHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
-            <Button profile="lm_sortHeader" id="contractHead_status" position="20px 0px" text="$l10n_livingMarket_colStatus"/>
-            <Button profile="lm_sortHeader" id="contractHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
-            <Button profile="lm_sortHeader" id="contractHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
-            <Button profile="lm_sortHeader" id="contractHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_bonus" position="600px 0px" text="$l10n_livingMarket_colBonus"/>
-            <Button profile="lm_sortHeader" id="contractHead_deadline" position="1075px 0px" text="$l10n_livingMarket_colDeadline"/>
-            <Button profile="lm_sortHeaderRight" id="contractHead_stock" position="870px 0px" text="$l10n_livingMarket_colStock"/>
-            <ThreePartBitmap profile="lm_headerLine"/>
-        </GuiElement>
-
-        <GuiElement profile="lm_wareArea" id="contractArea" visible="false">
+        <!-- obere Hälfte: Angebote und laufende Verträge -->
+        <GuiElement profile="lm_contractTopArea" id="contractArea" visible="false">
+            <!-- Rahmen hinter Kopfzeile und Liste (zuerst, damit die Kopfzeile darüber liegt) -->
+            <ThreePartBitmap profile="lm_tableFrameBottom" id="contractFrame"/>
             <SmoothList profile="fs25_settingsControlsList" id="contractList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickContract">
                 <ListItem profile="lm_listItem" name="contract">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
@@ -260,10 +248,24 @@
             </GuiElement>
         </GuiElement>
 
+
+        <GuiElement profile="fs25_settingsControlsListHeader" id="contractHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
+            <Button profile="lm_sortHeader" id="contractHead_status" position="20px 0px" text="$l10n_livingMarket_colStatus"/>
+            <Button profile="lm_sortHeader" id="contractHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
+            <Button profile="lm_sortHeader" id="contractHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
+            <Button profile="lm_sortHeader" id="contractHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_bonus" position="600px 0px" text="$l10n_livingMarket_colBonus"/>
+            <Button profile="lm_sortHeader" id="contractHead_deadline" position="1075px 0px" text="$l10n_livingMarket_colDeadline"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_stock" position="870px 0px" text="$l10n_livingMarket_colStock"/>
+            <ThreePartBitmap profile="lm_headerLine"/>
+        </GuiElement>
+
         <Text profile="lm_emptyText" id="contractEmptyText" text="$l10n_livingMarket_noContracts" visible="false"/>
 
         <!-- Unten: abgeschlossene Verträge (wie das Detailfenster der Marktansicht) -->
-        <GuiElement profile="lm_detailArea" id="historyPanel" visible="false">
+        <GuiElement profile="lm_contractBottomArea" id="historyPanel" visible="false">
             <ThreePartBitmap profile="lm_tableFrameBottom" id="historyFrame"/>
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <Button profile="lm_sortHeader" id="historyHead_status" position="20px 0px" text="$l10n_livingMarket_ctHistoryTitle"/>
@@ -272,8 +274,8 @@
                 <Button profile="lm_sortHeader" id="historyHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
                 <Button profile="lm_sortHeaderRight" id="historyHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
                 <Button profile="lm_sortHeaderRight" id="historyHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
-                <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="600px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
-                <Button profile="lm_sortHeader" id="historyHead_end" position="1075px 0px" text="$l10n_livingMarket_colEnd"/>
+                <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="650px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
+                <Button profile="lm_sortHeader" id="historyHead_end" position="1125px 0px" text="$l10n_livingMarket_colEnd"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
             <SmoothList profile="fs25_settingsControlsList" id="historyList" absoluteSizeOffset="90px 60px" selectOnClick="false">
@@ -286,8 +288,8 @@
                     <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
-                    <Text profile="lm_rowTextRight" name="bonus" position="600px 0px"/>
-                    <Text profile="lm_rowText" name="deadline" position="1075px 0px"/>
+                    <Text profile="lm_rowTextRight" name="bonus" position="650px 0px"/>
+                    <Text profile="lm_rowText" name="deadline" position="1125px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="870px 0px"/>
                 </ListItem>
             </SmoothList>
@@ -350,6 +352,15 @@
             <pivot value="0 0"/>
             <position value="0px 0px"/>
             <size value="100% 190px"/>
+        </Profile>
+
+        <!-- Verträge: obere und untere Tabelle je halbe Höhe -->
+        <Profile name="lm_contractTopArea" extends="lm_wareArea">
+            <size value="100% 50%"/>
+            <absoluteSizeOffset value="0px 0px"/>
+        </Profile>
+        <Profile name="lm_contractBottomArea" extends="lm_detailArea">
+            <size value="100% 50%"/>
         </Profile>
 
         <!-- Spaltenköpfe linksbündig, damit sie über den Werten stehen -->
