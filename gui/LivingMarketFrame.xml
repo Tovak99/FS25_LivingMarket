@@ -18,8 +18,8 @@
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
             <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
             <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
-            <!-- Filter der Verträge (Alle Angebote / Vorrätig) -->
-            <Button profile="lm_filterButton" id="contractFilterButton" text="" onClick="onClickContractFilter" visible="false"/>
+            <!-- Filter der Verträge (Alle Angebote / Vorrätig): rechts am Platz des Suchfelds (dort ausgeblendet) -->
+            <Button profile="lm_filterButton" id="contractFilterButton" position="-20px 0px" text="" onClick="onClickContractFilter" visible="false"/>
 
             <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
             <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
