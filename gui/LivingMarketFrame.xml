@@ -29,8 +29,9 @@
         <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
             <Button profile="lm_sortHeader" id="favHeader" position="14px 0px" text="*"/>
             <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-70px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="90px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-90px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="40px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortWare_bestMonth" position="515px 0px" text="$l10n_livingMarket_colBestMonth" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_price" position="330px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_deviation" position="420px 0px" text="$l10n_livingMarket_colDeviation" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortWare_station" position="900px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
@@ -49,8 +50,9 @@
                     <Text profile="lm_rowTextBold" name="fav" position="14px 0px"/>
                     <Bitmap profile="lm_wareIcon" name="icon" position="32px 0px"/>
                     <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
-                    <Text profile="lm_rowTextRight" name="stock" position="-70px 0px"/>
-                    <Text profile="lm_rowTextRight" name="highPrice" position="90px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="-90px 0px"/>
+                    <Text profile="lm_rowTextRight" name="highPrice" position="40px 0px"/>
+                    <Text profile="lm_rowText" name="bestMonth" position="515px 0px"/>
                     <Bitmap profile="lm_trendIcon" name="trend" position="684px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="330px 0px"/>
                     <Text profile="lm_rowTextRight" name="deviation" position="420px 0px"/>

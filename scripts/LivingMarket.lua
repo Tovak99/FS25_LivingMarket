@@ -416,6 +416,12 @@ function LivingMarket:getYearPrices(fillTypeIndex)
     return result
 end
 
+-- Aktueller Monat der Preiskurve (1 = erster Monat im Preismenü)
+function LivingMarket.getCurrentMonth()
+    local environment = g_currentMission ~= nil and g_currentMission.environment or nil
+    return environment ~= nil and environment.currentPeriod or nil
+end
+
 -- Monatsname zum Monat der Preiskurve (1 = erster Monat im Preismenü, meist März)
 function LivingMarket.getMonthName(month)
     if g_i18n ~= nil and g_i18n.formatPeriod ~= nil then

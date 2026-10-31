@@ -352,6 +352,7 @@ LivingMarketFrame.WARE_COLUMNS = {
     stock    = { label = "livingMarket_colStock",       isText = false },
     station  = { label = "livingMarket_colBestStation", isText = true  },
     highPrice = { label = "livingMarket_colHighPrice",  isText = false },
+    bestMonth = { label = "livingMarket_colBestMonth",  isText = true  },   -- erster Klick aufsteigend: bald am besten zuerst
     deviation = { label = "livingMarket_colDeviation",  isText = false },
     price    = { label = "livingMarket_colPrice",       isText = false },
     sellable = { label = "livingMarket_colSellable",    isText = false },
@@ -380,6 +381,16 @@ local function wareValue(ware, key)
         return ware.basePrice
     elseif key == "highPrice" then
         return ware.year ~= nil and ware.year.max or nil
+    elseif key == "bestMonth" then
+        -- Monate bis zum besten Monat (0 = jetzt), damit "bald am besten" oben steht
+        if ware.year == nil then
+            return nil
+        end
+        local current = LivingMarket.getCurrentMonth()
+        if current == nil then
+            return ware.year.maxMonth
+        end
+        return (ware.year.maxMonth - current) % 12
     elseif key == "deviation" then
         return (ware.best ~= nil and ware.basePrice ~= nil and ware.basePrice > 0) and ware.best.price / ware.basePrice or nil
     elseif key == "sellable" then
@@ -776,12 +787,19 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
 
     local highPriceText = cell:getAttribute("highPrice")
     if highPriceText ~= nil then
-        if ware.year ~= nil then
-            highPriceText:setText(string.format("%s (%s)", formatPrice(ware.year.max), LivingMarket.getMonthName(ware.year.maxMonth)))
-        else
-            highPriceText:setText("-")
-        end
+        highPriceText:setText(ware.year ~= nil and formatPrice(ware.year.max) or "-")
         setColor(highPriceText, COLOR_TEXT)
+    end
+    local bestMonthText = cell:getAttribute("bestMonth")
+    if bestMonthText ~= nil then
+        if ware.year ~= nil then
+            bestMonthText:setText(LivingMarket.getMonthName(ware.year.maxMonth))
+            -- jetzt ist der beste Monat: grün
+            setColor(bestMonthText, ware.year.maxMonth == LivingMarket.getCurrentMonth() and COLOR_GOOD or COLOR_TEXT)
+        else
+            bestMonthText:setText("-")
+            setColor(bestMonthText, COLOR_TEXT)
+        end
     end
 
 
