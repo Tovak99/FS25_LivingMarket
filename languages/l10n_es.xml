@@ -2,6 +2,7 @@
 <l10n>
     <texts>
         <text name="ui_LivingMarketFrame" text="Mercado vivo"/>
+        <text name="ui_LivingMarketEventsFrame" text="Noticias del mercado"/>
         <text name="livingMarket_title" text="Mercado vivo"/>
         <text name="livingMarket_colShare" text="Libre"/>
         <text name="livingMarket_colMarket" text="Presión"/>
@@ -30,6 +31,17 @@
         <text name="livingMarket_evLabelBoom" text="Demanda"/>
         <text name="livingMarket_evLabelSlump" text="Caída"/>
         <text name="livingMarket_testMonth" text="Prueba: cambio de mes"/>
+        <text name="livingMarket_eventsTitle" text="Noticias del mercado"/>
+        <text name="livingMarket_colEvent" text="Evento"/>
+        <text name="livingMarket_colStationEv" text="Punto de venta"/>
+        <text name="livingMarket_colDemand" text="Demanda"/>
+        <text name="livingMarket_colStart" text="Inicio"/>
+        <text name="livingMarket_colEnd" text="Fin"/>
+        <text name="livingMarket_colStatus" text="Estado"/>
+        <text name="livingMarket_evRunning" text="activo"/>
+        <text name="livingMarket_evPending" text="anunciado"/>
+        <text name="livingMarket_allStations" text="Todos los puntos"/>
+        <text name="livingMarket_noEvents" text="Actualmente no hay eventos de mercado."/>
         <text name="livingMarket_filterAll" text="Todos los productos"/>
         <text name="livingMarket_filterStock" text="En stock"/>
         <text name="livingMarket_filterFav" text="Favoritos"/>

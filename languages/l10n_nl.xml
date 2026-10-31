@@ -2,6 +2,7 @@
 <l10n>
     <texts>
         <text name="ui_LivingMarketFrame" text="Levende markt"/>
+        <text name="ui_LivingMarketEventsFrame" text="Marktnieuws"/>
         <text name="livingMarket_title" text="Levende markt"/>
         <text name="livingMarket_colShare" text="Vrij"/>
         <text name="livingMarket_colMarket" text="Druk"/>
@@ -30,6 +31,17 @@
         <text name="livingMarket_evLabelBoom" text="Gevraagd"/>
         <text name="livingMarket_evLabelSlump" text="Malaise"/>
         <text name="livingMarket_testMonth" text="Test: maandwissel"/>
+        <text name="livingMarket_eventsTitle" text="Marktnieuws"/>
+        <text name="livingMarket_colEvent" text="Gebeurtenis"/>
+        <text name="livingMarket_colStationEv" text="Verkooppunt"/>
+        <text name="livingMarket_colDemand" text="Vraag"/>
+        <text name="livingMarket_colStart" text="Begin"/>
+        <text name="livingMarket_colEnd" text="Einde"/>
+        <text name="livingMarket_colStatus" text="Status"/>
+        <text name="livingMarket_evRunning" text="loopt"/>
+        <text name="livingMarket_evPending" text="aangekondigd"/>
+        <text name="livingMarket_allStations" text="Alle verkooppunten"/>
+        <text name="livingMarket_noEvents" text="Er zijn momenteel geen marktgebeurtenissen."/>
         <text name="livingMarket_filterAll" text="Alle goederen"/>
         <text name="livingMarket_filterStock" text="Op voorraad"/>
         <text name="livingMarket_filterFav" text="Favorieten"/>

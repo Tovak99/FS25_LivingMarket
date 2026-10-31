@@ -255,6 +255,7 @@ function LivingMarket:createRandomEvent()
             type = eventType, fillTypeIndex = fillTypeIndex, stationKey = stationKey,
             price = eventType == self.EVENT_SHORTAGE and (1 + change) or (1 - change),
             maxFactor = s.maxFactor[eventType], months = months, startsIn = 0,
+            startPeriod = self.getCurrentMonth(),
         }
         return event
     end
@@ -269,6 +270,7 @@ function LivingMarket:createRandomEvent()
         price = eventType == self.EVENT_BOOM and (1 + change) or (1 - change),
         maxFactor = s.maxFactor[eventType], months = months,
         startsIn = 1,   -- marktweit: einen Monat vorher angekündigt
+        startPeriod = self.wrapMonth((self.getCurrentMonth() or 1) + 1),
     }
 end
 
@@ -347,6 +349,9 @@ function LivingMarket:saveEventsToXML(xmlFile, baseKey)
         setXMLFloat(xmlFile, key .. "#maxFactor", event.maxFactor)
         setXMLInt(xmlFile, key .. "#months", event.months)
         setXMLInt(xmlFile, key .. "#startsIn", event.startsIn)
+        if event.startPeriod ~= nil then
+            setXMLInt(xmlFile, key .. "#startPeriod", event.startPeriod)
+        end
     end
 end
 
@@ -369,6 +374,7 @@ function LivingMarket:loadEventsFromXML(xmlFile, baseKey)
                 maxFactor     = getXMLFloat(xmlFile, key .. "#maxFactor") or 1,
                 months        = getXMLInt(xmlFile, key .. "#months") or 1,
                 startsIn      = getXMLInt(xmlFile, key .. "#startsIn") or 0,
+                startPeriod   = getXMLInt(xmlFile, key .. "#startPeriod"),
             })
         end
         i = i + 1
@@ -376,4 +382,47 @@ function LivingMarket:loadEventsFromXML(xmlFile, baseKey)
     -- gespeicherter Stand mit Ereignissen: nicht neu würfeln, nur anwenden
     self.eventsInitialized = false
     self.eventInitTimer = 0
+end
+
+-- ---------------------------------------------------------------------
+-- Liste für die Seite "Marktnachrichten"
+-- ---------------------------------------------------------------------
+function LivingMarket.wrapMonth(month)
+    return ((math.floor(month) - 1) % 12) + 1
+end
+
+function LivingMarket:getEventList()
+    local current = self.getCurrentMonth() or 1
+    local rows = {}
+    for _, event in ipairs(self.events or {}) do
+        local pending = event.startsIn > 0
+        local startMonth = event.startPeriod
+        if startMonth == nil then
+            startMonth = pending and self.wrapMonth(current + event.startsIn) or current
+        end
+        -- Ende: aktiv = aktueller Monat + verbleibende Monate - 1; angekündigt = Beginn + Dauer - 1
+        local endMonth = pending and self.wrapMonth(current + event.startsIn + event.months - 1)
+            or self.wrapMonth(current + event.months - 1)
+        local fillType = g_fillTypeManager:getFillTypeByIndex(event.fillTypeIndex)
+        table.insert(rows, {
+            type          = event.type,
+            fillTypeIndex = event.fillTypeIndex,
+            wareTitle     = fillType ~= nil and (fillType.title or fillType.name) or "?",
+            stationName   = event.stationKey ~= nil and self:getEventStationName(event) or g_i18n:getText("livingMarket_allStations"),
+            pricePercent  = math.floor((event.price - 1) * 100 + 0.5),
+            maxFactor     = event.maxFactor,
+            startMonth    = startMonth,
+            endMonth      = endMonth,
+            pending       = pending,
+            sortKey       = (pending and 100 or 0) + event.startsIn * 12 + event.months,
+        })
+    end
+    -- laufende zuerst (die bald enden oben), dann angekündigte
+    table.sort(rows, function(a, b)
+        if a.sortKey ~= b.sortKey then
+            return a.sortKey < b.sortKey
+        end
+        return a.wareTitle < b.wareTitle
+    end)
+    return rows
 end
