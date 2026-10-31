@@ -42,7 +42,7 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 | `scripts/gui/LivingMarketFrame.lua` | Menüseite: Warenliste, Detailfenster, Suche, Filter |
 | `scripts/events/LivingMarketSyncEvent.lua` | Multiplayer-Sync Server → Clients |
 | `gui/LivingMarketFrame.xml` | Layout und Profile der Menüseite |
-| `config/defaultConfig.xml` | Standardwerte: Warengruppen, Maximum und Auffüllung je Monat |
+| `config/defaultConfig.xml` | Einstellungen: Warengruppen, Maximum und Auffüllung je Monat, Marktlage, Schwankungen, Marktereignisse |
 | `languages/l10n_*.xml` | Texte in allen Sprachen |
 
 ## Fehlersuche

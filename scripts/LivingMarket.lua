@@ -227,6 +227,63 @@ function LivingMarket:getModSettingsDir()
     return dir
 end
 
+-- Einstellungen für Marktlage, Schwankungen und Marktereignisse (fehlende Werte: Standard)
+function LivingMarket:loadSettingsFromConfig(xmlFile)
+    local function num(key, current)
+        local value = getXMLFloat(xmlFile, key)
+        return value ~= nil and value or current
+    end
+
+    local priceKey = "livingMarket.marketPrice"
+    self.PRICE_FULL_SHARE = math.max(0.01, math.min(1, num(priceKey .. "#fullShare", self.PRICE_FULL_SHARE)))
+    self.PRICE_MIN_SHARE  = math.max(0, math.min(self.PRICE_FULL_SHARE - 0.01, num(priceKey .. "#minShare", self.PRICE_MIN_SHARE)))
+    self.PRICE_MIN_FACTOR = math.max(0, math.min(1, num(priceKey .. "#minFactor", self.PRICE_MIN_FACTOR)))
+    self.PRICE_CURVE      = math.max(0.1, num(priceKey .. "#curve", self.PRICE_CURVE))
+
+    local s = self.EVENT_SETTINGS
+    s.noise       = math.max(0, math.min(0.9, num("livingMarket.variation#demand", s.noise)))
+    s.refillNoise = math.max(0, math.min(0.9, num("livingMarket.variation#refill", s.refillNoise)))
+
+    local eventsKey = "livingMarket.events"
+    if hasXMLProperty(xmlFile, eventsKey) then
+        local enabled = getXMLBool(xmlFile, eventsKey .. "#enabled")
+        if enabled ~= nil then
+            s.enabled = enabled
+        end
+        s.minActive      = math.max(0, math.floor(num(eventsKey .. "#minActive", s.minActive)))
+        s.maxActive      = math.max(s.minActive, math.floor(num(eventsKey .. "#maxActive", s.maxActive)))
+        s.minMonths      = math.max(1, math.floor(num(eventsKey .. "#minMonths", s.minMonths)))
+        s.maxMonths      = math.max(s.minMonths, math.floor(num(eventsKey .. "#maxMonths", s.maxMonths)))
+        s.announceMonths = math.max(0, num(eventsKey .. "#announceMonths", s.announceMonths))
+
+        local byName = {}
+        for _, settings in pairs(s.types) do
+            byName[settings.name] = settings
+        end
+        local i = 0
+        while true do
+            local key = string.format("%s.event(%d)", eventsKey, i)
+            if not hasXMLProperty(xmlFile, key) then
+                break
+            end
+            local settings = byName[getXMLString(xmlFile, key .. "#type") or ""]
+            if settings ~= nil then
+                settings.weight       = math.max(0, num(key .. "#weight", settings.weight))
+                settings.minPrice     = num(key .. "#minPrice", settings.minPrice)
+                settings.maxPrice     = num(key .. "#maxPrice", settings.maxPrice)
+                settings.demandFactor = num(key .. "#demandFactor", settings.demandFactor)
+                settings.minRefill    = num(key .. "#minRefill", settings.minRefill)
+                settings.maxRefill    = num(key .. "#maxRefill", settings.maxRefill)
+                local palletOnly = getXMLBool(xmlFile, key .. "#palletOnly")
+                if palletOnly ~= nil then
+                    settings.palletOnly = palletOnly
+                end
+            end
+            i = i + 1
+        end
+    end
+end
+
 function LivingMarket:loadConfig()
     local config = {
         default      = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL },
@@ -337,6 +394,7 @@ function LivingMarket:loadConfig()
             auto.priceTiers = tiers
         end
     end
+    self:loadSettingsFromConfig(xmlFile)
     delete(xmlFile)
 
     log("Konfiguration gelesen (%s): %d Gruppen, %d Waren zugeordnet, Rest %d l / %d %% je Monat",

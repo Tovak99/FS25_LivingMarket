@@ -20,28 +20,28 @@ LivingMarket.EVENT_SLUMP     = 4   -- marktweit Überangebot
 LivingMarket.EVENT_DEMAND    = 5   -- Nachgefragt: Station füllt schneller auf (eine Station)
 LivingMarket.EVENT_SLOW      = 6   -- Ladenhüter: Station füllt langsamer auf (eine Station, nur Palettenware)
 
+-- Standardwerte; werden aus der Konfigurationsdatei (<variation>, <events>) überschrieben
 LivingMarket.EVENT_SETTINGS = {
+    enabled        = true,
     minActive      = 10,     -- so viele Ereignisse sollen etwa gleichzeitig laufen (inkl. angekündigter)
     maxActive      = 20,
-    minPrice       = 0.10,   -- Preisänderung ±10..25 %
-    maxPrice       = 0.25,
-    minMonths      = 1,
+    minMonths      = 1,      -- Dauer eines Ereignisses
     maxMonths      = 2,
-    noise          = 0.10,   -- kleine Schwankung des Bedarfs ±10 %
-    refillNoise    = 0.10,   -- eigene kleine Schwankung der Auffüllung ±10 %
-    minRefill      = 0.10,   -- Nachgefragt/Ladenhüter: Auffüllung ±10..50 %
-    maxRefill      = 0.50,
-    weightShortage = 0.30,
-    weightSurplus  = 0.25,
-    weightDemand   = 0.12,   -- Nachgefragt
-    weightSlow     = 0.08,   -- Ladenhüter (Rest: marktweit)
-    maxFactor = {
-        [1] = 1.5,   -- Engpass
-        [2] = 0.6,   -- Überangebot
-        [3] = 1.3,   -- Boom
-        [4] = 0.7,   -- Flaute
+    announceMonths = 1,      -- marktweite Ereignisse so lange vorher ankündigen
+    noise          = 0.10,   -- kleine Schwankung des Bedarfs ±10 % (je Monat neu)
+    refillNoise    = 0.10,   -- kleine Schwankung der Auffüllung ±10 % (je Monat neu)
+    -- je Ereignistyp: Gewicht (Häufigkeit), Preisänderung, Bedarfsfaktor, Auffüllungsänderung
+    types = {
+        [1] = { name = "shortage",   weight = 0.30,  minPrice = 0.10, maxPrice = 0.25, demandFactor = 1.5 },
+        [2] = { name = "surplus",    weight = 0.25,  minPrice = 0.10, maxPrice = 0.25, demandFactor = 0.6 },
+        [3] = { name = "boom",       weight = 0.125, minPrice = 0.10, maxPrice = 0.25, demandFactor = 1.3 },
+        [4] = { name = "slump",      weight = 0.125, minPrice = 0.10, maxPrice = 0.25, demandFactor = 0.7 },
+        [5] = { name = "demand",     weight = 0.12,  minRefill = 0.10, maxRefill = 0.50 },
+        [6] = { name = "slowSeller", weight = 0.08,  minRefill = 0.10, maxRefill = 0.50, palletOnly = true },
     },
 }
+LivingMarket.EVENT_POSITIVE = { [1] = true, [3] = true, [5] = true }   -- erhöhen Preis/Auffüllung
+LivingMarket.EVENT_GLOBAL   = { [3] = true, [4] = true }               -- marktweit, mit Ankündigung
 
 LivingMarket.events = {}   -- { type, fillTypeIndex, stationKey (nil = marktweit), price, maxFactor, months, startHour, endHour, active }
 
@@ -345,63 +345,79 @@ end
 -- ---------------------------------------------------------------------
 -- Würfeln
 -- ---------------------------------------------------------------------
+-- Ereignistyp nach Gewicht auswählen
+function LivingMarket:pickEventType()
+    local total = 0
+    for _, settings in pairs(self.EVENT_SETTINGS.types) do
+        total = total + math.max(0, settings.weight or 0)
+    end
+    if total <= 0 then
+        return nil
+    end
+    local roll = math.random() * total
+    for eventType = 1, 6 do
+        local settings = self.EVENT_SETTINGS.types[eventType]
+        if settings ~= nil and (settings.weight or 0) > 0 then
+            roll = roll - settings.weight
+            if roll <= 0 then
+                return eventType, settings
+            end
+        end
+    end
+    return nil
+end
+
+-- Änderung um ±min..max (Vorzeichen je nach Typ), 1 = keine Änderung
+local function rollChange(eventType, minValue, maxValue)
+    if maxValue == nil or maxValue <= 0 then
+        return 1
+    end
+    local change = randomRange(minValue or 0, maxValue)
+    return LivingMarket.EVENT_POSITIVE[eventType] and (1 + change) or math.max(0.05, 1 - change)
+end
+
 function LivingMarket:createRandomEvent()
     local s = self.EVENT_SETTINGS
-    local roll = math.random()
-    local months = math.random(s.minMonths, s.maxMonths)
-    local change = randomRange(s.minPrice, s.maxPrice)
+    local eventType, settings = self:pickEventType()
+    if eventType == nil then
+        return nil
+    end
+    local months = math.random(s.minMonths, math.max(s.minMonths, s.maxMonths))
     local now = self.getNowHour()
     local hoursPerMonth = self.getHoursPerMonth()
 
-    -- Nachgefragt / Ladenhüter: nur die Auffüllung ändert sich, Preis und Bedarf bleiben
-    local refillStart = s.weightShortage + s.weightSurplus
-    if roll >= refillStart and roll < refillStart + s.weightDemand + s.weightSlow then
-        local eventType = roll < refillStart + s.weightDemand and self.EVENT_DEMAND or self.EVENT_SLOW
-        local filter = eventType == self.EVENT_SLOW and self.isPalletWare or nil
+    local event = {
+        type         = eventType,
+        price        = rollChange(eventType, settings.minPrice, settings.maxPrice),
+        maxFactor    = settings.demandFactor or 1,
+        refillFactor = rollChange(eventType, settings.minRefill, settings.maxRefill),
+        months       = months,
+        active       = false,
+    }
+    if self.EVENT_GLOBAL[eventType] then
+        -- marktweit: vorher angekündigt
+        event.fillTypeIndex = self:pickMarketWare()
+        if event.fillTypeIndex == nil then
+            return nil
+        end
+        event.startHour = now + (s.announceMonths or 0) * hoursPerMonth
+    else
+        -- eine Station: beginnt sofort
+        local filter = settings.palletOnly and self.isPalletWare or nil
         local station, stationKey, fillTypeIndex = self:pickStationWare(filter)
         if station == nil then
             return nil
         end
-        local refillChange = randomRange(s.minRefill, s.maxRefill)
-        return {   -- beginnt sofort
-            type = eventType, fillTypeIndex = fillTypeIndex, stationKey = stationKey,
-            price = 1, maxFactor = 1,
-            refillFactor = eventType == self.EVENT_DEMAND and (1 + refillChange) or (1 - refillChange),
-            months = months, startHour = now, endHour = now + months * hoursPerMonth, active = false,
-        }
+        event.fillTypeIndex, event.stationKey = fillTypeIndex, stationKey
+        event.startHour = now
     end
-
-    if roll < s.weightShortage + s.weightSurplus then
-        local station, stationKey, fillTypeIndex = self:pickStationWare()
-        if station == nil then
-            return nil
-        end
-        local eventType = roll < s.weightShortage and self.EVENT_SHORTAGE or self.EVENT_SURPLUS
-        return {   -- Stationsereignis: beginnt sofort
-            type = eventType, fillTypeIndex = fillTypeIndex, stationKey = stationKey,
-            price = eventType == self.EVENT_SHORTAGE and (1 + change) or (1 - change),
-            maxFactor = s.maxFactor[eventType], months = months,
-            startHour = now, endHour = now + months * hoursPerMonth, active = false,
-        }
-    end
-
-    local fillTypeIndex = self:pickMarketWare()
-    if fillTypeIndex == nil then
-        return nil
-    end
-    local eventType = math.random() < 0.5 and self.EVENT_BOOM or self.EVENT_SLUMP
-    local startHour = now + hoursPerMonth   -- marktweit: einen Monat vorher angekündigt
-    return {
-        type = eventType, fillTypeIndex = fillTypeIndex, stationKey = nil,
-        price = eventType == self.EVENT_BOOM and (1 + change) or (1 - change),
-        maxFactor = s.maxFactor[eventType], months = months,
-        startHour = startHour, endHour = startHour + months * hoursPerMonth, active = false,
-    }
+    event.endHour = event.startHour + months * hoursPerMonth
+    return event
 end
 
 function LivingMarket:rollEventTarget()
     local s = self.EVENT_SETTINGS
-    self.eventTarget = math.random(s.minActive, s.maxActive)
+    self.eventTarget = math.random(s.minActive, math.max(s.minActive, s.maxActive))
 end
 
 -- Ein neues Ereignis würfeln und melden (angekündigt oder sofort gestartet)
@@ -446,7 +462,7 @@ function LivingMarket:tickEvents()
     if self.eventTarget == nil then
         self:rollEventTarget()
     end
-    local missing = self.eventTarget - #self.events
+    local missing = self.EVENT_SETTINGS.enabled and (self.eventTarget - #self.events) or 0
     if missing > 0 then
         -- Fehlende Ereignisse kommen verteilt im Lauf von etwa einem Drittel Monat:
         -- je Stunde im Schnitt missing / window neue (ganzzahliger Teil sicher, Rest als Chance)
