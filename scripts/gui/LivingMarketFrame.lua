@@ -328,9 +328,9 @@ local function getEventText(eventType, eventPrice, eventRefill)
     local value = refill and eventRefill or eventPrice
     local percent = math.floor(((value or 1) - 1) * 100 + 0.5)
     local color = isPositiveEvent(eventType) and COLOR_GOOD or COLOR_LOW
-    -- z. B. "Engpass – Preis +24 %" bzw. "Nachgefragt – Verkäufe +23 %"
+    -- zwei Teile: Ereignis ("Engpass") und Wirkung ("Preis +24 %" bzw. "Verkäufe +23 %")
     local what = g_i18n:getText(refill and "livingMarket_colRefill" or "livingMarket_colPrice")
-    return string.format("%s – %s %+d %%", g_i18n:getText(label), what, percent), color
+    return g_i18n:getText(label), color, string.format("%s %+d %%", what, percent)
 end
 
 local function formatPrice(pricePer1000)
@@ -1651,9 +1651,14 @@ function LivingMarketFrame:populateStationCell(station, cell)
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")
     local eventText = cell:getAttribute("event")
     if eventText ~= nil then
-        local text, color = getEventText(station.eventType, station.eventPrice, station.eventRefill)
+        local text, color, effect = getEventText(station.eventType, station.eventPrice, station.eventRefill)
         eventText:setText(text or "")
         setColor(eventText, isFull and COLOR_MUTED or color or COLOR_TEXT)
+        local effectText = cell:getAttribute("eventEffect")
+        if effectText ~= nil then
+            effectText:setText(effect or "")
+            setColor(effectText, isFull and COLOR_MUTED or color or COLOR_TEXT)
+        end
     end
     local revenueText = cell:getAttribute("revenue")
     if revenueText ~= nil then
