@@ -32,7 +32,61 @@ LivingMarket.EXCLUDED_FILLTYPES = {
     CASH        = true,
     SERVICE     = true,   -- Wartung: wird nur verteilt, nicht transportiert
     MAINTENANCE = true,
+    ELECTRICCHARGE = true, -- Elektrische Energie: nur verteilt/direkt verkauft
+    ELECTRICITY    = true,
 }
+
+-- Waren, die sich gar nicht transportieren lassen (keine Palette und in keiner Füllart-Kategorie
+-- für Anhänger, Tanks, Ballen ...), z. B. Wartung oder Strom: Sie werden nur verteilt und nicht
+-- an Verkaufsstellen geliefert. Ergebnis wird beim ersten Zugriff ermittelt.
+local function buildCategorizedSet()
+    local set = {}
+    local manager = g_fillTypeManager
+    if manager == nil then
+        return nil
+    end
+    local found = false
+    if type(manager.fillTypeToCategories) == "table" then
+        for index, categories in pairs(manager.fillTypeToCategories) do
+            if type(categories) == "table" and next(categories) ~= nil then
+                set[index] = true
+                found = true
+            end
+        end
+    end
+    if type(manager.categoryNameToFillTypes) == "table" then
+        for _, fillTypes in pairs(manager.categoryNameToFillTypes) do
+            if type(fillTypes) == "table" then
+                for key, value in pairs(fillTypes) do
+                    -- je nach Spielversion { [index] = true } oder { index, ... }
+                    local index = (value == true) and key or value
+                    if type(index) == "number" then
+                        set[index] = true
+                        found = true
+                    end
+                end
+            end
+        end
+    end
+    return found and set or nil
+end
+
+function LivingMarket:isTransportableFillType(fillTypeIndex)
+    if self.categorizedFillTypes == nil then
+        self.categorizedFillTypes = buildCategorizedSet() or false
+    end
+    if self.categorizedFillTypes == false then
+        return true   -- Kategorien nicht lesbar: nichts ausschließen
+    end
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    if fillType == nil then
+        return true
+    end
+    if fillType.palletFilename ~= nil then
+        return true
+    end
+    return self.categorizedFillTypes[fillTypeIndex] == true
+end
 
 -- ---------------------------------------------------------------------
 -- Laufzeitdaten
@@ -204,6 +258,10 @@ function LivingMarket:isExcludedFillType(fillTypeIndex)
             or string.find(name, "CASH", 1, true) ~= nil
             or string.find(name, "SERVICE", 1, true) ~= nil
             or string.find(name, "MAINTENANCE", 1, true) ~= nil
+        if not excluded and not self:isTransportableFillType(fillTypeIndex) then
+            excluded = true
+            log("Ware ausgenommen (nicht transportierbar, nur verteilbar): %s", name)
+        end
     end
 
     self.excludedCache[fillTypeIndex] = excluded
@@ -2132,6 +2190,7 @@ function LivingMarket:deleteMap()
     self.stationNames = {}
     self.stationKeys = {}
     self.excludedCache = {}
+    self.categorizedFillTypes = nil
     self.loggedMissionDeliveries = {}
     self.hasLoggedStock = false
     self.hasLoggedStations = false

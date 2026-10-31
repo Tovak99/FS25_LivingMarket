@@ -478,7 +478,7 @@ function LivingMarket:isEventWareSellable(event)
         return station == nil or self:isContractWareSellable(station, event.fillTypeIndex)
     end
     local fillType = g_fillTypeManager:getFillTypeByIndex(event.fillTypeIndex)
-    return fillType ~= nil and (fillType.pricePerLiter or 0) > 0
+    return fillType ~= nil and (fillType.pricePerLiter or 0) > 0 and fillType.showOnPriceTable ~= false
 end
 
 function LivingMarket:tickEvents()

@@ -210,6 +210,11 @@ function LivingMarket:isContractWareSellable(station, fillTypeIndex)
     if fillType == nil or (fillType.pricePerLiter or 0) <= 0 then
         return false
     end
+    -- Waren, die das Spiel nicht in der Preisübersicht führt ("Keine Verkaufsstellen verfügbar",
+    -- z. B. Wasser, Gärreste, Abwasser, Wickelfolie): keine Ereignisse und keine Verträge
+    if fillType.showOnPriceTable == false then
+        return false
+    end
     if station.getEffectiveFillTypePrice ~= nil then
         local ok, price = pcall(station.getEffectiveFillTypePrice, station, fillTypeIndex)
         if not ok or price == nil or price <= 0 then
