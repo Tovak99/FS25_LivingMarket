@@ -570,10 +570,10 @@ local function getProductionOutputs(productionPoint)
     return outputs
 end
 
--- Fahrzeuge: nur Paletten und Anhänger sind Lagerware. Sämaschinen, Streuer,
--- Spritzen usw. tragen Arbeitsmaterial (Saatgut, Dünger …), das zählt nicht.
+-- Fahrzeuge: nur Paletten sind Lagerware. Anhänger zählen nicht (Ladung kann
+-- Auftragsware oder geliehen sein), Sämaschinen, Streuer usw. auch nicht.
 local function isStockVehicle(vehicle)
-    return vehicle.isPallet == true or vehicle.spec_trailer ~= nil
+    return vehicle.isPallet == true or vehicle.spec_pallet ~= nil
 end
 
 function LivingMarket:getFarmId()
@@ -663,7 +663,7 @@ function LivingMarket:getFarmStock()
         end
     end
 
-    -- 3) Paletten und Anhänger (Füllstände ihrer Fülleinheiten)
+    -- 3) Paletten (Füllstände ihrer Fülleinheiten)
     local vehicles = (mission.vehicleSystem ~= nil and mission.vehicleSystem.vehicles) or mission.vehicles
     for _, vehicle in pairs(vehicles or {}) do
         local spec = vehicle.spec_fillUnit
@@ -673,7 +673,7 @@ function LivingMarket:getFarmStock()
             for _, fillUnit in ipairs(spec.fillUnits) do
                 local isConsumable = consumers ~= nil and fillUnit.fillType ~= nil and consumers[fillUnit.fillType] ~= nil
                 if not isConsumable then
-                    addStock(stock, fillUnit.fillType, fillUnit.fillLevel, sources, "Fahrzeug/Palette '" .. describe(vehicle, "?") .. "'")
+                    addStock(stock, fillUnit.fillType, fillUnit.fillLevel, sources, "Palette '" .. describe(vehicle, "?") .. "'")
                 end
             end
         end
