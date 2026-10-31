@@ -498,23 +498,8 @@ end
 function LivingMarket:initEvents()
     self:normalizeEvents()
     self:rollEventTarget()
-    if #self.events == 0 and self.EVENT_SETTINGS.enabled then
-        -- Neues Spiel bzw. erster Start mit dem Mod: sofort die Mindestanzahl erzeugen (ohne Meldungsflut),
-        -- weitere bis zum Monatsziel kommen verteilt über den Monat
-        local wanted = math.max(1, math.min(self.EVENT_SETTINGS.minActive, self.eventTarget))
-        self.silentEvents = true
-        local attempts = 0
-        while #self.events < wanted and attempts < wanted * 3 do
-            self:spawnEvent()
-            attempts = attempts + 1
-        end
-        for _, event in ipairs(self.events) do
-            if not event.active and event.startHour <= self.getNowHour() then
-                event.active = true
-            end
-        end
-        self.silentEvents = false
-    end
+    -- keine Ereignisse sofort erzeugen: auch ein neues Spiel beginnt mit 0,
+    -- tickEvents bringt sie im Lauf der Zeit (verteilt über etwa ein Drittel Monat)
     self:applyEventsToAll()
     self:broadcastEventList()
     log("Marktereignisse: %d (Ziel %d)", #self.events, self.eventTarget)
