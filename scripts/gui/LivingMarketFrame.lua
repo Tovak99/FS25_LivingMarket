@@ -1412,10 +1412,12 @@ function LivingMarketFrame:populateContractCell(row, cell, isSelected)
     put("station", row.stationName, base)
     if row.isActive then
         put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
-        put("deadline", LivingMarket:formatEventTime(row.deadlineHour or 0), base)
+        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(row.deadlineHour or 0)), base)
     else
         put("amount", LivingMarket.formatLiters(row.amount), base)
-        put("deadline", string.format(g_i18n:getText("livingMarket_ctMonths"), row.months or 1), base)
+        -- Frist, wenn das Angebot jetzt angenommen wird
+        local deadline = LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth()
+        put("deadline", string.format(g_i18n:getText("livingMarket_ctUntil"), LivingMarket:formatEventTime(deadline)), base)
     end
     put("price", formatPrice(row.price), base)
     put("bonus", LivingMarket.formatMoney(row.bonus), COLOR_GOOD)

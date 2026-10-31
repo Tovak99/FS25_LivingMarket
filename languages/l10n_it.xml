@@ -84,6 +84,7 @@
         <text name="livingMarket_ctBonusPenalty" text="Bonus / penale"/>
         <text name="livingMarket_ctNoHistory" text="Nessun contratto concluso"/>
         <text name="livingMarket_ctEnded" text="Terminato"/>
+        <text name="livingMarket_ctUntil" text="entro %s"/>
         <text name="livingMarket_year" text="Anno %d"/>
         <text name="livingMarket_colRefill" text="Smercio"/>
         <text name="livingMarket_colStart" text="Inizio"/>

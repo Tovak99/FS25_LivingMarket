@@ -84,6 +84,7 @@
         <text name="livingMarket_ctBonusPenalty" text="Prime / pénalité"/>
         <text name="livingMarket_ctNoHistory" text="Aucun contrat terminé"/>
         <text name="livingMarket_ctEnded" text="Terminé le"/>
+        <text name="livingMarket_ctUntil" text="avant %s"/>
         <text name="livingMarket_year" text="Année %d"/>
         <text name="livingMarket_colRefill" text="Écoulement"/>
         <text name="livingMarket_colStart" text="Début"/>
