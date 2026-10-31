@@ -83,6 +83,7 @@
         <text name="livingMarket_ctHistoryTitle" text="Resultaat"/>
         <text name="livingMarket_ctBonusPenalty" text="Bonus / boete"/>
         <text name="livingMarket_ctNoHistory" text="Nog geen afgeronde contracten"/>
+        <text name="livingMarket_ctEnded" text="Beëindigd"/>
         <text name="livingMarket_year" text="Jaar %d"/>
         <text name="livingMarket_colRefill" text="Afzet"/>
         <text name="livingMarket_colStart" text="Begin"/>

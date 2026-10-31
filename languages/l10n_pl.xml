@@ -83,6 +83,7 @@
         <text name="livingMarket_ctHistoryTitle" text="Wynik"/>
         <text name="livingMarket_ctBonusPenalty" text="Premia / kara"/>
         <text name="livingMarket_ctNoHistory" text="Brak zakończonych umów"/>
+        <text name="livingMarket_ctEnded" text="Zakończono"/>
         <text name="livingMarket_year" text="Rok %d"/>
         <text name="livingMarket_colRefill" text="Zbyt"/>
         <text name="livingMarket_colStart" text="Początek"/>

@@ -275,7 +275,7 @@
                 <Button profile="lm_sortHeaderRight" id="historyHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
                 <Button profile="lm_sortHeaderRight" id="historyHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
                 <Button profile="lm_sortHeaderRight" id="historyHead_bonus" position="650px 0px" text="$l10n_livingMarket_ctBonusPenalty"/>
-                <Button profile="lm_sortHeader" id="historyHead_end" position="1125px 0px" text="$l10n_livingMarket_colEnd"/>
+                <Button profile="lm_sortHeader" id="historyHead_end" position="1125px 0px" text="$l10n_livingMarket_ctEnded"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
             <SmoothList profile="fs25_settingsControlsList" id="historyList" absoluteSizeOffset="90px 60px" selectOnClick="false">
