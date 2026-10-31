@@ -145,9 +145,9 @@
             <Button profile="lm_sortHeaderRight" id="sortEvent_price" position="250px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortEvent_demand" position="350px 0px" text="$l10n_livingMarket_colDemand" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortEvent_refill" position="460px 0px" text="$l10n_livingMarket_colRefill" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_start" position="920px 0px" text="$l10n_livingMarket_colStart" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_finish" position="1060px 0px" text="$l10n_livingMarket_colEnd" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeader" id="sortEvent_status" position="1200px 0px" text="$l10n_livingMarket_colStatus" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_start" position="940px 0px" text="$l10n_livingMarket_colStart" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_finish" position="1090px 0px" text="$l10n_livingMarket_colEnd" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeader" id="sortEvent_status" position="1290px 0px" text="$l10n_livingMarket_colStatus" onClick="onClickSortHeader"/>
             <Bitmap profile="lm_sortArrow" id="eventSortArrow"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
@@ -164,9 +164,9 @@
                     <Text profile="lm_rowTextRight" name="price" position="250px 0px"/>
                     <Text profile="lm_rowTextRight" name="demand" position="350px 0px"/>
                     <Text profile="lm_rowTextRight" name="refill" position="460px 0px"/>
-                    <Text profile="lm_rowText" name="start" position="920px 0px"/>
-                    <Text profile="lm_rowText" name="end" position="1060px 0px"/>
-                    <Text profile="lm_rowText" name="status" position="1200px 0px"/>
+                    <Text profile="lm_rowText" name="start" position="940px 0px"/>
+                    <Text profile="lm_rowText" name="end" position="1090px 0px"/>
+                    <Text profile="lm_rowText" name="status" position="1290px 0px"/>
                 </ListItem>
             </SmoothList>
             <GuiElement profile="lm_sliderArea">
