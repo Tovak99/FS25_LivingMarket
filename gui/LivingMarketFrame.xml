@@ -30,8 +30,7 @@
             <Button profile="lm_sortHeader" id="favHeader" position="14px 0px" text="*"/>
             <Button profile="lm_sortHeader" id="sortWare_title" position="66px 0px" text="$l10n_livingMarket_colWare" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_stock" position="-70px 0px" text="$l10n_livingMarket_colStock" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_basePrice" position="50px 0px" text="$l10n_livingMarket_colBasePrice" onClick="onClickSortHeader"/>
-            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="200px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
+            <Button profile="lm_sortHeaderRight" id="sortWare_highPrice" position="90px 0px" text="$l10n_livingMarket_colHighPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_price" position="330px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_deviation" position="420px 0px" text="$l10n_livingMarket_colDeviation" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeader" id="sortWare_station" position="900px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
@@ -51,8 +50,8 @@
                     <Bitmap profile="lm_wareIcon" name="icon" position="32px 0px"/>
                     <Text profile="lm_rowTextBold" name="title" position="66px 0px"/>
                     <Text profile="lm_rowTextRight" name="stock" position="-70px 0px"/>
-                    <Text profile="lm_rowTextRight" name="basePrice" position="50px 0px"/>
-                    <Text profile="lm_rowTextRight" name="highPrice" position="200px 0px"/>
+                    <Text profile="lm_rowTextRight" name="highPrice" position="90px 0px"/>
+                    <Bitmap profile="lm_trendIcon" name="trend" position="684px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="330px 0px"/>
                     <Text profile="lm_rowTextRight" name="deviation" position="420px 0px"/>
                     <Text profile="lm_rowText" name="station" position="900px 0px"/>
@@ -92,6 +91,7 @@
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
                     <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
+                    <Bitmap profile="lm_trendIcon" name="trend" position="764px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="410px 0px"/>
                     <Text profile="lm_rowTextRight" name="market" position="530px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="770px 0px"/>
@@ -277,6 +277,18 @@
         </Profile>
 
         <!-- Icon der Ware links in der Zeile -->
+        <!-- Pfeil vor dem Preis: über (grün) oder unter (rot) dem Grundpreis -->
+        <Profile name="lm_trendIcon">
+            <anchors value="0 0 0.5 0.5"/>
+            <pivot value="0 0.5"/>
+            <position value="0px 0px"/>
+            <size value="18px 18px"/>
+            <imageColor value="1 1 1 1"/>
+            <imageSelectedColor value="1 1 1 1"/>
+            <imageFocusedColor value="1 1 1 1"/>
+            <imageHighlightedColor value="1 1 1 1"/>
+        </Profile>
+
         <Profile name="lm_wareIcon">
             <anchors value="0 0 0.5 0.5"/>
             <pivot value="0 0.5"/>

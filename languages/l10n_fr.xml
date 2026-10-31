@@ -7,7 +7,7 @@
         <text name="livingMarket_colMarket" text="Pression"/>
         <text name="livingMarket_colDeviation" text="Marché"/>
         <text name="livingMarket_colBasePrice" text="Prix de base"/>
-        <text name="livingMarket_colHighPrice" text="Prix max."/>
+        <text name="livingMarket_colHighPrice" text="Meilleur prix"/>
         <text name="livingMarket_none" text="Aucun point de vente trouvé"/>
         <text name="livingMarket_unknownStation" text="Point de vente"/>
         <text name="livingMarket_searchHint" text="Chercher produit ou point de vente …"/>

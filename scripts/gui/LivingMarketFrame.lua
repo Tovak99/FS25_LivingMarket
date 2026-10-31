@@ -185,6 +185,20 @@ local function getDeviationText(price, basePrice)
     return text, priceColor(price, basePrice)
 end
 
+-- Pfeil vor dem Preis: über dem Grundpreis grün nach oben, darunter rot nach unten, gleich = keiner
+local function setTrendIcon(icon, price, basePrice)
+    if icon == nil then
+        return
+    end
+    local percent = (price ~= nil and basePrice ~= nil and basePrice > 0) and math.floor(price / basePrice * 100 + 0.5) or 100
+    if percent == 100 then
+        icon:setVisible(false)
+        return
+    end
+    icon:setImageFilename(Utils.getFilename(percent > 100 and "images/priceUp.dds" or "images/priceDown.dds", LivingMarket.modDir))
+    icon:setVisible(true)
+end
+
 local function formatPrice(pricePer1000)
     return LivingMarket.formatMoney(pricePer1000)
 end
@@ -337,7 +351,6 @@ LivingMarketFrame.WARE_COLUMNS = {
     title    = { label = "livingMarket_colWare",        isText = true  },
     stock    = { label = "livingMarket_colStock",       isText = false },
     station  = { label = "livingMarket_colBestStation", isText = true  },
-    basePrice = { label = "livingMarket_colBasePrice",  isText = false },
     highPrice = { label = "livingMarket_colHighPrice",  isText = false },
     deviation = { label = "livingMarket_colDeviation",  isText = false },
     price    = { label = "livingMarket_colPrice",       isText = false },
@@ -771,11 +784,6 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
         setColor(highPriceText, COLOR_TEXT)
     end
 
-    local basePriceText = cell:getAttribute("basePrice")
-    if basePriceText ~= nil then
-        basePriceText:setText(ware.basePrice ~= nil and formatPrice(ware.basePrice) or "-")
-        setColor(basePriceText, COLOR_TEXT)
-    end
 
     local stationText = cell:getAttribute("station")
     local priceText = cell:getAttribute("price")
@@ -790,6 +798,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
         setColor(stationText, COLOR_LOW)
         priceText:setText("-")
         setColor(priceText, COLOR_TEXT)
+        setTrendIcon(cell:getAttribute("trend"), nil, nil)
         if marketText ~= nil then
             marketText:setText("-")
             setColor(marketText, COLOR_MUTED)
@@ -808,7 +817,8 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     stationText:setText(ware.best.name)
     setColor(stationText, ware.isBestStation and COLOR_GOOD or COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
-    setColor(priceText, priceColor(ware.best.price, ware.basePrice))
+    setColor(priceText, COLOR_TEXT)
+    setTrendIcon(cell:getAttribute("trend"), ware.best.price, ware.basePrice)
     if marketText ~= nil then
         local text, color = getMarketText(ware.best.factor)
         marketText:setText(text)
@@ -855,7 +865,8 @@ function LivingMarketFrame:populateStationCell(station, cell)
     local main = isFull and COLOR_MUTED or COLOR_TEXT
     setColor(nameText, main)
     local basePrice = self.detailWare ~= nil and self.detailWare.basePrice or nil
-    setColor(priceText, isFull and COLOR_MUTED or priceColor(station.price, basePrice))
+    setColor(priceText, main)
+    setTrendIcon(cell:getAttribute("trend"), station.price, basePrice)
     setColor(amountText, main)
     setColor(shareText, isFull and COLOR_MUTED or shareColor(station.share))
     if marketText ~= nil then
