@@ -64,7 +64,7 @@
         <text name="livingMarket_colSellable" text="Leverbaar"/>
         <text name="livingMarket_colRevenue" text="Opbrengst"/>
         <text name="livingMarket_colFreeMax" text="Vrij / Maximum"/>
-        <text name="livingMarket_colMax" text="Maximum"/>
+        <text name="livingMarket_colMax" text="Vraag"/>
         <text name="livingMarket_allFull" text="Alle verkooppunten vol"/>
         <text name="livingMarket_detailHint" text="Kies een product"/>
     </texts>
