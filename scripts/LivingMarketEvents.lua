@@ -69,7 +69,7 @@ end
 
 -- Maximum/Auffüllung aus Grundwert × Schwankung × Ereignis.
 -- Die Auffüllung wächst mit dem Maximum und hat zusätzlich eigene Schwankung und Ereignisfaktor.
--- keepShare = true: wächst das Maximum, wächst der freie Bedarf mit (Station braucht plötzlich mehr)
+-- keepShare = true: gelieferte Menge bleibt gleich, die freie Menge ändert sich mit dem Maximum (in beide Richtungen)
 function LivingMarket:recalcEntryLimits(entry, keepShare)
     local factor = (entry.noise or 1) * (entry.eventMax or 1)
     local oldMax = entry.max
@@ -78,7 +78,9 @@ function LivingMarket:recalcEntryLimits(entry, keepShare)
     local refillFactor = factor * (entry.refillNoise or 1) * (entry.eventRefill or 1)
     entry.refill = (entry.baseRefill or entry.refill or 0) * refillFactor
     if entry.remaining ~= nil then
-        if keepShare and oldMax ~= nil and entry.max > oldMax then
+        if keepShare and oldMax ~= nil then
+            -- Die schon gelieferte Menge bleibt bei der Station, nur die Kapazität ändert sich:
+            -- 100.000 l Kapazität, 50.000 l geliefert -> Kapazität 80.000 l -> noch 30.000 l frei (37,5 %)
             entry.remaining = entry.remaining + (entry.max - oldMax)
         end
         entry.remaining = math.max(0, math.min(entry.remaining, entry.max))
