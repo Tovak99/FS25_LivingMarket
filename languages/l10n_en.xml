@@ -42,6 +42,9 @@
         <text name="livingMarket_locNone" text="You have none of this in stock."/>
         <text name="livingMarket_locPallets" text="Pallets"/>
         <text name="livingMarket_colEvent" text="Event"/>
+        <text name="livingMarket_colScope" text="Scope"/>
+        <text name="livingMarket_scopeLocal" text="Local"/>
+        <text name="livingMarket_scopeGlobal" text="Global"/>
         <text name="livingMarket_colStationEv" text="Station"/>
         <text name="livingMarket_colDemand" text="Demand"/>
         <text name="livingMarket_colStart" text="Start"/>

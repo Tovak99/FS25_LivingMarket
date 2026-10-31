@@ -42,6 +42,9 @@
         <text name="livingMarket_locNone" text="Nie masz tego w magazynie."/>
         <text name="livingMarket_locPallets" text="Palety"/>
         <text name="livingMarket_colEvent" text="Zdarzenie"/>
+        <text name="livingMarket_colScope" text="Zasięg"/>
+        <text name="livingMarket_scopeLocal" text="Lokalne"/>
+        <text name="livingMarket_scopeGlobal" text="Globalne"/>
         <text name="livingMarket_colStationEv" text="Punkt"/>
         <text name="livingMarket_colDemand" text="Popyt"/>
         <text name="livingMarket_colStart" text="Początek"/>

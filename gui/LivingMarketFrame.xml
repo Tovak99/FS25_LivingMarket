@@ -129,14 +129,15 @@
         <ThreePartBitmap profile="lm_tableFrameFull" id="eventFrame" visible="false"/>
 
         <GuiElement profile="fs25_settingsControlsListHeader" id="eventHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
-            <Text profile="lm_colHeader" position="20px 0px" text="$l10n_livingMarket_colEvent"/>
-            <Text profile="lm_colHeader" position="204px 0px" text="$l10n_livingMarket_colWare"/>
-            <Text profile="lm_colHeaderRight" position="380px 0px" text="$l10n_livingMarket_colPrice"/>
-            <Text profile="lm_colHeader" position="470px 0px" text="$l10n_livingMarket_colStationEv"/>
-            <Text profile="lm_colHeaderRight" position="500px 0px" text="$l10n_livingMarket_colDemand"/>
-            <Text profile="lm_colHeader" position="960px 0px" text="$l10n_livingMarket_colStart"/>
-            <Text profile="lm_colHeader" position="1100px 0px" text="$l10n_livingMarket_colEnd"/>
-            <Text profile="lm_colHeader" position="1240px 0px" text="$l10n_livingMarket_colStatus"/>
+            <Text profile="lm_colHeader" position="20px 0px" text="$l10n_livingMarket_colScope"/>
+            <Text profile="lm_colHeader" position="120px 0px" text="$l10n_livingMarket_colEvent"/>
+            <Text profile="lm_colHeader" position="274px 0px" text="$l10n_livingMarket_colWare"/>
+            <Text profile="lm_colHeader" position="500px 0px" text="$l10n_livingMarket_colStationEv"/>
+            <Text profile="lm_colHeaderRight" position="340px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Text profile="lm_colHeaderRight" position="450px 0px" text="$l10n_livingMarket_colDemand"/>
+            <Text profile="lm_colHeader" position="940px 0px" text="$l10n_livingMarket_colStart"/>
+            <Text profile="lm_colHeader" position="1070px 0px" text="$l10n_livingMarket_colEnd"/>
+            <Text profile="lm_colHeader" position="1200px 0px" text="$l10n_livingMarket_colStatus"/>
             <ThreePartBitmap profile="lm_headerLine"/>
         </GuiElement>
 
@@ -144,15 +145,16 @@
             <SmoothList profile="fs25_settingsControlsList" id="eventList" absoluteSizeOffset="90px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="event">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
-                    <Text profile="lm_rowTextBold" name="type" position="20px 0px"/>
-                    <Bitmap profile="lm_wareIcon" name="icon" position="170px 0px"/>
-                    <Text profile="lm_rowTextBold" name="ware" position="204px 0px"/>
-                    <Text profile="lm_rowTextRight" name="price" position="380px 0px"/>
-                    <Text profile="lm_rowText" name="station" position="470px 0px"/>
-                    <Text profile="lm_rowTextRight" name="demand" position="500px 0px"/>
-                    <Text profile="lm_rowText" name="start" position="960px 0px"/>
-                    <Text profile="lm_rowText" name="end" position="1100px 0px"/>
-                    <Text profile="lm_rowText" name="status" position="1240px 0px"/>
+                    <Text profile="lm_rowTextBold" name="scope" position="20px 0px"/>
+                    <Text profile="lm_rowTextBold" name="type" position="120px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="240px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="274px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="500px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="340px 0px"/>
+                    <Text profile="lm_rowTextRight" name="demand" position="450px 0px"/>
+                    <Text profile="lm_rowText" name="start" position="940px 0px"/>
+                    <Text profile="lm_rowText" name="end" position="1070px 0px"/>
+                    <Text profile="lm_rowText" name="status" position="1200px 0px"/>
                 </ListItem>
             </SmoothList>
             <GuiElement profile="lm_sliderArea">

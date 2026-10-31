@@ -887,6 +887,8 @@ function LivingMarketFrame:populateEventCell(row, cell)
             setTextColorAll(element, color or COLOR_TEXT)
         end
     end
+    -- Lokal = eine Station, Global = alle Stationen
+    put("scope", g_i18n:getText(row.isGlobal and "livingMarket_scopeGlobal" or "livingMarket_scopeLocal"), row.isGlobal and COLOR_MID or main)
     put("type", g_i18n:getText(EVENT_TYPE_LABELS[row.type] or "livingMarket_evLabelShortage"), typeColor)
     put("ware", row.wareTitle, main)
     put("station", row.stationName, main)

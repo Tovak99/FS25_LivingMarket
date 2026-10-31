@@ -526,6 +526,7 @@ function LivingMarket:getEventList()
             fillTypeIndex = event.fillTypeIndex,
             wareTitle     = fillType ~= nil and (fillType.title or fillType.name) or "?",
             stationName   = event.stationKey ~= nil and self:getEventStationName(event) or g_i18n:getText("livingMarket_allStations"),
+            isGlobal      = event.stationKey == nil,
             pricePercent  = math.floor((event.price - 1) * 100 + 0.5),
             maxFactor     = event.maxFactor,
             startText     = self:formatEventTime(event.startHour),
