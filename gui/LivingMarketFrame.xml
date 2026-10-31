@@ -17,6 +17,9 @@
             <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
             <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
 
+            <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
+            <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
+
             <!-- Suchfeld rechtsbündig neben dem Titel -->
             <TextInput profile="lm_searchInput" id="searchInput" onTextChanged="onSearchTextChanged" onEnterPressed="onSearchEnter" focusOnHighlight="true">
                 <ThreePartBitmap profile="fs25_textInputBg"/>
@@ -182,6 +185,18 @@
                  den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
             <textAlignment value="left"/>
             <textOffset value="15px 0px"/>
+        </Profile>
+
+        <Profile name="lm_clockText" extends="fs25_textDefault">
+            <anchors value="1 1 0.5 0.5"/>
+            <pivot value="1 0.5"/>
+            <position value="-20px 0px"/>
+            <size value="420px 40px"/>
+            <textAlignment value="right"/>
+            <textVerticalAlignment value="middle"/>
+            <textSize value="20px"/>
+            <textBold value="true"/>
+            <textColor value="1 1 1 1"/>
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">

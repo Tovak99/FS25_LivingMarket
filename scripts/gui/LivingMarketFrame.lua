@@ -823,6 +823,36 @@ function LivingMarketFrame:update(dt)
             self:applySearch()
         end
     end
+
+    -- Uhr in den Marktnachrichten
+    if self.viewMode == "events" then
+        self.clockTimer = (self.clockTimer or 0) - dt
+        if self.clockTimer <= 0 then
+            self.clockTimer = 250
+            self:updateClock()
+        end
+    end
+end
+
+-- Spielzeit und Datum, z. B. "14. März, Jahr 2 · 08:35" (bei 1 Tag je Monat ohne Tag)
+function LivingMarketFrame:updateClock()
+    if self.clockText == nil then
+        return
+    end
+    local env = g_currentMission ~= nil and g_currentMission.environment or nil
+    if env == nil then
+        self.clockText:setText("")
+        return
+    end
+    local minutes = math.floor((env.dayTime or 0) / 60000)
+    local timeText = string.format("%02d:%02d", math.floor(minutes / 60) % 24, minutes % 60)
+    local month = LivingMarket.getMonthName(LivingMarket.getCurrentMonth() or 1)
+    local dateText = month
+    if (env.daysPerPeriod or 1) > 1 then
+        dateText = string.format("%d. %s", env.currentDayInPeriod or 1, month)
+    end
+    local yearText = string.format(g_i18n:getText("livingMarket_year"), env.currentYear or 1)
+    self.clockText:setText(string.format("%s, %s · %s", dateText, yearText, timeText))
 end
 
 -- ---------------------------------------------------------------------
@@ -889,6 +919,13 @@ function LivingMarketFrame:setViewMode(mode)
     end
     if self.emptyText ~= nil and not showMarket then
         self.emptyText:setVisible(false)
+    end
+    if self.clockText ~= nil then
+        self.clockText:setVisible(not showMarket)
+        if not showMarket then
+            self.clockTimer = 0
+            self:updateClock()
+        end
     end
     for _, element in ipairs({ self.eventFrame, self.eventHeader, self.eventArea, self.eventFilterButton }) do
         if element ~= nil then

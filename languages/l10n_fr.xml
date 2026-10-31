@@ -48,6 +48,7 @@
         <text name="livingMarket_scopeGlobal" text="Global"/>
         <text name="livingMarket_colStationEv" text="Point de vente"/>
         <text name="livingMarket_colDemand" text="Demande"/>
+        <text name="livingMarket_year" text="Année %d"/>
         <text name="livingMarket_colRefill" text="Réappro."/>
         <text name="livingMarket_colStart" text="Début"/>
         <text name="livingMarket_colEnd" text="Fin"/>
