@@ -295,6 +295,7 @@ LivingMarketFrame.WARE_COLUMNS = {
     title    = { label = "livingMarket_colWare",        isText = true  },
     stock    = { label = "livingMarket_colStock",       isText = false },
     station  = { label = "livingMarket_colBestStation", isText = true  },
+    basePrice = { label = "livingMarket_colBasePrice",  isText = false },
     price    = { label = "livingMarket_colPrice",       isText = false },
     market   = { label = "livingMarket_colMarket",      isText = false },
     sellable = { label = "livingMarket_colSellable",    isText = false },
@@ -319,6 +320,8 @@ local function wareValue(ware, key)
         return ware.best ~= nil and ware.best.price or nil
     elseif key == "market" then
         return ware.best ~= nil and ware.best.factor or nil
+    elseif key == "basePrice" then
+        return ware.basePrice
     elseif key == "sellable" then
         return ware.sellable
     elseif key == "revenue" then
@@ -708,6 +711,12 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     setColor(cell:getAttribute("title"), COLOR_TEXT)
     cell:getAttribute("stock"):setText(ware.stock >= 1 and LivingMarket.formatLiters(ware.stock) or "-")
     setColor(cell:getAttribute("stock"), COLOR_TEXT)
+
+    local basePriceText = cell:getAttribute("basePrice")
+    if basePriceText ~= nil then
+        basePriceText:setText(ware.basePrice ~= nil and formatPrice(ware.basePrice) or "-")
+        setColor(basePriceText, COLOR_TEXT)
+    end
 
     local stationText = cell:getAttribute("station")
     local priceText = cell:getAttribute("price")

@@ -5,6 +5,7 @@
         <text name="livingMarket_title" text="Lebendiger Markt"/>
         <text name="livingMarket_colShare" text="Frei"/>
         <text name="livingMarket_colMarket" text="Marktlage"/>
+        <text name="livingMarket_colBasePrice" text="Grundpreis"/>
         <text name="livingMarket_none" text="Keine Verkaufsstellen gefunden"/>
         <text name="livingMarket_unknownStation" text="Verkaufsstelle"/>
         <text name="livingMarket_searchHint" text="Ware oder Station suchen …"/>

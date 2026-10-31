@@ -5,6 +5,7 @@
         <text name="livingMarket_title" text="Living Market"/>
         <text name="livingMarket_colShare" text="Free"/>
         <text name="livingMarket_colMarket" text="Market"/>
+        <text name="livingMarket_colBasePrice" text="Base price"/>
         <text name="livingMarket_none" text="No selling stations found"/>
         <text name="livingMarket_unknownStation" text="Selling station"/>
         <text name="livingMarket_searchHint" text="Search goods or station …"/>

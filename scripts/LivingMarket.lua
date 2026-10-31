@@ -296,6 +296,30 @@ function LivingMarket:estimateRevenue(basePricePerLiter, remaining, max, amount)
     return revenue
 end
 
+-- Grundpreis der Ware aus dem Basisspiel (je 1000 l), inkl. Schwierigkeitsgrad,
+-- unabhängig von Station, Monat und Marktlage
+function LivingMarket:getBasePricePer1000(fillTypeIndex)
+    local economyManager = g_currentMission ~= nil and g_currentMission.economyManager or nil
+    if economyManager ~= nil and economyManager.getPricePerLiter ~= nil then
+        local ok, pricePerLiter = pcall(economyManager.getPricePerLiter, economyManager, fillTypeIndex)
+        if ok and pricePerLiter ~= nil then
+            return pricePerLiter * 1000
+        end
+    end
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    if fillType == nil or fillType.pricePerLiter == nil then
+        return nil
+    end
+    local multiplier = 1
+    if EconomyManager ~= nil and EconomyManager.getPriceMultiplier ~= nil then
+        local ok, value = pcall(EconomyManager.getPriceMultiplier, fillTypeIndex)
+        if ok and value ~= nil then
+            multiplier = value
+        end
+    end
+    return fillType.pricePerLiter * multiplier * 1000
+end
+
 function LivingMarket:getPricePer1000(station, fillTypeIndex)
     if station.getEffectiveFillTypePrice ~= nil then
         local ok, pricePerLiter = pcall(station.getEffectiveFillTypePrice, station, fillTypeIndex)
@@ -359,6 +383,7 @@ function LivingMarket:getWareData()
                             title         = title,
                             searchKey     = LivingMarket.toLower(title),
                             stock         = stock[fillTypeIndex] or 0,
+                            basePrice     = self:getBasePricePer1000(fillTypeIndex),
                             stations      = {}
                         }
                         byFillType[fillTypeIndex] = ware
