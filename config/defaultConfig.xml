@@ -11,10 +11,25 @@
   refillPerMonth = Anteil vom Maximum, der sich je Spielmonat wieder auffüllt (0.40 = 40 %)
                    (wird gleichmäßig auf die Spielstunden des Monats verteilt)
   fillType name  = interner Name der Ware (wie in fillTypes.xml). Unbekannte Namen werden übersprungen.
-  Waren ohne Gruppe bekommen die Werte von <default>.
+  Waren, die in keiner Gruppe stehen, werden automatisch zugeordnet (siehe <autoGroups>),
+  alles Übrige bekommt die Werte von <default>. Ausdrücklich eingetragene Waren haben immer Vorrang.
 -->
 <livingMarket version="1">
     <default max="30000" refillPerMonth="0.30"/>
+
+    <!-- Automatische Zuordnung für Karten- und Mod-Waren, die unten nicht aufgeführt sind:
+         1. Schwad/Halmgut (…_WINDROW)          -> windrowGroup
+         2. Milch (lose)                         -> milkGroup
+         3. Feldfrucht (Erntegut einer Frucht)   -> fruitGroup
+         4. Paletten-/Stückware nach Grundpreis je 1000 l -> erste passende priceTier (von oben)
+         5. alles andere (Schüttgut, Flüssiges)  -> <default>
+         Betriebsmittel (Diesel, Dünger, Saatgut ...) bekommen immer <default>.
+         enabled="false" schaltet die Automatik ab. -->
+    <autoGroups enabled="true" fruitGroup="grain" windrowGroup="forage" milkGroup="milk">
+        <priceTier minPrice="4000" group="premium"/>
+        <priceTier minPrice="1500" group="food"/>
+        <priceTier minPrice="0"    group="intermediate"/>
+    </autoGroups>
 
     <groups>
         <group name="grain" title="Getreide &amp; Ölsaaten" max="250000" refillPerMonth="0.40">

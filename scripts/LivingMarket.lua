@@ -198,8 +198,21 @@ end
 
 function LivingMarket:loadConfig()
     local config = {
-        default    = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL },
-        byFillType = {}
+        default      = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL },
+        byFillType   = {},
+        groupsByName = {},
+        -- Automatische Zuordnung für Waren, die nicht ausdrücklich in einer Gruppe stehen
+        auto = {
+            enabled      = true,
+            fruitGroup   = "grain",      -- Feldfrüchte (Erntegut)
+            windrowGroup = "forage",     -- Schwad/Halmgut
+            milkGroup    = "milk",       -- Milch (lose)
+            priceTiers   = {             -- Paletten-/Stückware nach Grundpreis je 1000 l
+                { minPrice = 4000, group = "premium" },
+                { minPrice = 1500, group = "food" },
+                { minPrice = 0,    group = "intermediate" },
+            }
+        }
     }
     self.config = config
 
@@ -243,6 +256,7 @@ function LivingMarket:loadConfig()
             refillPerMonth = getXMLFloat(xmlFile, groupKey .. "#refillPerMonth") or config.default.refillPerMonth
         }
         groupCount = groupCount + 1
+        config.groupsByName[group.name] = group
         local f = 0
         while true do
             local fillTypeKey = string.format("%s.fillType(%d)", groupKey, f)
@@ -261,12 +275,112 @@ function LivingMarket:loadConfig()
         end
         g = g + 1
     end
+
+    -- Einstellungen der automatischen Zuordnung (fehlt der Abschnitt, gelten die Standardwerte)
+    local autoKey = "livingMarket.autoGroups"
+    if hasXMLProperty(xmlFile, autoKey) then
+        local auto = config.auto
+        local enabled = getXMLBool(xmlFile, autoKey .. "#enabled")
+        if enabled ~= nil then
+            auto.enabled = enabled
+        end
+        auto.fruitGroup   = getXMLString(xmlFile, autoKey .. "#fruitGroup") or auto.fruitGroup
+        auto.windrowGroup = getXMLString(xmlFile, autoKey .. "#windrowGroup") or auto.windrowGroup
+        auto.milkGroup    = getXMLString(xmlFile, autoKey .. "#milkGroup") or auto.milkGroup
+        local tiers = {}
+        local t = 0
+        while true do
+            local tierKey = string.format("%s.priceTier(%d)", autoKey, t)
+            if not hasXMLProperty(xmlFile, tierKey) then
+                break
+            end
+            local minPrice = getXMLFloat(xmlFile, tierKey .. "#minPrice")
+            local group = getXMLString(xmlFile, tierKey .. "#group")
+            if minPrice ~= nil and group ~= nil then
+                table.insert(tiers, { minPrice = minPrice, group = group })
+            end
+            t = t + 1
+        end
+        if #tiers > 0 then
+            table.sort(tiers, function(a, b) return a.minPrice > b.minPrice end)
+            auto.priceTiers = tiers
+        end
+    end
     delete(xmlFile)
 
     log("Konfiguration gelesen (%s): %d Gruppen, %d Waren zugeordnet, Rest %d l / %d %% je Monat",
         path, groupCount, fillTypeCount, config.default.max, math.floor(config.default.refillPerMonth * 100 + 0.5))
     if #unknown > 0 then
         log("Konfiguration: auf dieser Karte unbekannte Waren übersprungen: %s", table.concat(unknown, ", "))
+    end
+
+    if config.auto.enabled then
+        local ok, err = pcall(self.assignAutoGroups, self)
+        if not ok then
+            print("[LivingMarket] FEHLER bei der automatischen Gruppenzuordnung: " .. tostring(err))
+        end
+    end
+end
+
+-- Gruppe für eine Ware vorschlagen, die nicht in der Konfiguration steht
+function LivingMarket:getAutoGroupName(fillType)
+    local auto = self.config.auto
+    local name = fillType.name or ""
+    local index = fillType.index
+
+    if self:getConsumables()[index] then
+        return nil   -- Betriebsmittel: Standardwerte
+    end
+    -- Schwad/Halmgut (Gras, Heu, Luzerne ...)
+    if string.find(name, "WINDROW", 1, true) ~= nil
+        or (g_fillTypeManager.getIsFillTypeInCategory ~= nil and g_fillTypeManager:getIsFillTypeInCategory(index, "FORAGEWAGON")) then
+        return auto.windrowGroup
+    end
+    -- Milch, lose (abgefüllte Milch auf Paletten läuft über den Preis)
+    if string.find(name, "MILK", 1, true) ~= nil and fillType.palletFilename == nil then
+        return auto.milkGroup
+    end
+    -- Feldfrucht: Erntegut einer Fruchtart
+    if g_fruitTypeManager ~= nil and g_fruitTypeManager.getFruitTypeByFillTypeIndex ~= nil
+        and g_fruitTypeManager:getFruitTypeByFillTypeIndex(index) ~= nil then
+        return auto.fruitGroup
+    end
+    -- Paletten-/Stückware: je teurer, desto kleiner der Bedarf
+    if fillType.palletFilename ~= nil then
+        local price = self:getBasePricePer1000(index)
+        if price ~= nil then
+            for _, tier in ipairs(auto.priceTiers) do
+                if price >= tier.minPrice then
+                    return tier.group
+                end
+            end
+        end
+    end
+    return nil   -- sonstiges Schüttgut / Flüssigkeit: Standardwerte
+end
+
+function LivingMarket:assignAutoGroups()
+    local config = self.config
+    local fillTypes = g_fillTypeManager.getFillTypes ~= nil and g_fillTypeManager:getFillTypes() or g_fillTypeManager.fillTypes
+    local byGroup = {}
+    local count = 0
+    for _, fillType in pairs(fillTypes or {}) do
+        local index = fillType.index
+        if index ~= nil and config.byFillType[index] == nil and not self:isExcludedFillType(index) then
+            local groupName = self:getAutoGroupName(fillType)
+            local group = groupName ~= nil and config.groupsByName[groupName] or nil
+            if group ~= nil then
+                config.byFillType[index] = group
+                byGroup[groupName] = byGroup[groupName] or {}
+                table.insert(byGroup[groupName], fillType.name)
+                count = count + 1
+            end
+        end
+    end
+    log("Automatisch zugeordnet: %d Waren", count)
+    for groupName, names in pairs(byGroup) do
+        table.sort(names)
+        log("  automatisch %s: %s", groupName, table.concat(names, ", "))
     end
 end
 
