@@ -306,6 +306,7 @@ function LivingMarketFrame:updateDetail(ware)
         for _, station in ipairs(ware.stations) do
             -- Erlös, wenn der Lagerbestand (soweit möglich) an diese Station geht
             local amount = math.min(ware.stock or 0, math.max(station.remaining, 0))
+            station.deliverable = amount   -- Liefermenge: höchstens der eigene Lagerbestand
             station.revenue = LivingMarket:estimateRevenue((station.basePrice or station.price) / 1000, station.remaining, station.max, amount)
             table.insert(self.detailStations, station)
         end
@@ -424,7 +425,7 @@ local function stationValue(station, key)
     elseif key == "deviation" then
         return station.deviation
     elseif key == "amount" then
-        return station.remaining
+        return station.deliverable or station.remaining
     elseif key == "max" then
         return station.max
     elseif key == "revenue" then
@@ -901,7 +902,8 @@ function LivingMarketFrame:populateStationCell(station, cell)
 
     nameText:setText(station.name)
     priceText:setText(formatPrice(station.price))
-    amountText:setText(LivingMarket.formatLiters(station.remaining))
+    local deliverable = station.deliverable or station.remaining
+    amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")
     local revenueText = cell:getAttribute("revenue")
     if revenueText ~= nil then
         if (station.revenue or 0) >= 1 then

@@ -82,8 +82,8 @@
 
             <GuiElement profile="fs25_settingsControlsListHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px">
                 <!-- erste Spalte: Icon und Name der gewählten Ware -->
-                <Bitmap profile="lm_wareIcon" id="detailIcon" position="18px 0px" visible="false"/>
-                <Button profile="lm_sortHeader" id="detailTitle" position="50px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
+                <Bitmap profile="lm_wareIcon" id="detailIcon" position="32px 0px" visible="false"/>
+                <Button profile="lm_sortHeader" id="detailTitle" position="66px 0px" text="$l10n_livingMarket_detailHint" onClick="onClickSortHeader"/>
                 <!-- Spalten bündig unter der Warenliste: Liefermenge, Preis, Marktlage (unter Markt), Erlös -->
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="55px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="180px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
@@ -98,7 +98,7 @@
             <SmoothList profile="fs25_settingsControlsList" id="detailList" absoluteSizeOffset="90px 60px" selectOnClick="false">
                 <ListItem profile="lm_listItem" name="station">
                     <ThreePartBitmap profile="lm_rowBg" name="bg"/>
-                    <Text profile="lm_rowTextBold" name="name" position="50px 0px"/>
+                    <Text profile="lm_rowTextBold" name="name" position="66px 0px"/>
                     <Text profile="lm_rowTextRight" name="amount" position="55px 0px"/>
                     <Text profile="lm_rowTextRight" name="price" position="180px 0px"/>
                     <!-- Pfeil direkt hinter dem Preis (rechte Kante Preis = 180 + 450 = 630), wie oben -->
