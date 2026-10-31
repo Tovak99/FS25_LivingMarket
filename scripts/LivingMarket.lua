@@ -397,15 +397,45 @@ local function addStock(stock, fillTypeIndex, amount, sources, sourceName)
     end
 end
 
-local function addStorage(stock, storage, farmId, visited, sources, kind)
+-- onlyFillTypes (optional): nur diese Füllarten zählen, z. B. die Erzeugnisse einer Produktion
+local function addStorage(stock, storage, farmId, visited, sources, kind, onlyFillTypes, owner)
     if storage == nil or visited[storage] or getOwner(storage) ~= farmId then
         return
     end
     visited[storage] = true
-    local name = kind .. " '" .. describe(storage, "?") .. "'"
+    local name = kind .. " '" .. describe(owner or storage, "?") .. "'"
     for fillTypeIndex, level in pairs(storage.fillLevels or {}) do
-        addStock(stock, fillTypeIndex, level, sources, name)
+        if onlyFillTypes == nil or onlyFillTypes[fillTypeIndex] then
+            addStock(stock, fillTypeIndex, level, sources, name)
+        end
     end
+end
+
+-- Erzeugnisse (Ausgangswaren) einer Produktion; Zutaten zählen nicht als Lagerware
+local function getProductionOutputs(productionPoint)
+    local outputs = {}
+    if productionPoint.outputFillTypeIds ~= nil then
+        for fillTypeIndex, isOutput in pairs(productionPoint.outputFillTypeIds) do
+            if isOutput then
+                outputs[fillTypeIndex] = true
+            end
+        end
+    end
+    for _, production in pairs(productionPoint.productions or {}) do
+        for _, output in pairs(production.outputs or {}) do
+            local fillTypeIndex = output.type or output.fillTypeIndex or output.fillType
+            if type(fillTypeIndex) == "number" then
+                outputs[fillTypeIndex] = true
+            end
+        end
+    end
+    return outputs
+end
+
+-- Fahrzeuge: nur Paletten und Anhänger sind Lagerware. Sämaschinen, Streuer,
+-- Spritzen usw. tragen Arbeitsmaterial (Saatgut, Dünger …), das zählt nicht.
+local function isStockVehicle(vehicle)
+    return vehicle.isPallet == true or vehicle.spec_trailer ~= nil
 end
 
 function LivingMarket:getFarmId()
@@ -428,32 +458,44 @@ function LivingMarket:getFarmStock()
     -- Beim ersten Aufruf ins Log schreiben, woher jede Lagermenge stammt
     local sources = (self.DEBUG and not self.hasLoggedStock) and {} or nil
 
+    -- Lager der Produktionen vorab markieren: die werden in Schritt 2 gezählt,
+    -- und zwar nur mit ihren Erzeugnissen
+    local productionStorages = {}
+    local manager = mission.productionChainManager
+    if manager ~= nil and manager.productionPoints ~= nil then
+        for _, productionPoint in pairs(manager.productionPoints) do
+            if productionPoint.storage ~= nil then
+                productionStorages[productionPoint.storage] = true
+            end
+        end
+    end
+
     -- 1) Silos und Lager (auch Tierställe), wie sie das Storage-System kennt
     local storageSystem = mission.storageSystem
     if storageSystem ~= nil and storageSystem.storages ~= nil then
         for key, value in pairs(storageSystem.storages) do
             local storage = (type(key) == "table" and key.fillLevels ~= nil) and key or value
-            if type(storage) == "table" then
+            if type(storage) == "table" and not productionStorages[storage] then
                 addStorage(stock, storage, farmId, visited, sources, "Lager")
             end
         end
     end
 
-    -- 2) Lager der Produktionen (fertige Erzeugnisse)
-    local manager = mission.productionChainManager
+    -- 2) Lager der Produktionen: nur die Erzeugnisse, keine Zutaten
     if manager ~= nil and manager.productionPoints ~= nil then
         for _, productionPoint in pairs(manager.productionPoints) do
             if getOwner(productionPoint) == farmId then
-                addStorage(stock, productionPoint.storage, farmId, visited, sources, "Produktion")
+                addStorage(stock, productionPoint.storage, farmId, visited, sources, "Produktion",
+                    getProductionOutputs(productionPoint), productionPoint)
             end
         end
     end
 
-    -- 3) Paletten und Fahrzeuge (Füllstände aller Fülleinheiten)
+    -- 3) Paletten und Anhänger (Füllstände ihrer Fülleinheiten)
     local vehicles = (mission.vehicleSystem ~= nil and mission.vehicleSystem.vehicles) or mission.vehicles
     for _, vehicle in pairs(vehicles or {}) do
         local spec = vehicle.spec_fillUnit
-        if spec ~= nil and spec.fillUnits ~= nil and getOwner(vehicle) == farmId then
+        if spec ~= nil and spec.fillUnits ~= nil and isStockVehicle(vehicle) and getOwner(vehicle) == farmId then
             -- Betriebsstoffe (Diesel, AdBlue, Strom, Methan im Tank) zählen nicht als Ware
             local consumers = vehicle.spec_motorized ~= nil and vehicle.spec_motorized.consumersByFillType or nil
             for _, fillUnit in ipairs(spec.fillUnits) do
