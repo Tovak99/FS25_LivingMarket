@@ -35,6 +35,9 @@ function LivingMarketFrame.new(target, customMt)
     self.eventRows = {}
     self.saleSort = { key = "time", asc = false }      -- Sortierung Verkäufe (neueste zuerst)
     self.saleRows = {}
+    self.contractFilter = "all"   -- Verträge: "all" = alle Angebote, "stock" = nur vorrätige Waren
+    self.contractRows = {}
+    self.selectedContractIndex = 1
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
     self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
@@ -44,6 +47,7 @@ function LivingMarketFrame.new(target, customMt)
     self.clearSearchButtonInfo = {}
     self.favButtonInfo = {}
     self.locationButtonInfo = {}
+    self.contractButtonInfo = {}
 
     return self
 end
@@ -59,6 +63,11 @@ function LivingMarketFrame:initialize()
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText("livingMarket_favAdd"),
         callback = function() self:onToggleFavorite() end
+    }
+    self.contractButtonInfo = {
+        inputAction = InputAction.MENU_ACTIVATE,
+        text = g_i18n:getText("livingMarket_ctAccept"),
+        callback = function() self:onContractAction() end
     }
     self.clearSearchButtonInfo = {
         inputAction = InputAction.MENU_CANCEL,
@@ -78,6 +87,10 @@ function LivingMarketFrame:initialize()
     if self.saleList ~= nil then
         self.saleList:setDataSource(self)
         self.saleList:setDelegate(self)
+    end
+    if self.contractList ~= nil then
+        self.contractList:setDataSource(self)
+        self.contractList:setDelegate(self)
     end
 
     self:setupSortHeaders()
@@ -99,6 +112,7 @@ function LivingMarketFrame:applyUiState()
     self.detailSort = { key = "price", asc = false }
     self.eventSort = { key = "status", asc = true }
     self.saleSort = { key = "time", asc = false }
+    self.contractFilter = "all"
     if ui == nil then
         return
     end
@@ -107,6 +121,9 @@ function LivingMarketFrame:applyUiState()
     end
     if ui.eventFilter == "all" or ui.eventFilter == "stock" then
         self.eventFilter = ui.eventFilter
+    end
+    if ui.contractFilter == "all" or ui.contractFilter == "stock" then
+        self.contractFilter = ui.contractFilter
     end
     local function take(state, columns, target)
         if state ~= nil and columns[state.key] ~= nil then
@@ -127,6 +144,7 @@ function LivingMarketFrame:storeUiState()
     LivingMarket.uiState = {
         filterMode  = self.filterMode,
         eventFilter = self.eventFilter,
+        contractFilter = self.contractFilter,
         wareSort    = copy(self.wareSort),
         detailSort  = copy(self.detailSort),
         eventSort   = copy(self.eventSort),
@@ -139,7 +157,7 @@ function LivingMarketFrame:onFrameOpen()
     self:applyUiState()
 
     -- Tabellenrahmen einfärben (etwas heller als der Seitenhintergrund)
-    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame, self.saleFrame }) do
+    for _, frame in ipairs({ self.wareFrame, self.detailFrame, self.eventFrame, self.saleFrame, self.contractFrame }) do
         if frame ~= nil and frame.setImageColor ~= nil and GuiOverlay ~= nil and GuiOverlay.STATE_NORMAL ~= nil then
             local c = LivingMarketFrame.FRAME_COLOR
             frame:setImageColor(GuiOverlay.STATE_NORMAL, c[1], c[2], c[3], c[4])
@@ -158,6 +176,9 @@ function LivingMarketFrame:onFrameOpen()
     end
     if self.saleSlider ~= nil then
         self.saleSlider:setDataElement(self.saleList)
+    end
+    if self.contractSlider ~= nil then
+        self.contractSlider:setDataElement(self.contractList)
     end
     self:refreshData()
     self:setViewMode(self.viewMode)
@@ -275,9 +296,24 @@ end
 -- Marktereignis einer Station: Text und Farbe (Engpass/Gefragt grün, Überangebot/Flaute rot)
 local EVENT_LABELS = { [1] = "livingMarket_evLabelShortage", [2] = "livingMarket_evLabelSurplus",
                        [3] = "livingMarket_evLabelBoom",     [4] = "livingMarket_evLabelSlump",
-                       [5] = "livingMarket_evLabelDemand",   [6] = "livingMarket_evLabelSlow" }
+                       [5] = "livingMarket_evLabelDemand",   [6] = "livingMarket_evLabelSlow",
+                       [100] = "livingMarket_contractLabel" }
 local function isPositiveEvent(eventType)
-    return eventType == 1 or eventType == 3 or eventType == 5
+    return eventType == 1 or eventType == 3 or eventType == 5 or eventType == 100
+end
+
+-- Ansehen als 1–5 Sterne (Grafik)
+local function setStarsIcon(icon, stars)
+    if icon == nil then
+        return
+    end
+    if stars == nil then
+        icon:setVisible(false)
+        return
+    end
+    stars = math.max(1, math.min(5, stars))
+    icon:setImageFilename(Utils.getFilename(string.format("images/stars%d.dds", stars), LivingMarket.modDir))
+    icon:setVisible(true)
 end
 local function isRefillEvent(eventType)
     return eventType == 5 or eventType == 6
@@ -316,6 +352,11 @@ function LivingMarketFrame:refreshData()
             self.emptyText:setVisible(false)
         end
         self:refreshSales()
+    elseif self.viewMode == "contracts" then
+        if self.emptyText ~= nil then
+            self.emptyText:setVisible(false)
+        end
+        self:refreshContracts()
     end
 end
 
@@ -436,6 +477,10 @@ end
 
 -- Auswahl in der Warenliste geändert (Tastatur, Controller, Maus)
 function LivingMarketFrame:onListSelectionChanged(list, section, index)
+    if list == self.contractList and not self.isRepaintingSelection then
+        self:selectContract(index)
+        return
+    end
     if list ~= self.wareList or self.isRepaintingSelection then
         return
     end
@@ -747,6 +792,8 @@ function LivingMarketFrame:setupSortHeaders()
     limitHeaderHitArea(self.eventFilterButton)
     limitHeaderHitArea(self.viewEventsButton)
     limitHeaderHitArea(self.viewSalesButton)
+    limitHeaderHitArea(self.viewContractsButton)
+    limitHeaderHitArea(self.contractFilterButton)
     limitHeaderHitArea(self.detailTitle)
     for key in pairs(self.WARE_COLUMNS) do
         limitHeaderHitArea(self["sortWare_" .. key])
@@ -892,6 +939,10 @@ function LivingMarketFrame:update(dt)
     if self.viewMode == "sales" and self.shownSalesVersion ~= LivingMarket.salesVersion then
         self:refreshSales()
     end
+    -- Verträge: Änderungen (neue Angebote, Fortschritt) sofort zeigen
+    if self.viewMode == "contracts" and self.shownContractsVersion ~= LivingMarket.contractsVersion then
+        self:refreshContracts()
+    end
 
     -- Uhr in den Marktnachrichten
     if self.viewMode == "events" then
@@ -980,14 +1031,19 @@ function LivingMarketFrame:onClickViewSales()
     self:setViewMode("sales")
 end
 
+function LivingMarketFrame:onClickViewContracts()
+    self:setViewMode("contracts")
+end
+
 function LivingMarketFrame:setViewMode(mode)
-    if mode ~= "events" and mode ~= "sales" then
+    if mode ~= "events" and mode ~= "sales" and mode ~= "contracts" then
         mode = "market"
     end
     self.viewMode = mode
     local showMarket = mode == "market"
     local showEvents = mode == "events"
     local showSales = mode == "sales"
+    local showContracts = mode == "contracts"
 
     for _, element in ipairs({ self.wareFrame, self.wareHeader, self.wareArea, self.detailPanel,
                                self.filterButton }) do
@@ -1019,6 +1075,14 @@ function LivingMarketFrame:setViewMode(mode)
             element:setVisible(showSales)
         end
     end
+    for _, element in ipairs({ self.contractFrame, self.contractHeader, self.contractArea, self.contractFilterButton }) do
+        if element ~= nil then
+            element:setVisible(showContracts)
+        end
+    end
+    if self.contractEmptyText ~= nil and not showContracts then
+        self.contractEmptyText:setVisible(false)
+    end
     if self.eventEmptyText ~= nil and not showEvents then
         self.eventEmptyText:setVisible(false)
     end
@@ -1030,8 +1094,10 @@ function LivingMarketFrame:setViewMode(mode)
         self:rebuildWareList()   -- setzt auch den Hinweis bei leerer Liste
     elseif showEvents then
         self:refreshEvents()
-    else
+    elseif showSales then
         self:refreshSales()
+    else
+        self:refreshContracts()
     end
 
     local function paint(button, active)
@@ -1049,6 +1115,7 @@ function LivingMarketFrame:setViewMode(mode)
     paint(self.viewMarketButton, showMarket)
     paint(self.viewEventsButton, showEvents)
     paint(self.viewSalesButton, showSales)
+    paint(self.viewContractsButton, showContracts)
     self:updateMenuButtons()
 end
 
@@ -1211,6 +1278,153 @@ function LivingMarketFrame:populateSaleCell(row, cell)
     setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
 end
 
+-- ---------------------------------------------------------------------
+-- Verträge
+-- ---------------------------------------------------------------------
+local function getOwnFarmId()
+    return g_currentMission ~= nil and g_currentMission.getFarmId ~= nil and g_currentMission:getFarmId() or 0
+end
+
+function LivingMarketFrame:getStockFor(fillTypeIndex)
+    for _, ware in ipairs(self.wares or {}) do
+        if ware.fillTypeIndex == fillTypeIndex then
+            return ware.stock or 0
+        end
+    end
+    return 0
+end
+
+function LivingMarketFrame:onClickContractFilter()
+    self.contractFilter = self.contractFilter == "stock" and "all" or "stock"
+    self:storeUiState()
+    self:refreshContracts()
+end
+
+function LivingMarketFrame:refreshContracts()
+    self.shownContractsVersion = LivingMarket.contractsVersion
+    local selectedId = self.contractRows[self.selectedContractIndex] ~= nil and self.contractRows[self.selectedContractIndex].id or nil
+    local rows = {}
+    for _, row in ipairs(LivingMarket:getContractRows(getOwnFarmId())) do
+        row.stock = self:getStockFor(row.fillTypeIndex)
+        if row.isActive or self.contractFilter ~= "stock" or row.stock >= 1 then
+            table.insert(rows, row)
+        end
+    end
+    self.contractRows = rows
+    self.selectedContractIndex = 1
+    for i, row in ipairs(rows) do
+        if row.id == selectedId then
+            self.selectedContractIndex = i
+        end
+    end
+    if self.contractFilterButton ~= nil then
+        self.contractFilterButton:setText(g_i18n:getText(self.contractFilter == "stock" and "livingMarket_ctFilterStock" or "livingMarket_ctFilterAll"))
+    end
+    if self.contractEmptyText ~= nil then
+        self.contractEmptyText:setText(g_i18n:getText(self.contractFilter == "stock" and "livingMarket_noContractsStock" or "livingMarket_noContracts"))
+        self.contractEmptyText:setVisible(self.viewMode == "contracts" and #rows == 0)
+    end
+    if self.contractList ~= nil then
+        self.isRepaintingSelection = true
+        self.contractList:reloadData(true)
+        self.isRepaintingSelection = false
+    end
+    self:updateMenuButtons()
+end
+
+function LivingMarketFrame:selectContract(index)
+    if self.contractRows[index] == nil or index == self.selectedContractIndex then
+        return
+    end
+    self.selectedContractIndex = index
+    self.isRepaintingSelection = true
+    self.contractList:reloadData()
+    self.isRepaintingSelection = false
+    self:updateMenuButtons()
+end
+
+function LivingMarketFrame:onClickContract(list, section, index)
+    self:selectContract(index)
+end
+
+function LivingMarketFrame:populateContractCell(row, cell, isSelected)
+    if row == nil or cell:getAttribute("status") == nil then
+        return
+    end
+    local base = isSelected and COLOR_ON_GREEN or COLOR_TEXT
+    local function put(name, text, color)
+        local element = cell:getAttribute(name)
+        if element ~= nil then
+            element:setText(text or "")
+            setTextColorAll(element, isSelected and COLOR_ON_GREEN or (color or COLOR_TEXT))
+        end
+    end
+    put("status", g_i18n:getText(row.isActive and "livingMarket_ctActive" or "livingMarket_ctOffer"), row.isActive and COLOR_GOOD or COLOR_MID)
+    put("ware", row.wareTitle, base)
+    put("station", row.stationName, base)
+    if row.isActive then
+        put("amount", string.format("%s / %s", LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount)), base)
+        put("deadline", LivingMarket:formatEventTime(row.deadlineHour or 0), base)
+    else
+        put("amount", LivingMarket.formatLiters(row.amount), base)
+        put("deadline", string.format(g_i18n:getText("livingMarket_ctMonths"), row.months or 1), base)
+    end
+    put("price", formatPrice(row.price), base)
+    put("bonus", LivingMarket.formatMoney(row.bonus), COLOR_GOOD)
+    put("stock", row.stock >= 1 and LivingMarket.formatLiters(row.stock) or "0 l", row.stock >= 1 and base or COLOR_LOW)
+    setStarsIcon(cell:getAttribute("stars"), row.stars)
+    setWareIcon(cell:getAttribute("icon"), row.fillTypeIndex)
+end
+
+-- Rückfrage im Stil der Spieldialoge
+local function showConfirm(title, text, callback)
+    if YesNoDialog ~= nil and YesNoDialog.show ~= nil then
+        YesNoDialog.show(function(yes) callback(yes == true) end, nil, text, title)
+    elseif g_gui ~= nil and g_gui.showYesNoDialog ~= nil then
+        g_gui:showYesNoDialog({ text = text, title = title, callback = function(yes) callback(yes == true) end })
+    else
+        callback(true)
+    end
+end
+
+-- Taste "Vertrag annehmen" / "Vertrag kündigen"
+function LivingMarketFrame:onContractAction()
+    local row = self.contractRows[self.selectedContractIndex]
+    if row == nil then
+        return
+    end
+    local s = LivingMarket.CONTRACT_SETTINGS
+    if row.isActive then
+        local text = string.format(g_i18n:getText("livingMarket_ctCancelText"),
+            LivingMarket.formatLiters(row.delivered), LivingMarket.formatLiters(row.amount), row.wareTitle, row.stationName,
+            LivingMarket.formatMoney(row.penalty), row.stationName)
+        showConfirm(g_i18n:getText("livingMarket_ctCancel"), text, function(yes)
+            if yes then
+                LivingMarket:requestContractAction("cancel", row.id)
+            end
+        end)
+        return
+    end
+    if LivingMarket:countActiveContracts(getOwnFarmId()) >= s.maxActivePerFarm then
+        LivingMarket:notify(string.format(g_i18n:getText("livingMarket_ctLimit"), s.maxActivePerFarm), true)
+        return
+    end
+    local deadline = LivingMarket:formatEventTime(LivingMarket.getNowHour() + (row.months or 1) * LivingMarket.getHoursPerMonth())
+    local value = row.amount / 1000 * row.price
+    local text = string.format(g_i18n:getText("livingMarket_ctAcceptText"),
+        LivingMarket.formatLiters(row.amount), row.wareTitle, row.stationName, deadline,
+        formatPrice(row.price), LivingMarket.formatMoney(value), LivingMarket.formatMoney(row.bonus),
+        math.floor(s.penaltyRate * 100 + 0.5), LivingMarket.formatMoney(value * s.penaltyRate), row.stationName)
+    if (row.stock or 0) < 1 then
+        text = text .. "\n\n" .. g_i18n:getText("livingMarket_ctNoStock")
+    end
+    showConfirm(g_i18n:getText("livingMarket_ctAccept"), text, function(yes)
+        if yes then
+            LivingMarket:requestContractAction("accept", row.id)
+        end
+    end)
+end
+
 function LivingMarketFrame:updateMenuButtons()
     self:updateFilterButton()
 
@@ -1223,6 +1437,13 @@ function LivingMarketFrame:updateMenuButtons()
         table.insert(self.menuButtonInfo, self.locationButtonInfo)
         self.favButtonInfo.text = g_i18n:getText(LivingMarket:isFavorite(ware.fillTypeIndex) and "livingMarket_favRemove" or "livingMarket_favAdd")
         table.insert(self.menuButtonInfo, self.favButtonInfo)
+    end
+    if self.viewMode == "contracts" then
+        local row = self.contractRows[self.selectedContractIndex]
+        if row ~= nil then
+            self.contractButtonInfo.text = g_i18n:getText(row.isActive and "livingMarket_ctCancel" or "livingMarket_ctAccept")
+            table.insert(self.menuButtonInfo, self.contractButtonInfo)
+        end
     end
     if self:isSearching() and (self.viewMode == "market" or self.viewMode == "sales") then
         table.insert(self.menuButtonInfo, self.clearSearchButtonInfo)
@@ -1244,6 +1465,8 @@ function LivingMarketFrame:getNumberOfItemsInSection(list, section)
         return #self.eventRows
     elseif list == self.saleList then
         return #self.saleRows
+    elseif list == self.contractList then
+        return #self.contractRows
     end
     return #self.detailStations
 end
@@ -1253,6 +1476,8 @@ function LivingMarketFrame:getCellTypeForItemInSection(list, section, index)
         return "event"
     elseif list == self.saleList then
         return "sale"
+    elseif list == self.contractList then
+        return "contract"
     end
     return list == self.wareList and "ware" or "station"
 end
@@ -1278,6 +1503,10 @@ function LivingMarketFrame:populateCellForItemInSection(list, section, index, ce
     elseif list == self.saleList then
         setRowBackground(cell:getAttribute("bg"), index, false)
         self:populateSaleCell(self.saleRows[index], cell)
+        return
+    elseif list == self.contractList then
+        setRowBackground(cell:getAttribute("bg"), index, index == self.selectedContractIndex)
+        self:populateContractCell(self.contractRows[index], cell, index == self.selectedContractIndex)
         return
     end
     local isSelected = list == self.wareList and index == self.selectedWareIndex
@@ -1411,6 +1640,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
     local deviationText = cell:getAttribute("deviation")
 
     nameText:setText(station.name)
+    setStarsIcon(cell:getAttribute("stars"), station.stars)
     priceText:setText(formatPrice(station.price))
     local deliverable = station.deliverable or station.remaining
     amountText:setText(deliverable >= 1 and LivingMarket.formatLiters(deliverable) or "-")

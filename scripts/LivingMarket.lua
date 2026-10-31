@@ -415,6 +415,9 @@ function LivingMarket:loadConfig()
         end
     end
     self:loadSettingsFromConfig(xmlFile)
+    if self.loadContractSettings ~= nil then
+        self:loadContractSettings(xmlFile)
+    end
     delete(xmlFile)
 
     log("Konfiguration gelesen (%s): %d Gruppen, %d Waren zugeordnet, Rest %d l / %d %% je Monat",
@@ -883,7 +886,8 @@ function LivingMarket:getWareData()
                         deviation = (ware.basePrice ~= nil and ware.basePrice > 0) and price / ware.basePrice or nil,   -- Preis / Grundpreis
                         remaining = entry.remaining,
                         max       = entry.max,
-                        share     = entry.max > 0 and entry.remaining / entry.max or 0
+                        share     = entry.max > 0 and entry.remaining / entry.max or 0,
+                        stars     = self.getStationStars ~= nil and self:getStationStars(self:getFarmId(), station) or 3,   -- Ansehen des eigenen Hofs
                     })
                 end
             end
@@ -1262,7 +1266,8 @@ function LivingMarket.getFreeCapacity(station, superFunc, fillTypeIndex, ...)
     if LivingMarket:isMissionDelivery(station, fillTypeIndex, nil) then
         return capacity
     end
-    return math.min(capacity or math.huge, math.max(entry.remaining, 0))
+    local contractRest = LivingMarket.getContractCapacity ~= nil and LivingMarket:getContractCapacity(station, fillTypeIndex) or 0
+    return math.min(capacity or math.huge, math.max(entry.remaining, 0) + contractRest)
 end
 
 -- Tatsächliche Annahme: Menge auf den Restbedarf kürzen und abziehen
@@ -1287,9 +1292,20 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
         return superFunc(station, farmId, deltaFillLevel, fillTypeIndex, ...)
     end
 
+    -- Liefervertrag dieses Hofs: zuerst die Vertragsmenge zum Festpreis (zählt nicht gegen die Liefermenge)
+    local contractMoved = 0
+    local contract = LivingMarket.getActiveContractFor ~= nil and LivingMarket:getActiveContractFor(station, farmId, fillTypeIndex) or nil
+    if contract ~= nil then
+        contractMoved = LivingMarket:deliverToContract(contract, station, superFunc, farmId, deltaFillLevel, fillTypeIndex, ...)
+        deltaFillLevel = deltaFillLevel - contractMoved
+        if deltaFillLevel <= 0.0001 then
+            return contractMoved
+        end
+    end
+
     local allowed = math.min(deltaFillLevel, math.max(entry.remaining, 0))
     if allowed <= 0 then
-        return 0
+        return contractMoved
     end
 
     -- Verkaufsprotokoll (DEBUG): Preis vor dem Abladen und tatsächlich gutgeschriebenes Geld
@@ -1311,11 +1327,18 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
     if entry.remaining < 1 and LivingMarket.onStationSoldOut ~= nil then
         LivingMarket:onStationSoldOut(station, fillTypeIndex)
     end
+    if contractMoved > 0 then
+        return contractMoved + (moved or used)
+    end
     return moved
 end
 
 -- Preis: Spielpreis × Marktfaktor. Gilt für den Verkaufserlös und jede Preisanzeige.
 function LivingMarket.getEffectiveFillTypePrice(station, superFunc, fillTypeIndex, ...)
+    local override = LivingMarket.contractOverride
+    if override ~= nil and override.station == station and override.fillTypeIndex == fillTypeIndex then
+        return override.pricePerLiter   -- Vertragslieferung: Festpreis
+    end
     local price = superFunc(station, fillTypeIndex, ...)
     if price == nil or fillTypeIndex == nil then
         return price
@@ -1396,6 +1419,12 @@ function LivingMarket:onHourChanged()
     end
 
     -- Marktereignisse: fällige starten/beenden, gelegentlich neue (verteilt über den Monat)
+    if self.tickContracts ~= nil then
+        local okC, errC = pcall(self.tickContracts, self)
+        if not okC then
+            print("[LivingMarket] FEHLER bei den Lieferverträgen: " .. tostring(errC))
+        end
+    end
     local ok, err = pcall(self.tickEvents, self)
     if not ok then
         print("[LivingMarket] FEHLER bei den Marktereignissen: " .. tostring(err))
@@ -1522,6 +1551,9 @@ function LivingMarket.sendInitialClientState(mission, connection, user, farm)
     if LivingMarket.sendSalesToConnection ~= nil then
         LivingMarket:sendSalesToConnection(connection)
     end
+    if LivingMarketContractListEvent ~= nil then
+        connection:sendEvent(LivingMarketContractListEvent.new())
+    end
     if LivingMarketFavoritesEvent ~= nil then
         LivingMarket:isFavorite(0)
         connection:sendEvent(LivingMarketFavoritesEvent.new(LivingMarket:getFavoriteNames()))
@@ -1548,6 +1580,9 @@ function LivingMarket:update(dt)
     end
     if self.updateSalesSync ~= nil then
         self:updateSalesSync(dt)
+    end
+    if self.updateContractsSync ~= nil then
+        self:updateContractsSync(dt)
     end
     if not self.hasDirty then
         return
@@ -1871,6 +1906,10 @@ function LivingMarket:loadFromSavegame()
     if version >= 4 then
         self:loadEventsFromXML(xmlFile, "livingMarket.events")
     end
+    -- Lieferverträge und Ansehen (ab 0.2.2)
+    if self.loadContractsFromXML ~= nil then
+        self:loadContractsFromXML(xmlFile, "livingMarket.contracts")
+    end
     -- Verkaufsverlauf (ab 0.2.1.5)
     if self.loadSalesFromXML ~= nil then
         self:loadSalesFromXML(xmlFile, "livingMarket.sales")
@@ -1893,6 +1932,7 @@ function LivingMarket:loadFromSavegame()
         self.uiState = {
             filterMode  = getXMLString(xmlFile, "livingMarket.ui#filter"),
             eventFilter = getXMLString(xmlFile, "livingMarket.ui#eventFilter"),
+            contractFilter = getXMLString(xmlFile, "livingMarket.ui#contractFilter"),
             wareSort    = sortState("ware"),
             detailSort  = sortState("detail"),
             eventSort   = sortState("event"),
@@ -1975,6 +2015,9 @@ function LivingMarket.saveToSavegame(missionInfo)
     if self.saveSalesToXML ~= nil then
         self:saveSalesToXML(xmlFile, "livingMarket.sales")
     end
+    if self.saveContractsToXML ~= nil then
+        self:saveContractsToXML(xmlFile, "livingMarket.contracts")
+    end
 
     -- Favoriten (gemeinsam für alle Spieler); Abschnitt auch bei leerer Liste, damit nichts neu übernommen wird
     self:isFavorite(0)
@@ -1986,6 +2029,7 @@ function LivingMarket.saveToSavegame(missionInfo)
     if ui ~= nil then
         if ui.filterMode ~= nil then setXMLString(xmlFile, "livingMarket.ui#filter", ui.filterMode) end
         if ui.eventFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#eventFilter", ui.eventFilter) end
+        if ui.contractFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#contractFilter", ui.contractFilter) end
         for _, name in ipairs({ "ware", "detail", "event", "sale" }) do
             local state = ui[name .. "Sort"]
             if state ~= nil and state.key ~= nil then
@@ -2050,6 +2094,9 @@ function LivingMarket:deleteMap()
     self.favorites = nil
     if self.resetSales ~= nil then
         self:resetSales()
+    end
+    if self.resetContracts ~= nil then
+        self:resetContracts()
     end
     g_messageCenter:unsubscribeAll(self)
     self.stations = {}

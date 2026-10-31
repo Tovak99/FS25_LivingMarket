@@ -545,6 +545,9 @@ function LivingMarket:onPeriodChanged()
     end
     self:rollEventTarget()
     self:applyEventsToAll()
+    if self.onContractsPeriodChanged ~= nil then
+        self:onContractsPeriodChanged()
+    end
     log("Monatswechsel: Schwankungen neu, Ziel %d Marktereignisse", self.eventTarget)
 end
 

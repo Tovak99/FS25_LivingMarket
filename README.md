@@ -21,6 +21,8 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
   - Filter per Klick: Alle Waren · Lagernd · Favoriten; Suche nach Ware oder Station
   - Favoriten (Stern-Spalte), gemeinsam für alle Spieler im Spielstand gespeichert
   - Ansicht **Verkäufe**: die letzten 50 Verkäufe des eigenen Hofs (Zeit, Ware, Station, Menge, Preis, Erlös, Marktlage, Ereignis), auch Paletten und Ballen; Auftragsware zählt nicht
+  - Ansicht **Verträge**: Stationen schreiben Lieferungen aus (Menge, Frist, Festpreis bis +10 %, Bonus); annehmen per Taste mit Rückfrage; Lieferung zum Festpreis ohne Marktlage; bei Nichterfüllung oder Kündigung 50 % Strafe auf die fehlende Menge
+  - **Ansehen** je Hof und Station (1–5 Sterne) im Detailfenster und bei den Verträgen; steigt mit erfüllten, sinkt mit gescheiterten Verträgen und pendelt langsam zur Mitte zurück
 - **Schimpfwortfilter des Spiels abgeschaltet** (sonst wird z. B. „Aldi“ zu „Al$i“) – Idee aus „Disable Profanity Filter“ von Supermaschine
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
 - **Speichert den Bedarf im Spielstand** (`livingMarket.xml` im Savegame-Ordner)

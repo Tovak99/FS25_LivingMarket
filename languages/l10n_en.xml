@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Amount"/>
         <text name="livingMarket_noSales" text="No sales yet"/>
         <text name="livingMarket_yearShort" text="Y%d"/>
+        <text name="livingMarket_viewNews" text="News"/>
+        <text name="livingMarket_viewContracts" text="Contracts"/>
+        <text name="livingMarket_colBonus" text="Bonus"/>
+        <text name="livingMarket_colDeadline" text="Deadline"/>
+        <text name="livingMarket_colReputation" text="Standing"/>
+        <text name="livingMarket_ctOffer" text="Offer"/>
+        <text name="livingMarket_ctActive" text="Active"/>
+        <text name="livingMarket_ctMonths" text="%d month(s)"/>
+        <text name="livingMarket_ctFilterAll" text="All offers"/>
+        <text name="livingMarket_ctFilterStock" text="In stock"/>
+        <text name="livingMarket_ctAccept" text="Accept contract"/>
+        <text name="livingMarket_ctCancel" text="Cancel contract"/>
+        <text name="livingMarket_ctAcceptText" text="Deliver %s %s to %s by %s.&#10;Fixed price %s per 1000 l (contract value %s), bonus on full delivery %s.&#10;&#10;If not fulfilled: penalty %d %% of the missing amount (up to %s) and lower standing with %s."/>
+        <text name="livingMarket_ctNoStock" text="You have none of this product in stock!"/>
+        <text name="livingMarket_ctCancelText" text="Really cancel this contract?&#10;Delivered so far: %s of %s %s to %s.&#10;&#10;Penalty %s and lower standing with %s."/>
+        <text name="livingMarket_ctLimit" text="You already have %d active contracts."/>
+        <text name="livingMarket_ctNewOffer" text="New tender: %s is looking for %s %s"/>
+        <text name="livingMarket_ctDone" text="Contract fulfilled: %s %s to %s – bonus %s"/>
+        <text name="livingMarket_ctFailed" text="Contract not fulfilled: %s %s to %s – penalty %s"/>
+        <text name="livingMarket_ctCancelled" text="Contract cancelled: %s %s to %s – penalty %s"/>
+        <text name="livingMarket_noContracts" text="No tenders at the moment"/>
+        <text name="livingMarket_noContractsStock" text="No tenders for products in stock"/>
+        <text name="livingMarket_contractLabel" text="Contract"/>
         <text name="livingMarket_year" text="Year %d"/>
         <text name="livingMarket_colRefill" text="Refill"/>
         <text name="livingMarket_colStart" text="Start"/>

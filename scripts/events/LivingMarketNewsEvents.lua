@@ -221,3 +221,199 @@ function LivingMarketSalesEvent:run(connection)
         LivingMarket:applySales(self.sales, self.replace)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Lieferverträge: komplette Liste + Ansehen (Server -> Mitspieler)
+-- ---------------------------------------------------------------------
+LivingMarketContractListEvent = {}
+local LivingMarketContractListEvent_mt = Class(LivingMarketContractListEvent, Event)
+InitEventClass(LivingMarketContractListEvent, "LivingMarketContractListEvent")
+
+function LivingMarketContractListEvent.emptyNew()
+    return Event.new(LivingMarketContractListEvent_mt)
+end
+
+function LivingMarketContractListEvent.new()
+    return LivingMarketContractListEvent.emptyNew()
+end
+
+function LivingMarketContractListEvent:writeStream(streamId, connection)
+    local now = LivingMarket.getNowHour()
+    local contracts = LivingMarket.contracts or {}
+    local count = math.min(#contracts, 1000)
+    streamWriteUInt16(streamId, count)
+    for i = 1, count do
+        local c = contracts[i]
+        streamWriteInt32(streamId, c.id)
+        streamWriteBool(streamId, c.state == "active")
+        streamWriteString(streamId, c.stationKey or "")
+        streamWriteString(streamId, c.stationName or "")
+        streamWriteUIntN(streamId, c.fillTypeIndex, FillTypeManager.SEND_NUM_BITS)
+        streamWriteFloat32(streamId, c.amount)
+        streamWriteFloat32(streamId, c.delivered or 0)
+        streamWriteFloat32(streamId, c.basePrice or 0)
+        streamWriteFloat32(streamId, c.markup or 0)
+        streamWriteFloat32(streamId, c.eventMarkup or 0)
+        streamWriteUInt8(streamId, c.months or 1)
+        streamWriteInt32(streamId, math.floor((c.offerEndHour or now) - now))
+        if c.state == "active" then
+            streamWriteUInt8(streamId, c.farmId or 0)
+            streamWriteFloat32(streamId, c.price or 0)
+            streamWriteFloat32(streamId, c.bonus or 0)
+            streamWriteInt32(streamId, math.floor((c.deadlineHour or now) - now))
+        end
+    end
+    local entries = {}
+    for farmId, farm in pairs(LivingMarket.reputation or {}) do
+        for stationKey, value in pairs(farm) do
+            table.insert(entries, { farmId = farmId, stationKey = stationKey, value = value })
+        end
+    end
+    streamWriteUInt16(streamId, math.min(#entries, 4000))
+    for i = 1, math.min(#entries, 4000) do
+        streamWriteUInt8(streamId, entries[i].farmId)
+        streamWriteString(streamId, entries[i].stationKey)
+        streamWriteFloat32(streamId, entries[i].value)
+    end
+end
+
+function LivingMarketContractListEvent:readStream(streamId, connection)
+    local now = LivingMarket.getNowHour()
+    self.contracts = {}
+    local count = streamReadUInt16(streamId)
+    for _ = 1, count do
+        local c = {}
+        c.id            = streamReadInt32(streamId)
+        c.state         = streamReadBool(streamId) and "active" or "offer"
+        c.stationKey    = streamReadString(streamId)
+        c.stationName   = streamReadString(streamId)
+        c.fillTypeIndex = streamReadUIntN(streamId, FillTypeManager.SEND_NUM_BITS)
+        c.amount        = streamReadFloat32(streamId)
+        c.delivered     = streamReadFloat32(streamId)
+        c.basePrice     = streamReadFloat32(streamId)
+        c.markup        = streamReadFloat32(streamId)
+        c.eventMarkup   = streamReadFloat32(streamId)
+        c.months        = streamReadUInt8(streamId)
+        c.offerEndHour  = now + streamReadInt32(streamId)
+        if c.state == "active" then
+            c.farmId       = streamReadUInt8(streamId)
+            c.price        = streamReadFloat32(streamId)
+            c.bonus        = streamReadFloat32(streamId)
+            c.deadlineHour = now + streamReadInt32(streamId)
+        end
+        table.insert(self.contracts, c)
+    end
+    self.reputation = {}
+    local repCount = streamReadUInt16(streamId)
+    for _ = 1, repCount do
+        local farmId = streamReadUInt8(streamId)
+        local stationKey = streamReadString(streamId)
+        local value = streamReadFloat32(streamId)
+        self.reputation[farmId] = self.reputation[farmId] or {}
+        self.reputation[farmId][stationKey] = value
+    end
+    self:run(connection)
+end
+
+function LivingMarketContractListEvent:run(connection)
+    if connection:getIsServer() and g_server == nil then
+        LivingMarket.contracts = self.contracts
+        LivingMarket.reputation = self.reputation
+        LivingMarket.contractsVersion = (LivingMarket.contractsVersion or 0) + 1
+    end
+end
+
+-- ---------------------------------------------------------------------
+-- Lieferverträge: Annahme / Kündigung (Mitspieler -> Server)
+-- ---------------------------------------------------------------------
+LivingMarketContractRequestEvent = {}
+local LivingMarketContractRequestEvent_mt = Class(LivingMarketContractRequestEvent, Event)
+InitEventClass(LivingMarketContractRequestEvent, "LivingMarketContractRequestEvent")
+
+function LivingMarketContractRequestEvent.emptyNew()
+    return Event.new(LivingMarketContractRequestEvent_mt)
+end
+
+function LivingMarketContractRequestEvent.new(accept, contractId, farmId)
+    local self = LivingMarketContractRequestEvent.emptyNew()
+    self.accept, self.contractId, self.farmId = accept == true, contractId, farmId or 0
+    return self
+end
+
+function LivingMarketContractRequestEvent:writeStream(streamId, connection)
+    streamWriteBool(streamId, self.accept)
+    streamWriteInt32(streamId, self.contractId)
+    streamWriteUInt8(streamId, self.farmId)
+end
+
+function LivingMarketContractRequestEvent:readStream(streamId, connection)
+    self.accept = streamReadBool(streamId)
+    self.contractId = streamReadInt32(streamId)
+    self.farmId = streamReadUInt8(streamId)
+    self:run(connection)
+end
+
+function LivingMarketContractRequestEvent:run(connection)
+    if connection:getIsServer() or g_server == nil then
+        return   -- nur der Server bearbeitet Anfragen
+    end
+    -- Hof des anfragenden Spielers verwenden, falls bekannt
+    local farmId = self.farmId
+    if g_currentMission ~= nil and g_currentMission.userManager ~= nil and g_currentMission.userManager.getUserByConnection ~= nil then
+        local user = g_currentMission.userManager:getUserByConnection(connection)
+        if user ~= nil and g_farmManager ~= nil and g_farmManager.getFarmByUserId ~= nil then
+            local farm = g_farmManager:getFarmByUserId(user:getId())
+            if farm ~= nil and farm.farmId ~= nil then
+                farmId = farm.farmId
+            end
+        end
+    end
+    if self.accept then
+        LivingMarket:acceptContract(self.contractId, farmId)
+    else
+        LivingMarket:cancelContract(self.contractId, farmId)
+    end
+end
+
+-- ---------------------------------------------------------------------
+-- Lieferverträge: Meldung (Server -> Mitspieler; farmId 0 = alle, sonst nur dieser Hof)
+-- ---------------------------------------------------------------------
+LivingMarketContractNotifyEvent = {}
+local LivingMarketContractNotifyEvent_mt = Class(LivingMarketContractNotifyEvent, Event)
+InitEventClass(LivingMarketContractNotifyEvent, "LivingMarketContractNotifyEvent")
+
+function LivingMarketContractNotifyEvent.emptyNew()
+    return Event.new(LivingMarketContractNotifyEvent_mt)
+end
+
+function LivingMarketContractNotifyEvent.new(farmId, key, stationName, fillTypeIndex, liters, money)
+    local self = LivingMarketContractNotifyEvent.emptyNew()
+    self.farmId, self.key, self.stationName = farmId or 0, key, stationName or ""
+    self.fillTypeIndex, self.liters, self.money = fillTypeIndex, liters or 0, money or 0
+    return self
+end
+
+function LivingMarketContractNotifyEvent:writeStream(streamId, connection)
+    streamWriteUInt8(streamId, self.farmId)
+    streamWriteString(streamId, self.key)
+    streamWriteString(streamId, self.stationName)
+    streamWriteUIntN(streamId, self.fillTypeIndex, FillTypeManager.SEND_NUM_BITS)
+    streamWriteFloat32(streamId, self.liters)
+    streamWriteFloat32(streamId, self.money)
+end
+
+function LivingMarketContractNotifyEvent:readStream(streamId, connection)
+    self.farmId = streamReadUInt8(streamId)
+    self.key = streamReadString(streamId)
+    self.stationName = streamReadString(streamId)
+    self.fillTypeIndex = streamReadUIntN(streamId, FillTypeManager.SEND_NUM_BITS)
+    self.liters = streamReadFloat32(streamId)
+    self.money = streamReadFloat32(streamId)
+    self:run(connection)
+end
+
+function LivingMarketContractNotifyEvent:run(connection)
+    if connection:getIsServer() and g_server == nil then
+        LivingMarket:showContractNotification(self.farmId, self.key, self.stationName, self.fillTypeIndex, self.liters, self.money)
+    end
+end

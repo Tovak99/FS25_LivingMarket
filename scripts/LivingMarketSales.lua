@@ -68,10 +68,14 @@ function LivingMarket:recordSale(station, farmId, fillTypeIndex, liters, money)
     end
     local stationKey = self:getStationKey(station)
     local now = g_time or 0
+    -- Vertragslieferung (Festpreis) als eigener Eintrag, markiert als "Vertrag"
+    local override = self.contractOverride
+    local isContract = override ~= nil and override.station == station and override.fillTypeIndex == fillTypeIndex
     -- laufenden Abladevorgang derselben Station und Ware suchen (nicht nur den obersten Eintrag)
     local sale = nil
     for _, existing in ipairs(list) do
         if existing.stationKey == stationKey and existing.fillTypeIndex == fillTypeIndex
+            and (existing.eventType == self.EVENT_CONTRACT) == isContract
             and existing.realTime ~= nil and now - existing.realTime < self.SALES_MERGE_TIME then
             sale = existing
             break
@@ -92,8 +96,8 @@ function LivingMarket:recordSale(station, farmId, fillTypeIndex, liters, money)
             liters        = liters,
             money         = money or 0,
             minute        = self.getNowMinute(),
-            factor        = entry ~= nil and self:getDemandFactor(station, fillTypeIndex) or 1,   -- Marktlage zu Beginn
-            eventType     = entry ~= nil and entry.eventType or 0,
+            factor        = (entry ~= nil and not isContract) and self:getDemandFactor(station, fillTypeIndex) or 1,   -- Marktlage zu Beginn
+            eventType     = isContract and self.EVENT_CONTRACT or (entry ~= nil and entry.eventType or 0),
             realTime      = now,
         }
         self.saleNextId = self.saleNextId + 1

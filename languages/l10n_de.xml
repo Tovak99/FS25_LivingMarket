@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Menge"/>
         <text name="livingMarket_noSales" text="Noch keine Verkäufe"/>
         <text name="livingMarket_yearShort" text="J%d"/>
+        <text name="livingMarket_viewNews" text="Nachrichten"/>
+        <text name="livingMarket_viewContracts" text="Verträge"/>
+        <text name="livingMarket_colBonus" text="Bonus"/>
+        <text name="livingMarket_colDeadline" text="Frist"/>
+        <text name="livingMarket_colReputation" text="Ansehen"/>
+        <text name="livingMarket_ctOffer" text="Angebot"/>
+        <text name="livingMarket_ctActive" text="Läuft"/>
+        <text name="livingMarket_ctMonths" text="%d Monat(e)"/>
+        <text name="livingMarket_ctFilterAll" text="Alle Angebote"/>
+        <text name="livingMarket_ctFilterStock" text="Vorrätig"/>
+        <text name="livingMarket_ctAccept" text="Vertrag annehmen"/>
+        <text name="livingMarket_ctCancel" text="Vertrag kündigen"/>
+        <text name="livingMarket_ctAcceptText" text="%s %s an %s liefern, Frist bis %s.&#10;Festpreis %s je 1000 l (Vertragswert %s), Bonus bei vollständiger Lieferung %s.&#10;&#10;Bei Nichterfüllung: Strafe %d %% der fehlenden Menge (bis zu %s) und weniger Ansehen bei %s."/>
+        <text name="livingMarket_ctNoStock" text="Du hast diese Ware gar nicht auf Lager!"/>
+        <text name="livingMarket_ctCancelText" text="Vertrag wirklich kündigen?&#10;Bisher geliefert: %s von %s %s an %s.&#10;&#10;Strafe %s und weniger Ansehen bei %s."/>
+        <text name="livingMarket_ctLimit" text="Du hast bereits %d laufende Verträge."/>
+        <text name="livingMarket_ctNewOffer" text="Neue Ausschreibung: %s sucht %s %s"/>
+        <text name="livingMarket_ctDone" text="Vertrag erfüllt: %s %s an %s – Bonus %s"/>
+        <text name="livingMarket_ctFailed" text="Vertrag nicht erfüllt: %s %s an %s – Strafe %s"/>
+        <text name="livingMarket_ctCancelled" text="Vertrag gekündigt: %s %s an %s – Strafe %s"/>
+        <text name="livingMarket_noContracts" text="Zurzeit keine Ausschreibungen"/>
+        <text name="livingMarket_noContractsStock" text="Keine Ausschreibungen für vorrätige Waren"/>
+        <text name="livingMarket_contractLabel" text="Vertrag"/>
         <text name="livingMarket_year" text="Jahr %d"/>
         <text name="livingMarket_colRefill" text="Auffüllung"/>
         <text name="livingMarket_colStart" text="Beginn"/>

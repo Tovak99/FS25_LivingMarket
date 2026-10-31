@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="113">
     <author>Tovak99</author>
-    <version>0.2.1.11</version>
+    <version>0.2.1.12</version>
     <title>
         <en>Living Market</en>
         <de>Lebendiger Markt</de>
@@ -34,6 +34,7 @@
         <sourceFile filename="scripts/LivingMarket.lua"/>
         <sourceFile filename="scripts/LivingMarketEvents.lua"/>
         <sourceFile filename="scripts/LivingMarketSales.lua"/>
+        <sourceFile filename="scripts/LivingMarketContracts.lua"/>
     </extraSourceFiles>
 
     <l10n filenamePrefix="languages/l10n"/>

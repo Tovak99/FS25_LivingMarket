@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Ilość"/>
         <text name="livingMarket_noSales" text="Brak sprzedaży"/>
         <text name="livingMarket_yearShort" text="R%d"/>
+        <text name="livingMarket_viewNews" text="Wiadomości"/>
+        <text name="livingMarket_viewContracts" text="Umowy"/>
+        <text name="livingMarket_colBonus" text="Premia"/>
+        <text name="livingMarket_colDeadline" text="Termin"/>
+        <text name="livingMarket_colReputation" text="Renoma"/>
+        <text name="livingMarket_ctOffer" text="Oferta"/>
+        <text name="livingMarket_ctActive" text="Trwa"/>
+        <text name="livingMarket_ctMonths" text="%d mies."/>
+        <text name="livingMarket_ctFilterAll" text="Wszystkie oferty"/>
+        <text name="livingMarket_ctFilterStock" text="Na stanie"/>
+        <text name="livingMarket_ctAccept" text="Przyjmij umowę"/>
+        <text name="livingMarket_ctCancel" text="Wypowiedz umowę"/>
+        <text name="livingMarket_ctAcceptText" text="Dostarcz %s %s do %s do %s.&#10;Stała cena %s za 1000 l (wartość %s), premia za pełną dostawę %s.&#10;&#10;W razie niewykonania: kara %d %% brakującej ilości (do %s) i niższa renoma u %s."/>
+        <text name="livingMarket_ctNoStock" text="Nie masz tego towaru na stanie!"/>
+        <text name="livingMarket_ctCancelText" text="Na pewno wypowiedzieć umowę?&#10;Dostarczono: %s z %s %s do %s.&#10;&#10;Kara %s i niższa renoma u %s."/>
+        <text name="livingMarket_ctLimit" text="Masz już %d aktywne umowy."/>
+        <text name="livingMarket_ctNewOffer" text="Nowy przetarg: %s szuka %s %s"/>
+        <text name="livingMarket_ctDone" text="Umowa wykonana: %s %s do %s – premia %s"/>
+        <text name="livingMarket_ctFailed" text="Umowa niewykonana: %s %s do %s – kara %s"/>
+        <text name="livingMarket_ctCancelled" text="Umowa wypowiedziana: %s %s do %s – kara %s"/>
+        <text name="livingMarket_noContracts" text="Brak przetargów"/>
+        <text name="livingMarket_noContractsStock" text="Brak przetargów na towary na stanie"/>
+        <text name="livingMarket_contractLabel" text="Umowa"/>
         <text name="livingMarket_year" text="Rok %d"/>
         <text name="livingMarket_colRefill" text="Uzupełn."/>
         <text name="livingMarket_colStart" text="Początek"/>

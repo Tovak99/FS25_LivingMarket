@@ -9,14 +9,17 @@
             <Text profile="fs25_menuHeaderTitle" text="$l10n_livingMarket_title"/>
 
             <!-- Ansicht umschalten: Markt / Marktnachrichten / Verkäufe (aktive Ansicht grün; Position = rechte Textkante) -->
-            <Button profile="lm_viewButton" id="viewMarketButton" position="-880px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
-            <Button profile="lm_viewButton" id="viewEventsButton" position="-645px 0px" text="$l10n_livingMarket_eventsTitle" onClick="onClickViewEvents"/>
-            <Button profile="lm_viewButton" id="viewSalesButton" position="-510px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
+            <Button profile="lm_viewButton" id="viewMarketButton" position="-895px 0px" text="$l10n_livingMarket_viewMarket" onClick="onClickViewMarket"/>
+            <Button profile="lm_viewButton" id="viewEventsButton" position="-730px 0px" text="$l10n_livingMarket_viewNews" onClick="onClickViewEvents"/>
+            <Button profile="lm_viewButton" id="viewSalesButton" position="-601px 0px" text="$l10n_livingMarket_viewSales" onClick="onClickViewSales"/>
+            <Button profile="lm_viewButton" id="viewContractsButton" position="-466px 0px" text="$l10n_livingMarket_viewContracts" onClick="onClickViewContracts"/>
 
             <!-- Filter (Alle / Lagernd / Favoriten): Klick schaltet weiter, links neben dem Suchfeld -->
             <Button profile="lm_filterButton" id="filterButton" text="" onClick="onClickFilter"/>
             <!-- Filter der Marktnachrichten (Alle / Lieferbar), gleiche Stelle, nur in dieser Ansicht -->
             <Button profile="lm_filterButton" id="eventFilterButton" text="" onClick="onClickEventFilter" visible="false"/>
+            <!-- Filter der Verträge (Alle Angebote / Vorrätig) -->
+            <Button profile="lm_filterButton" id="contractFilterButton" text="" onClick="onClickContractFilter" visible="false"/>
 
             <!-- Spielzeit und Datum (nur in den Marktnachrichten, an Stelle des Suchfelds) -->
             <Text profile="lm_clockText" id="clockText" text="" visible="false"/>
@@ -101,6 +104,7 @@
                 <Button profile="lm_sortHeaderRight" id="sortDetail_revenue" position="405px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_max" position="550px 0px" text="$l10n_livingMarket_colMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="660px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Button profile="lm_sortHeader" id="detailStarsHeader" position="1150px 0px" text="$l10n_livingMarket_colReputation"/>
                 <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="lm_headerLine"/>
             </GuiElement>
@@ -119,6 +123,7 @@
                     <Text profile="lm_rowTextRight" name="revenue" position="405px 0px"/>
                     <Text profile="lm_rowTextRight" name="max" position="550px 0px"/>
                     <Text profile="lm_rowTextRight" name="share" position="660px 0px"/>
+                    <Bitmap profile="lm_starsIcon" name="stars" position="1150px 0px"/>
                 </ListItem>
             </SmoothList>
             <!-- Scrollbalken -->
@@ -212,6 +217,47 @@
         </GuiElement>
 
         <Text profile="lm_emptyText" id="saleEmptyText" text="$l10n_livingMarket_noSales" visible="false"/>
+
+        <!-- ============ Ansicht Verträge (Ausschreibungen + eigene laufende Verträge) ============ -->
+        <ThreePartBitmap profile="lm_tableFrameFull" id="contractFrame" visible="false"/>
+
+        <GuiElement profile="fs25_settingsControlsListHeader" id="contractHeader" absoluteSizeOffset="90px 0px" height="40px" position="0px -20px" visible="false">
+            <Button profile="lm_sortHeader" id="contractHead_status" position="20px 0px" text="$l10n_livingMarket_colStatus"/>
+            <Button profile="lm_sortHeader" id="contractHead_ware" position="154px 0px" text="$l10n_livingMarket_colWare"/>
+            <Button profile="lm_sortHeader" id="contractHead_station" position="360px 0px" text="$l10n_livingMarket_colStationEv"/>
+            <Button profile="lm_sortHeader" id="contractHead_stars" position="570px 0px" text="$l10n_livingMarket_colReputation"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_amount" position="380px 0px" text="$l10n_livingMarket_colAmount"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_price" position="490px 0px" text="$l10n_livingMarket_colPrice"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_bonus" position="600px 0px" text="$l10n_livingMarket_colBonus"/>
+            <Button profile="lm_sortHeader" id="contractHead_deadline" position="1075px 0px" text="$l10n_livingMarket_colDeadline"/>
+            <Button profile="lm_sortHeaderRight" id="contractHead_stock" position="870px 0px" text="$l10n_livingMarket_colStock"/>
+            <ThreePartBitmap profile="lm_headerLine"/>
+        </GuiElement>
+
+        <GuiElement profile="lm_eventsArea" id="contractArea" visible="false">
+            <SmoothList profile="fs25_settingsControlsList" id="contractList" absoluteSizeOffset="90px 60px" selectOnClick="false" onClick="onClickContract">
+                <ListItem profile="lm_listItem" name="contract">
+                    <ThreePartBitmap profile="lm_rowBg" name="bg"/>
+                    <Text profile="lm_rowTextBold" name="status" position="20px 0px"/>
+                    <Bitmap profile="lm_wareIcon" name="icon" position="120px 0px"/>
+                    <Text profile="lm_rowTextBold" name="ware" position="154px 0px"/>
+                    <Text profile="lm_rowText" name="station" position="360px 0px"/>
+                    <Bitmap profile="lm_starsIcon" name="stars" position="570px 0px"/>
+                    <Text profile="lm_rowTextRight" name="amount" position="380px 0px"/>
+                    <Text profile="lm_rowTextRight" name="price" position="490px 0px"/>
+                    <Text profile="lm_rowTextRight" name="bonus" position="600px 0px"/>
+                    <Text profile="lm_rowText" name="deadline" position="1075px 0px"/>
+                    <Text profile="lm_rowTextRight" name="stock" position="870px 0px"/>
+                </ListItem>
+            </SmoothList>
+            <GuiElement profile="lm_sliderArea">
+                <ThreePartBitmap profile="lm_sliderBox">
+                    <Slider profile="lm_slider" id="contractSlider" dataElementId="contractList"/>
+                </ThreePartBitmap>
+            </GuiElement>
+        </GuiElement>
+
+        <Text profile="lm_emptyText" id="contractEmptyText" text="$l10n_livingMarket_noContracts" visible="false"/>
     </GuiElement>
 
     <GUIProfiles>
@@ -221,7 +267,7 @@
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
             <position value="-20px 0px"/>
-            <size value="320px 48px"/>
+            <size value="280px 48px"/>
             <!-- Text linksbündig wie der Hinweistext; mittig gesetzt zeichnet das Spiel
                  den Eingabe-Cursor über die Buchstaben (z. B. "Al$i" statt "Aldi") -->
             <textAlignment value="left"/>
@@ -241,7 +287,7 @@
         </Profile>
 
         <Profile name="lm_searchHint" extends="fs25_textDefault" with="anchorMiddleLeft">
-            <size value="280px 30px"/>
+            <size value="245px 30px"/>
             <position value="15px 0px"/>
             <textAlignment value="left"/>
             <textVerticalAlignment value="middle"/>
@@ -371,7 +417,7 @@
         <Profile name="lm_filterButton" extends="lm_sortHeader">
             <anchors value="1 1 0.5 0.5"/>
             <pivot value="1 0.5"/>
-            <position value="-365px 0px"/>
+            <position value="-325px 0px"/>
             <textAlignment value="right"/>
             <textSize value="17px"/>
             <textColor value="0.212 0.376 0.012 1"/>
@@ -407,6 +453,10 @@
             <imageSelectedColor value="1 1 1 1"/>
             <imageFocusedColor value="1 1 1 1"/>
             <imageHighlightedColor value="1 1 1 1"/>
+        </Profile>
+
+        <Profile name="lm_starsIcon" extends="lm_trendIcon">
+            <size value="80px 20px"/>
         </Profile>
 
         <Profile name="lm_wareIcon">

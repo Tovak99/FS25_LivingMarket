@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Quantité"/>
         <text name="livingMarket_noSales" text="Aucune vente pour l’instant"/>
         <text name="livingMarket_yearShort" text="A%d"/>
+        <text name="livingMarket_viewNews" text="Actualités"/>
+        <text name="livingMarket_viewContracts" text="Contrats"/>
+        <text name="livingMarket_colBonus" text="Prime"/>
+        <text name="livingMarket_colDeadline" text="Échéance"/>
+        <text name="livingMarket_colReputation" text="Réputation"/>
+        <text name="livingMarket_ctOffer" text="Offre"/>
+        <text name="livingMarket_ctActive" text="En cours"/>
+        <text name="livingMarket_ctMonths" text="%d mois"/>
+        <text name="livingMarket_ctFilterAll" text="Toutes les offres"/>
+        <text name="livingMarket_ctFilterStock" text="En stock"/>
+        <text name="livingMarket_ctAccept" text="Accepter le contrat"/>
+        <text name="livingMarket_ctCancel" text="Résilier le contrat"/>
+        <text name="livingMarket_ctAcceptText" text="Livrer %s de %s à %s avant %s.&#10;Prix fixe %s les 1000 l (valeur %s), prime en cas de livraison complète %s.&#10;&#10;En cas de non-respect : pénalité de %d %% de la quantité manquante (jusqu’à %s) et réputation réduite auprès de %s."/>
+        <text name="livingMarket_ctNoStock" text="Vous n’avez pas du tout ce produit en stock !"/>
+        <text name="livingMarket_ctCancelText" text="Vraiment résilier ce contrat ?&#10;Déjà livré : %s sur %s de %s à %s.&#10;&#10;Pénalité %s et réputation réduite auprès de %s."/>
+        <text name="livingMarket_ctLimit" text="Vous avez déjà %d contrats en cours."/>
+        <text name="livingMarket_ctNewOffer" text="Nouvel appel d’offres : %s cherche %s de %s"/>
+        <text name="livingMarket_ctDone" text="Contrat rempli : %s de %s à %s – prime %s"/>
+        <text name="livingMarket_ctFailed" text="Contrat non rempli : %s de %s à %s – pénalité %s"/>
+        <text name="livingMarket_ctCancelled" text="Contrat résilié : %s de %s à %s – pénalité %s"/>
+        <text name="livingMarket_noContracts" text="Aucun appel d’offres pour le moment"/>
+        <text name="livingMarket_noContractsStock" text="Aucun appel d’offres pour les produits en stock"/>
+        <text name="livingMarket_contractLabel" text="Contrat"/>
         <text name="livingMarket_year" text="Année %d"/>
         <text name="livingMarket_colRefill" text="Réappro."/>
         <text name="livingMarket_colStart" text="Début"/>

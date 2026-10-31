@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="3">
+<livingMarket version="4">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -60,6 +60,28 @@
         <event type="demand"     weight="0.12"  minRefill="0.10" maxRefill="0.50"/>
         <event type="slowSeller" weight="0.08"  minRefill="0.10" maxRefill="0.50" palletOnly="true"/>
     </events>
+
+    <!-- Lieferverträge (Ausschreibungen der Stationen)
+         enabled            = false schaltet neue Ausschreibungen ab
+         minOffers/maxOffers = so viele offene Ausschreibungen gleichzeitig (jeden Monat neu gewählt)
+         offerMonths        = nicht angenommene Ausschreibung verfällt nach so vielen Monaten
+         minMonths/maxMonths = Frist ab Annahme in Monaten
+         minShare/maxShare  = Menge als Anteil vom Maximum der Station (auf 1000 l abgerundet)
+         minMarkup/maxMarkup = Grundaufschlag auf den Marktpreis des Monats
+         reputationMarkup   = zusätzlicher Aufschlag bei bestem Ansehen (5 Sterne)
+         eventMarkup        = zusätzlicher Aufschlag bei Engpass/Nachgefragt an der Station
+         maxTotalMarkup     = Aufschlag insgesamt höchstens (0.10 = 10 %)
+         bonusRate          = Bonus bei vollständiger Lieferung (Anteil vom Vertragswert)
+         penaltyRate        = Strafe bei Nichterfüllung/Kündigung (Anteil vom Wert der fehlenden Menge)
+         maxActivePerFarm   = laufende Verträge je Hof
+         Ansehen je Hof und Station 0..100 (Start 50 = 3 Sterne, je 20 Punkte ein Stern):
+         repFulfilled/repFailed = Änderung bei erfülltem/gescheitertem Vertrag
+         repDriftPerMonth   = so viele Punkte je Monat zurück Richtung 50
+         repMinStars        = darunter bietet die Station dem Hof keine Verträge an -->
+    <contracts enabled="true" minOffers="3" maxOffers="6" offerMonths="1" minMonths="1" maxMonths="3"
+               minShare="0.30" maxShare="0.80" minMarkup="0.02" maxMarkup="0.05" reputationMarkup="0.03"
+               eventMarkup="0.02" maxTotalMarkup="0.10" bonusRate="0.05" penaltyRate="0.50" maxActivePerFarm="3"
+               repFulfilled="10" repFailed="20" repDriftPerMonth="2" repMinStars="2"/>
 
     <!-- Automatische Zuordnung für Karten- und Mod-Waren, die unten nicht aufgeführt sind:
          1. Schwad/Halmgut (…_WINDROW)          -> windrowGroup

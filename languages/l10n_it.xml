@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Quantità"/>
         <text name="livingMarket_noSales" text="Nessuna vendita"/>
         <text name="livingMarket_yearShort" text="A%d"/>
+        <text name="livingMarket_viewNews" text="Notizie"/>
+        <text name="livingMarket_viewContracts" text="Contratti"/>
+        <text name="livingMarket_colBonus" text="Bonus"/>
+        <text name="livingMarket_colDeadline" text="Scadenza"/>
+        <text name="livingMarket_colReputation" text="Reputazione"/>
+        <text name="livingMarket_ctOffer" text="Offerta"/>
+        <text name="livingMarket_ctActive" text="In corso"/>
+        <text name="livingMarket_ctMonths" text="%d mese/i"/>
+        <text name="livingMarket_ctFilterAll" text="Tutte le offerte"/>
+        <text name="livingMarket_ctFilterStock" text="In magazzino"/>
+        <text name="livingMarket_ctAccept" text="Accetta contratto"/>
+        <text name="livingMarket_ctCancel" text="Disdici contratto"/>
+        <text name="livingMarket_ctAcceptText" text="Consegna %s di %s a %s entro %s.&#10;Prezzo fisso %s per 1000 l (valore %s), bonus per consegna completa %s.&#10;&#10;In caso di inadempienza: penale del %d %% della quantità mancante (fino a %s) e minore reputazione presso %s."/>
+        <text name="livingMarket_ctNoStock" text="Non hai per niente questa merce in magazzino!"/>
+        <text name="livingMarket_ctCancelText" text="Disdire davvero il contratto?&#10;Consegnato finora: %s di %s di %s a %s.&#10;&#10;Penale %s e minore reputazione presso %s."/>
+        <text name="livingMarket_ctLimit" text="Hai già %d contratti in corso."/>
+        <text name="livingMarket_ctNewOffer" text="Nuova gara: %s cerca %s di %s"/>
+        <text name="livingMarket_ctDone" text="Contratto adempiuto: %s di %s a %s – bonus %s"/>
+        <text name="livingMarket_ctFailed" text="Contratto non adempiuto: %s di %s a %s – penale %s"/>
+        <text name="livingMarket_ctCancelled" text="Contratto disdetto: %s di %s a %s – penale %s"/>
+        <text name="livingMarket_noContracts" text="Nessuna gara al momento"/>
+        <text name="livingMarket_noContractsStock" text="Nessuna gara per merci in magazzino"/>
+        <text name="livingMarket_contractLabel" text="Contratto"/>
         <text name="livingMarket_year" text="Anno %d"/>
         <text name="livingMarket_colRefill" text="Rifornim."/>
         <text name="livingMarket_colStart" text="Inizio"/>

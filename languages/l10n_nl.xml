@@ -53,6 +53,29 @@
         <text name="livingMarket_colAmount" text="Hoeveelheid"/>
         <text name="livingMarket_noSales" text="Nog geen verkopen"/>
         <text name="livingMarket_yearShort" text="J%d"/>
+        <text name="livingMarket_viewNews" text="Nieuws"/>
+        <text name="livingMarket_viewContracts" text="Contracten"/>
+        <text name="livingMarket_colBonus" text="Bonus"/>
+        <text name="livingMarket_colDeadline" text="Termijn"/>
+        <text name="livingMarket_colReputation" text="Aanzien"/>
+        <text name="livingMarket_ctOffer" text="Aanbod"/>
+        <text name="livingMarket_ctActive" text="Loopt"/>
+        <text name="livingMarket_ctMonths" text="%d maand(en)"/>
+        <text name="livingMarket_ctFilterAll" text="Alle aanbiedingen"/>
+        <text name="livingMarket_ctFilterStock" text="Op voorraad"/>
+        <text name="livingMarket_ctAccept" text="Contract aannemen"/>
+        <text name="livingMarket_ctCancel" text="Contract opzeggen"/>
+        <text name="livingMarket_ctAcceptText" text="%s %s leveren aan %s vóór %s.&#10;Vaste prijs %s per 1000 l (contractwaarde %s), bonus bij volledige levering %s.&#10;&#10;Bij niet-nakoming: boete %d %% van de ontbrekende hoeveelheid (tot %s) en minder aanzien bij %s."/>
+        <text name="livingMarket_ctNoStock" text="Je hebt deze waar helemaal niet op voorraad!"/>
+        <text name="livingMarket_ctCancelText" text="Contract echt opzeggen?&#10;Tot nu geleverd: %s van %s %s aan %s.&#10;&#10;Boete %s en minder aanzien bij %s."/>
+        <text name="livingMarket_ctLimit" text="Je hebt al %d lopende contracten."/>
+        <text name="livingMarket_ctNewOffer" text="Nieuwe aanbesteding: %s zoekt %s %s"/>
+        <text name="livingMarket_ctDone" text="Contract nagekomen: %s %s aan %s – bonus %s"/>
+        <text name="livingMarket_ctFailed" text="Contract niet nagekomen: %s %s aan %s – boete %s"/>
+        <text name="livingMarket_ctCancelled" text="Contract opgezegd: %s %s aan %s – boete %s"/>
+        <text name="livingMarket_noContracts" text="Momenteel geen aanbestedingen"/>
+        <text name="livingMarket_noContractsStock" text="Geen aanbestedingen voor waren op voorraad"/>
+        <text name="livingMarket_contractLabel" text="Contract"/>
         <text name="livingMarket_year" text="Jaar %d"/>
         <text name="livingMarket_colRefill" text="Aanvulling"/>
         <text name="livingMarket_colStart" text="Begin"/>
