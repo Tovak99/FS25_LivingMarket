@@ -1664,9 +1664,14 @@ function LivingMarketFrame:populateStationCell(station, cell)
     end
     local maxText = cell:getAttribute("max")
     if maxText ~= nil then
-        maxText:setText(LivingMarket.formatLiters(station.max))
-        -- Bedarf durch Ereignis erhöht (Engpass, Gefragt) grün, gesenkt (Überangebot, Flaute) rot
+        -- Bedarf durch Ereignis erhöht (Engpass, Gefragt) grün, gesenkt (Überangebot, Flaute) rot,
+        -- dann mit dem Faktor in Klammern, z. B. "115.500 l (150 %)"
         local eventMax = station.eventMax or 1
+        local maxLabel = LivingMarket.formatLiters(station.max)
+        if math.abs(eventMax - 1) > 0.001 then
+            maxLabel = string.format("%s (%d %%)", maxLabel, math.floor(eventMax * 100 + 0.5))
+        end
+        maxText:setText(maxLabel)
         local maxColor = eventMax > 1.001 and COLOR_GOOD or (eventMax < 0.999 and COLOR_LOW or COLOR_TEXT)
         setColor(maxText, isFull and COLOR_MUTED or maxColor)
     end
