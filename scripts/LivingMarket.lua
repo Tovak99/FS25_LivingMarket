@@ -535,14 +535,15 @@ local function addStock(stock, fillTypeIndex, amount, sources, sourceName)
 end
 
 -- onlyFillTypes (optional): nur diese Füllarten zählen, z. B. die Erzeugnisse einer Produktion
-local function addStorage(stock, storage, farmId, visited, sources, kind, onlyFillTypes, owner)
+-- skipFillTypes (optional): diese Füllarten nicht zählen, z. B. Einstreu-Stroh im Stall
+local function addStorage(stock, storage, farmId, visited, sources, kind, onlyFillTypes, owner, skipFillTypes)
     if storage == nil or visited[storage] or getOwner(storage) ~= farmId then
         return
     end
     visited[storage] = true
     local name = kind .. " '" .. describe(owner or storage, "?") .. "'"
     for fillTypeIndex, level in pairs(storage.fillLevels or {}) do
-        if onlyFillTypes == nil or onlyFillTypes[fillTypeIndex] then
+        if (onlyFillTypes == nil or onlyFillTypes[fillTypeIndex]) and (skipFillTypes == nil or not skipFillTypes[fillTypeIndex]) then
             addStock(stock, fillTypeIndex, level, sources, name)
         end
     end
@@ -607,15 +608,49 @@ function LivingMarket:getFarmStock()
         end
     end
 
+    -- Lager den Gebäuden zuordnen (wie im FieldManager): Tierställe und Silos der Gebäude.
+    -- Im Stall liegt Stroh als Einstreu - das ist kein Verkaufsbestand.
+    local husbandryStorages = {}
+    local storageOwners = {}
+    local placeables = (mission.placeableSystem ~= nil and mission.placeableSystem.placeables) or {}
+    for _, placeable in pairs(placeables) do
+        local husbandry = placeable.spec_husbandry
+        if husbandry ~= nil and husbandry.storage ~= nil then
+            husbandryStorages[husbandry.storage] = true
+            storageOwners[husbandry.storage] = placeable
+        end
+        local silo = placeable.spec_silo
+        if silo ~= nil then
+            for _, storage in pairs(silo.storages or {}) do
+                storageOwners[storage] = placeable
+            end
+        end
+    end
+    local strawIndex = g_fillTypeManager:getFillTypeIndexByName("STRAW")
+    local skipInStable = strawIndex ~= nil and { [strawIndex] = true } or nil
+
+    local function addPlainStorage(storage)
+        if type(storage) ~= "table" or productionStorages[storage] then
+            return
+        end
+        if husbandryStorages[storage] then
+            addStorage(stock, storage, farmId, visited, sources, "Stall", nil, storageOwners[storage], skipInStable)
+        else
+            addStorage(stock, storage, farmId, visited, sources, "Lager", nil, storageOwners[storage])
+        end
+    end
+
     -- 1) Silos und Lager (auch Tierställe), wie sie das Storage-System kennt
     local storageSystem = mission.storageSystem
     if storageSystem ~= nil and storageSystem.storages ~= nil then
         for key, value in pairs(storageSystem.storages) do
             local storage = (type(key) == "table" and key.fillLevels ~= nil) and key or value
-            if type(storage) == "table" and not productionStorages[storage] then
-                addStorage(stock, storage, farmId, visited, sources, "Lager")
-            end
+            addPlainStorage(storage)
         end
+    end
+    -- 1b) Silos der Gebäude, falls das Storage-System sie nicht führt
+    for storage in pairs(storageOwners) do
+        addPlainStorage(storage)
     end
 
     -- 2) Lager der Produktionen: nur die Erzeugnisse, keine Zutaten
