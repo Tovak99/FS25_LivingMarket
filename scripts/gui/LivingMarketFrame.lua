@@ -785,9 +785,16 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
         return
     end
 
-    -- In der gewählten (grünen) Zeile ist jede Schrift dunkel
+    -- In der gewählten (grünen) Zeile ist jede Schrift dunkel.
+    -- Waren ohne Lagerbestand ausgegraut, wie volle Stationen im Detailfenster.
+    local noStock = (ware.stock or 0) < 1
     local function setColor(textElement, c)
-        setTextColorAll(textElement, isSelected and COLOR_ON_GREEN or c)
+        if isSelected then
+            c = COLOR_ON_GREEN
+        elseif noStock then
+            c = COLOR_MUTED
+        end
+        setTextColorAll(textElement, c)
     end
 
     local favText = cell:getAttribute("fav")
