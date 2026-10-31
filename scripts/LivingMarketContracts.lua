@@ -173,6 +173,28 @@ function LivingMarket:getContractEventState(stationKey, fillTypeIndex)
     return negative, positive
 end
 
+-- Kann man diese Ware an dieser Station wirklich verkaufen? (Preis > 0, Ware hat einen Grundpreis)
+-- Schließt z. B. Wartung, Wasser oder Wickelfolie aus, die manche Stationen annehmen, aber nicht bezahlen.
+function LivingMarket:isContractWareSellable(station, fillTypeIndex)
+    if station == nil or fillTypeIndex == nil then
+        return false
+    end
+    if station.acceptedFillTypes ~= nil and not station.acceptedFillTypes[fillTypeIndex] then
+        return false
+    end
+    local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+    if fillType == nil or (fillType.pricePerLiter or 0) <= 0 then
+        return false
+    end
+    if station.getEffectiveFillTypePrice ~= nil then
+        local ok, price = pcall(station.getEffectiveFillTypePrice, station, fillTypeIndex)
+        if not ok or price == nil or price <= 0 then
+            return false
+        end
+    end
+    return true
+end
+
 function LivingMarket:hasContractFor(stationKey, fillTypeIndex)
     for _, contract in ipairs(self.contracts) do
         if contract.stationKey == stationKey and contract.fillTypeIndex == fillTypeIndex then
@@ -202,7 +224,8 @@ function LivingMarket:createContractOffer()
                 local stationKey = self:getStationKey(station)
                 local negative, positive = self:getContractEventState(stationKey, fillTypeIndex)
                 local basePrice = self:getMonthMarketPrice(fillTypeIndex)
-                if not negative and not self:hasContractFor(stationKey, fillTypeIndex) and basePrice ~= nil and basePrice > 0 then
+                if not negative and not self:hasContractFor(stationKey, fillTypeIndex) and basePrice ~= nil and basePrice > 0
+                    and self:isContractWareSellable(station, fillTypeIndex) then
                     local entry = self:getEntry(station, fillTypeIndex)
                     local amount = math.floor((entry.baseMax or entry.max) * randomRange(s.minShare, s.maxShare) / 1000) * 1000
                     amount = math.max(1000, amount)
@@ -489,6 +512,17 @@ function LivingMarket:tickContracts()
     local s = self.CONTRACT_SETTINGS
     local now = self.getNowHour()
     local changed = false
+
+    -- Verträge über Waren, die die Station gar nicht bezahlt (ältere Ausschreibungen):
+    -- Angebote entfernen, laufende ohne Strafe auflösen
+    for i = #self.contracts, 1, -1 do
+        local contract = self.contracts[i]
+        local station = self:findStationByKey(contract.stationKey)
+        if station ~= nil and not self:isContractWareSellable(station, contract.fillTypeIndex) then
+            table.remove(self.contracts, i)
+            changed = true
+        end
+    end
 
     for i = #self.contracts, 1, -1 do
         local contract = self.contracts[i]
