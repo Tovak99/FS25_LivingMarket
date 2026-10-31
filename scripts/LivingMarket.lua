@@ -1308,6 +1308,9 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
     end
     entry.remaining = math.max(entry.remaining - used, 0)
     LivingMarket:markDirty(entry)
+    if entry.remaining < 1 and LivingMarket.onStationSoldOut ~= nil then
+        LivingMarket:onStationSoldOut(station, fillTypeIndex)
+    end
     return moved
 end
 

@@ -436,6 +436,30 @@ function LivingMarket:spawnEvent()
     return true
 end
 
+-- Liefermenge einer Station auf 0: positive lokale Ereignisse (Engpass, Nachgefragt) sind erfüllt
+-- und enden sofort – der Bedarf ist gedeckt
+function LivingMarket:onStationSoldOut(station, fillTypeIndex)
+    if g_server == nil or self.events == nil or #self.events == 0 then
+        return
+    end
+    local stationKey = self:getStationKey(station)
+    local kept, ended = {}, false
+    for _, event in ipairs(self.events) do
+        if event.active and event.stationKey == stationKey and event.fillTypeIndex == fillTypeIndex
+            and self.EVENT_POSITIVE[event.type] then
+            self:announceEvent(event, "end")
+            ended = true
+        else
+            table.insert(kept, event)
+        end
+    end
+    if ended then
+        self.events = kept
+        self:applyEventsToAll()
+        self:broadcastEventList()
+    end
+end
+
 -- Jede Spielstunde: fällige Ereignisse starten/beenden, gelegentlich neue würfeln.
 -- Neue Ereignisse kommen zufällig über den Monat verteilt, solange weniger als das Ziel laufen.
 function LivingMarket:tickEvents()
