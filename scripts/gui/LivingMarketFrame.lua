@@ -158,6 +158,23 @@ local function getMarketText(factor)
     return string.format("%+d %%", percent), percent < 0 and COLOR_LOW or COLOR_GOOD
 end
 
+-- Farbe des Preises im Vergleich zum Grundpreis:
+-- über Grundpreis grün, gleich weiß, 75–99 % gelb, unter 75 % rot
+local function priceColor(price, basePrice)
+    if price == nil or basePrice == nil or basePrice <= 0 then
+        return COLOR_TEXT
+    end
+    local percent = math.floor(price / basePrice * 100 + 0.5)
+    if percent > 100 then
+        return COLOR_GOOD
+    elseif percent == 100 then
+        return COLOR_TEXT
+    elseif percent >= 75 then
+        return COLOR_MID
+    end
+    return COLOR_LOW
+end
+
 local function formatPrice(pricePer1000)
     return LivingMarket.formatMoney(pricePer1000)
 end
@@ -744,7 +761,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
     stationText:setText(ware.best.name)
     setColor(stationText, COLOR_TEXT)
     priceText:setText(formatPrice(ware.best.price))
-    setColor(priceText, COLOR_TEXT)
+    setColor(priceText, priceColor(ware.best.price, ware.basePrice))
     if marketText ~= nil then
         local text, color = getMarketText(ware.best.factor)
         marketText:setText(text)
