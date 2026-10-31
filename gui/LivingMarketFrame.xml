@@ -32,6 +32,7 @@
             <Button profile="lm_sortHeader" id="sortWare_station" position="730px 0px" text="$l10n_livingMarket_colBestStation" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_sellable" position="720px 0px" text="$l10n_livingMarket_colSellable" onClick="onClickSortHeader"/>
             <Button profile="lm_sortHeaderRight" id="sortWare_revenue" position="940px 0px" text="$l10n_livingMarket_colRevenue" onClick="onClickSortHeader"/>
+            <Bitmap profile="lm_sortArrow" id="wareSortArrow"/>
             <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
         </GuiElement>
 
@@ -73,6 +74,7 @@
                 <Button profile="lm_sortHeaderRight" id="sortDetail_price" position="510px 0px" text="$l10n_livingMarket_colPrice" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_amount" position="770px 0px" text="$l10n_livingMarket_colFreeMax" onClick="onClickSortHeader"/>
                 <Button profile="lm_sortHeaderRight" id="sortDetail_share" position="940px 0px" text="$l10n_livingMarket_colShare" onClick="onClickSortHeader"/>
+                <Bitmap profile="lm_sortArrow" id="detailSortArrow"/>
                 <ThreePartBitmap profile="fs25_lineSeparatorBottomSoft" absoluteSizeOffset="-60px 0px" position="-10px 0px"/>
             </GuiElement>
 
@@ -213,6 +215,15 @@
             <textHighlightedColor value="1 1 1 1"/>
             <textFocusedColor value="0.85 0.85 0.85 1"/>
             <textSelectedColor value="0.85 0.85 0.85 1"/>
+        </Profile>
+
+        <!-- Sortierpfeil: wird im Code links neben den Text der sortierten Spalte gesetzt -->
+        <Profile name="lm_sortArrow">
+            <anchors value="0 0 0.5 0.5"/>
+            <pivot value="0 0.5"/>
+            <position value="0px 0px"/>
+            <size value="11px 11px"/>
+            <imageColor value="0.69 0.69 0.69 1"/>
         </Profile>
 
         <Profile name="lm_sortHeaderRight" extends="lm_sortHeader">

@@ -270,8 +270,6 @@ end
 -- ---------------------------------------------------------------------
 -- Sortieren per Klick auf die Spaltenköpfe
 -- ---------------------------------------------------------------------
-LivingMarketFrame.ARROW_UP   = "▲"
-LivingMarketFrame.ARROW_DOWN = "▼"
 
 -- Spalten: Text der Überschrift und ob es eine Textspalte ist (erster Klick A→Z, sonst groß→klein)
 LivingMarketFrame.WARE_COLUMNS = {
@@ -455,6 +453,7 @@ end
 -- Pfeil vor die Überschrift der sortierten Spalte setzen
 function LivingMarketFrame:updateSortHeaders()
     local function apply(prefix, columns, sortState)
+        local sortedElement = nil
         for key, column in pairs(columns) do
             local element = prefix == "Detail" and key == "name" and self.detailTitle or self["sort" .. prefix .. "_" .. key]
             if element ~= nil then
@@ -466,16 +465,42 @@ function LivingMarketFrame:updateSortHeaders()
                 else
                     label = g_i18n:getText("livingMarket_detailHint")
                 end
-                if sortState.key == key then
-                    local arrow = sortState.asc and self.ARROW_UP or self.ARROW_DOWN
-                    label = arrow .. " " .. label
-                end
                 element:setText(label)
+                if sortState.key == key then
+                    sortedElement = element
+                end
             end
         end
+        return sortedElement
     end
-    apply("Ware", self.WARE_COLUMNS, self.wareSort)
-    apply("Detail", self.DETAIL_COLUMNS, self.detailSort)
+    self:placeSortArrow(self.wareSortArrow, apply("Ware", self.WARE_COLUMNS, self.wareSort), self.wareSort.asc)
+    self:placeSortArrow(self.detailSortArrow, apply("Detail", self.DETAIL_COLUMNS, self.detailSort), self.detailSort.asc)
+end
+
+-- Pfeil-Grafik links neben den sichtbaren Text der sortierten Spalte setzen.
+-- (Die Spielschrift kann die Zeichen ▲/▼ nicht darstellen.)
+local SORT_ARROW_GAP = 0.003   -- Bildschirmanteil zwischen Pfeil und Text
+
+function LivingMarketFrame:placeSortArrow(arrow, header, asc)
+    if arrow == nil then
+        return
+    end
+    if header == nil or header.absPosition == nil then
+        arrow:setVisible(false)
+        return
+    end
+
+    arrow:setImageFilename(Utils.getFilename(asc and "images/sortUp.dds" or "images/sortDown.dds", LivingMarket.modDir))
+
+    local textWidth = getHeaderTextWidth(header)
+    local textLeft = header.absPosition[1]
+    if RenderText ~= nil and header.textAlignment == RenderText.ALIGN_RIGHT then
+        textLeft = header.absPosition[1] + header.absSize[1] - textWidth
+    end
+    local x = textLeft - arrow.absSize[1] - SORT_ARROW_GAP
+    local y = header.absPosition[2] + (header.absSize[2] - arrow.absSize[2]) / 2
+    arrow:setAbsolutePosition(x, y)
+    arrow:setVisible(true)
 end
 
 -- ---------------------------------------------------------------------

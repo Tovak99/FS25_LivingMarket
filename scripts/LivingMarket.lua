@@ -369,19 +369,42 @@ local function getOwner(object)
     return object.ownerFarmId
 end
 
-local function addStock(stock, fillTypeIndex, amount)
+-- Name eines Lagers/Gebäudes/Fahrzeugs fürs Log
+local function describe(object, fallback)
+    for _, candidate in ipairs({ object, object ~= nil and object.owningPlaceable or nil }) do
+        if candidate ~= nil then
+            for _, getter in ipairs({ "getFullName", "getName" }) do
+                if candidate[getter] ~= nil then
+                    local ok, name = pcall(candidate[getter], candidate)
+                    if ok and name ~= nil and name ~= "" then
+                        return name
+                    end
+                end
+            end
+        end
+    end
+    return fallback
+end
+
+-- sources (nur zur Fehlersuche): [fillTypeIndex] = { "Quelle: Menge", ... }
+local function addStock(stock, fillTypeIndex, amount, sources, sourceName)
     if fillTypeIndex ~= nil and amount ~= nil and amount > 0 then
         stock[fillTypeIndex] = (stock[fillTypeIndex] or 0) + amount
+        if sources ~= nil then
+            sources[fillTypeIndex] = sources[fillTypeIndex] or {}
+            table.insert(sources[fillTypeIndex], string.format("%s: %.0f", sourceName, amount))
+        end
     end
 end
 
-local function addStorage(stock, storage, farmId, visited)
+local function addStorage(stock, storage, farmId, visited, sources, kind)
     if storage == nil or visited[storage] or getOwner(storage) ~= farmId then
         return
     end
     visited[storage] = true
+    local name = kind .. " '" .. describe(storage, "?") .. "'"
     for fillTypeIndex, level in pairs(storage.fillLevels or {}) do
-        addStock(stock, fillTypeIndex, level)
+        addStock(stock, fillTypeIndex, level, sources, name)
     end
 end
 
@@ -402,13 +425,16 @@ function LivingMarket:getFarmStock()
     end
     local visited = {}
 
+    -- Beim ersten Aufruf ins Log schreiben, woher jede Lagermenge stammt
+    local sources = (self.DEBUG and not self.hasLoggedStock) and {} or nil
+
     -- 1) Silos und Lager (auch Tierställe), wie sie das Storage-System kennt
     local storageSystem = mission.storageSystem
     if storageSystem ~= nil and storageSystem.storages ~= nil then
         for key, value in pairs(storageSystem.storages) do
             local storage = (type(key) == "table" and key.fillLevels ~= nil) and key or value
             if type(storage) == "table" then
-                addStorage(stock, storage, farmId, visited)
+                addStorage(stock, storage, farmId, visited, sources, "Lager")
             end
         end
     end
@@ -418,7 +444,7 @@ function LivingMarket:getFarmStock()
     if manager ~= nil and manager.productionPoints ~= nil then
         for _, productionPoint in pairs(manager.productionPoints) do
             if getOwner(productionPoint) == farmId then
-                addStorage(stock, productionPoint.storage, farmId, visited)
+                addStorage(stock, productionPoint.storage, farmId, visited, sources, "Produktion")
             end
         end
     end
@@ -433,9 +459,25 @@ function LivingMarket:getFarmStock()
             for _, fillUnit in ipairs(spec.fillUnits) do
                 local isConsumable = consumers ~= nil and fillUnit.fillType ~= nil and consumers[fillUnit.fillType] ~= nil
                 if not isConsumable then
-                    addStock(stock, fillUnit.fillType, fillUnit.fillLevel)
+                    addStock(stock, fillUnit.fillType, fillUnit.fillLevel, sources, "Fahrzeug/Palette '" .. describe(vehicle, "?") .. "'")
                 end
             end
+        end
+    end
+
+    if sources ~= nil then
+        self.hasLoggedStock = true
+        local lines = {}
+        for fillTypeIndex, list in pairs(sources) do
+            local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+            local name = fillType ~= nil and fillType.name or tostring(fillTypeIndex)
+            local unit = fillType ~= nil and fillType.unitShort or nil
+            table.insert(lines, string.format("Lager %s = %.0f%s <- %s", name, stock[fillTypeIndex] or 0,
+                unit ~= nil and (" (Einheit " .. tostring(unit) .. ")") or "", table.concat(list, " | ")))
+        end
+        table.sort(lines)
+        for _, line in ipairs(lines) do
+            log("%s", line)
         end
     end
 
@@ -781,6 +823,7 @@ function LivingMarket:deleteMap()
     self.stationNames = {}
     self.excludedCache = {}
     self.loggedMissionDeliveries = {}
+    self.hasLoggedStock = false
     self.hasLoggedStations = false
     self.hasDirty = false
     self.syncTimer = 0
