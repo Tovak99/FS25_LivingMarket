@@ -59,7 +59,8 @@ end
 function LivingMarket:recalcEntryLimits(entry, keepShare)
     local factor = (entry.noise or 1) * (entry.eventMax or 1)
     local oldMax = entry.max
-    entry.max = math.max(1, (entry.baseMax or entry.max or 0) * factor)
+    -- auf volle 100 Liter abrunden (28.171 l -> 28.100 l)
+    entry.max = math.max(100, math.floor((entry.baseMax or entry.max or 0) * factor / 100) * 100)
     entry.refill = (entry.baseRefill or entry.refill or 0) * factor
     if entry.remaining ~= nil then
         if keepShare and oldMax ~= nil and entry.max > oldMax then
