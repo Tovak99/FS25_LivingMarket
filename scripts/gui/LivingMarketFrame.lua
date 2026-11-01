@@ -1426,7 +1426,7 @@ function LivingMarketFrame:populateSaleCell(row, cell)
     put("station", row.stationName)
     put("amount", LivingMarket.formatLiters(row.liters))
     put("price", formatPrice(row.pricePer1000))
-    put("revenue", LivingMarket.formatMoney(row.money), COLOR_GOOD)
+    put("revenue", LivingMarket.formatMoney(row.money), COLOR_TEXT)   -- weiß: reine Anzeige, Grün nur für "mehr als normal"
     local marketText, marketColor = getMarketText(row.factor)
     put("market", marketText, marketColor)
     if row.eventLabel ~= nil then
