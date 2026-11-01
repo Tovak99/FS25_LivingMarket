@@ -777,7 +777,7 @@ function LivingMarket:logPriceDebug()
                 log("Wirtschaft %s: keine economy-Tabelle", name)
             end
             local result = self:getYearPrices(fillTypeIndex)
-            if result ~= nil then
+            if result ~= nil and result.text ~= nil then
                 log("Jahrespreise %s (je 1000 l): %s", name, table.concat(result.text, " "))
             end
         end
@@ -810,6 +810,9 @@ end
 
 -- Preis je Monat (1-12) aus den Monatsfaktoren der Ware, falls das Spiel sie bereitstellt.
 -- Ergebnis: { prices = {[monat] = Preis je 1000 l}, max, maxMonth, min, minMonth, text = {...} }
+-- Zwischenspeicher je Ware: neu berechnet nur, wenn sich Grundpreis (z. B. Schwierigkeit) oder Kurve ändern
+LivingMarket.yearPriceCache = {}
+
 function LivingMarket:getYearPrices(fillTypeIndex)
     local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
     local economy = fillType ~= nil and fillType.economy or nil
@@ -818,13 +821,25 @@ function LivingMarket:getYearPrices(fillTypeIndex)
     if type(factors) ~= "table" or base == nil then
         return nil
     end
-    local result = { prices = {}, text = {} }
+    local cached = self.yearPriceCache[fillTypeIndex]
+    if cached ~= nil and cached.base == base and cached.factors == factors then
+        return cached.result
+    end
+    local result = self:computeYearPrices(factors, base)
+    self.yearPriceCache[fillTypeIndex] = { base = base, factors = factors, result = result }
+    return result
+end
+
+function LivingMarket:computeYearPrices(factors, base)
+    local result = { prices = {}, text = self.DEBUG and {} or nil }
     for month = 1, 12 do
         local factor = factors[month]
         if type(factor) == "number" then
             local price = base * factor
             result.prices[month] = price
-            table.insert(result.text, string.format("%d:%.0f", month, price))
+            if result.text ~= nil then
+                table.insert(result.text, string.format("%d:%.0f", month, price))
+            end
             if result.max == nil or price > result.max then
                 result.max, result.maxMonth = price, month
             end
@@ -2192,6 +2207,7 @@ function LivingMarket:deleteMap()
     self.excludedCache = {}
     self.categorizedFillTypes = nil
     self.loggedMissionDeliveries = {}
+    self.yearPriceCache = {}
     self.hasLoggedStock = false
     self.hasLoggedStations = false
     self.hasLoggedPriceDebug = false

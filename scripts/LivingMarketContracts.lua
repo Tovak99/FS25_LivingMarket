@@ -571,7 +571,14 @@ function LivingMarket:deliverToContract(contract, station, superFunc, farmId, de
     if part <= 0 then
         return 0
     end
-    self.contractOverride = { station = station, fillTypeIndex = fillTypeIndex, pricePerLiter = contract.price / 1000 }
+    -- eine wiederverwendete Tabelle (kein neuer Speicher je Abladeschritt)
+    local override = self.contractOverrideData
+    if override == nil then
+        override = {}
+        self.contractOverrideData = override
+    end
+    override.station, override.fillTypeIndex, override.pricePerLiter = station, fillTypeIndex, contract.price / 1000
+    self.contractOverride = override
     local ok, moved = pcall(superFunc, station, farmId, part, fillTypeIndex, ...)
     self.contractOverride = nil
     if not ok then
@@ -931,6 +938,7 @@ function LivingMarket:resetContracts()
     self.contractTarget = nil
     self.contractSpawnHours = {}
     self.contractOverride = nil
+    self.contractOverrideData = nil
     self.maxContractsSetting = nil
     self.contractsVersion = self.contractsVersion + 1
 end
