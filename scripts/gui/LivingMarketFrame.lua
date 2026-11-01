@@ -1849,7 +1849,7 @@ function LivingMarketFrame:populateWareCell(ware, cell, isSelected)
         sellableText:setText(LivingMarket.formatLiters(ware.sellable))
         setColor(sellableText, COLOR_TEXT)
         revenueText:setText(LivingMarket.formatMoney(ware.revenue))
-        setColor(revenueText, COLOR_GOOD)
+        setColor(revenueText, COLOR_TEXT)   -- weiß: Grün steht für "mehr als normal" (wie beim Preis)
     else
         sellableText:setText("-")
         setColor(sellableText, COLOR_TEXT)
@@ -1909,7 +1909,7 @@ function LivingMarketFrame:populateStationCell(station, cell)
     if revenueText ~= nil then
         if (station.revenue or 0) >= 1 then
             revenueText:setText(LivingMarket.formatMoney(station.revenue))
-            setColor(revenueText, isFull and COLOR_MUTED or COLOR_GOOD)
+            setColor(revenueText, isFull and COLOR_MUTED or COLOR_TEXT)
         else
             revenueText:setText("-")
             setColor(revenueText, COLOR_MUTED)
