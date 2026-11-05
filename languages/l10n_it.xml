@@ -70,6 +70,10 @@
         <text name="livingMarket_ctNoStock" text="Non hai per niente questa merce in magazzino!"/>
         <text name="livingMarket_ctCancelText" text="Disdire davvero il contratto?&#10;Consegnato finora: %s di %s di %s a %s.&#10;&#10;Penale %s e minore reputazione presso %s."/>
         <text name="livingMarket_ctLimit" text="Hai già %d contratti in corso."/>
+        <text name="livingMarket_unloadSummary" text="%s → %s: %s venduti, %s · prezzo ora %s (%s) · %d %% libero"/>
+        <text name="livingMarket_unloadFull" text="%s: la domanda di %s è coperta – il punto vendita non accetta più nulla."/>
+        <text name="livingMarket_unloadAlt" text="Migliore alternativa: %s (%s, %d %% libero)"/>
+        <text name="livingMarket_unloadNoAlt" text="Al momento nessun altro punto vendita ha domanda."/>
         <text name="livingMarket_optTitle" text="Opzioni"/>
         <text name="livingMarket_optSecContracts" text="Contratti"/>
         <text name="livingMarket_optMaxContracts" text="Numero di contratti"/>

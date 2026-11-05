@@ -500,3 +500,67 @@ function LivingMarketSettingsEvent:run(connection)
         LivingMarket:applyMaxContracts(value)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Hinweise beim Abladen (Server -> alle, angezeigt nur beim abladenden Hof)
+-- kind 1 = Kurzmeldung nach dem Abladen, 2 = Station voll (mit Alternative)
+-- ---------------------------------------------------------------------
+LivingMarketUnloadNotifyEvent = {}
+local LivingMarketUnloadNotifyEvent_mt = Class(LivingMarketUnloadNotifyEvent, Event)
+InitEventClass(LivingMarketUnloadNotifyEvent, "LivingMarketUnloadNotifyEvent")
+
+function LivingMarketUnloadNotifyEvent.emptyNew()
+    return Event.new(LivingMarketUnloadNotifyEvent_mt)
+end
+
+function LivingMarketUnloadNotifyEvent.new(data)
+    local self = LivingMarketUnloadNotifyEvent.emptyNew()
+    self.data = data
+    return self
+end
+
+function LivingMarketUnloadNotifyEvent:writeStream(streamId, connection)
+    local d = self.data
+    streamWriteUInt8(streamId, d.kind or 1)
+    streamWriteUInt8(streamId, d.farmId or 0)
+    streamWriteUIntN(streamId, d.fillTypeIndex, FillTypeManager.SEND_NUM_BITS)
+    streamWriteString(streamId, d.stationName or "")
+    if d.kind == LivingMarket.UNLOAD_FULL then
+        streamWriteString(streamId, d.altName or "")
+        streamWriteFloat32(streamId, d.altPrice or 0)
+        streamWriteUInt8(streamId, d.altFree or 0)
+    else
+        streamWriteFloat32(streamId, d.liters or 0)
+        streamWriteFloat32(streamId, d.money or 0)
+        streamWriteFloat32(streamId, d.price or 0)
+        streamWriteFloat32(streamId, d.change or 0)
+        streamWriteUInt8(streamId, d.free or 0)
+    end
+end
+
+function LivingMarketUnloadNotifyEvent:readStream(streamId, connection)
+    local d = {}
+    d.kind = streamReadUInt8(streamId)
+    d.farmId = streamReadUInt8(streamId)
+    d.fillTypeIndex = streamReadUIntN(streamId, FillTypeManager.SEND_NUM_BITS)
+    d.stationName = streamReadString(streamId)
+    if d.kind == LivingMarket.UNLOAD_FULL then
+        d.altName = streamReadString(streamId)
+        d.altPrice = streamReadFloat32(streamId)
+        d.altFree = streamReadUInt8(streamId)
+    else
+        d.liters = streamReadFloat32(streamId)
+        d.money = streamReadFloat32(streamId)
+        d.price = streamReadFloat32(streamId)
+        d.change = streamReadFloat32(streamId)
+        d.free = streamReadUInt8(streamId)
+    end
+    self.data = d
+    self:run(connection)
+end
+
+function LivingMarketUnloadNotifyEvent:run(connection)
+    if connection:getIsServer() and g_server == nil then
+        LivingMarket:showUnloadNotification(self.data)
+    end
+end

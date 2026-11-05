@@ -70,6 +70,10 @@
         <text name="livingMarket_ctNoStock" text="You have none of this product in stock!"/>
         <text name="livingMarket_ctCancelText" text="Really cancel this contract?&#10;Delivered so far: %s of %s %s to %s.&#10;&#10;Penalty %s and lower standing with %s."/>
         <text name="livingMarket_ctLimit" text="You already have %d active contracts."/>
+        <text name="livingMarket_unloadSummary" text="%s → %s: %s sold, %s · price now %s (%s) · %d %% free"/>
+        <text name="livingMarket_unloadFull" text="%s: demand for %s is covered – the station accepts nothing more."/>
+        <text name="livingMarket_unloadAlt" text="Best alternative: %s (%s, %d %% free)"/>
+        <text name="livingMarket_unloadNoAlt" text="No other station has demand right now."/>
         <text name="livingMarket_optTitle" text="Options"/>
         <text name="livingMarket_optSecContracts" text="Contracts"/>
         <text name="livingMarket_optMaxContracts" text="Number of contracts"/>

@@ -1415,6 +1415,13 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
     end
     entry.remaining = math.max(entry.remaining - used, 0)
     LivingMarket:markDirty(entry)
+    -- Hinweise beim Abladen (Kurzmeldung danach, Warnung bei voller Station)
+    if LivingMarket.trackUnload ~= nil then
+        local ok, err = pcall(LivingMarket.trackUnload, LivingMarket, station, farmId, fillTypeIndex, used, priceBefore, entry)
+        if not ok then
+            print("[LivingMarket] FEHLER bei den Abladehinweisen: " .. tostring(err))
+        end
+    end
     if entry.remaining < 1 and LivingMarket.onStationSoldOut ~= nil then
         LivingMarket:onStationSoldOut(station, fillTypeIndex)
     end
@@ -1679,6 +1686,9 @@ function LivingMarket:update(dt)
     end
     if self.updateContractsSync ~= nil then
         self:updateContractsSync(dt)
+    end
+    if self.updateUnloads ~= nil and isServer() then
+        self:updateUnloads(dt)
     end
     if not self.hasDirty then
         return
@@ -2208,6 +2218,9 @@ function LivingMarket:deleteMap()
     self.categorizedFillTypes = nil
     self.loggedMissionDeliveries = {}
     self.yearPriceCache = {}
+    if self.resetUnloads ~= nil then
+        self:resetUnloads()
+    end
     self.hasLoggedStock = false
     self.hasLoggedStations = false
     self.hasLoggedPriceDebug = false

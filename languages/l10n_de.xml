@@ -70,6 +70,10 @@
         <text name="livingMarket_ctNoStock" text="Du hast diese Ware gar nicht auf Lager!"/>
         <text name="livingMarket_ctCancelText" text="Vertrag wirklich kündigen?&#10;Bisher geliefert: %s von %s %s an %s.&#10;&#10;Strafe %s und weniger Ansehen bei %s."/>
         <text name="livingMarket_ctLimit" text="Du hast bereits %d laufende Verträge."/>
+        <text name="livingMarket_unloadSummary" text="%s → %s: %s verkauft, %s · Preis jetzt %s (%s) · frei %d %%"/>
+        <text name="livingMarket_unloadFull" text="%s: Bedarf an %s gedeckt – die Station nimmt nichts mehr an."/>
+        <text name="livingMarket_unloadAlt" text="Beste Alternative: %s (%s, frei %d %%)"/>
+        <text name="livingMarket_unloadNoAlt" text="Gerade hat keine andere Station Bedarf."/>
         <text name="livingMarket_optTitle" text="Optionen"/>
         <text name="livingMarket_optSecContracts" text="Verträge"/>
         <text name="livingMarket_optMaxContracts" text="Anzahl der Verträge"/>

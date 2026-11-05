@@ -70,6 +70,10 @@
         <text name="livingMarket_ctNoStock" text="Je hebt deze waar helemaal niet op voorraad!"/>
         <text name="livingMarket_ctCancelText" text="Contract echt opzeggen?&#10;Tot nu geleverd: %s van %s %s aan %s.&#10;&#10;Boete %s en minder aanzien bij %s."/>
         <text name="livingMarket_ctLimit" text="Je hebt al %d lopende contracten."/>
+        <text name="livingMarket_unloadSummary" text="%s → %s: %s verkocht, %s · prijs nu %s (%s) · %d %% vrij"/>
+        <text name="livingMarket_unloadFull" text="%s: vraag naar %s is gedekt – het verkooppunt neemt niets meer aan."/>
+        <text name="livingMarket_unloadAlt" text="Beste alternatief: %s (%s, %d %% vrij)"/>
+        <text name="livingMarket_unloadNoAlt" text="Op dit moment heeft geen ander verkooppunt vraag."/>
         <text name="livingMarket_optTitle" text="Opties"/>
         <text name="livingMarket_optSecContracts" text="Contracten"/>
         <text name="livingMarket_optMaxContracts" text="Aantal contracten"/>
