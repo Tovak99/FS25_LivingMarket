@@ -1690,6 +1690,7 @@ function LivingMarket:update(dt)
     if self.updateUnloads ~= nil and isServer() then
         self:updateUnloads(dt)
     end
+    self:updateMenuPlacement(dt)
     if not self.hasDirty then
         return
     end
@@ -1777,7 +1778,88 @@ function LivingMarket:addMenuPage()
     inGameMenu:addPageTab(frame, iconFile, GuiUtils.getUVs({0, 0, 128, 128}, {128, 128}))
 
     inGameMenu:rebuildTabList()
+    self.menuFrame = frame
+    self.menuPlaceTries = 0
     log("Menüseite angelegt")
+    self:placeMenuPageAfterFieldManager()
+end
+
+-- ---------------------------------------------------------------------
+-- Reiter direkt hinter den Field Manager (Feld-Info-Mod, Seite "pageFieldOverview") setzen.
+-- Der Field Manager baut seine Seite evtl. erst nach uns ein, deshalb in der ersten
+-- Minute jede Sekunde prüfen (nur solange das Menü geschlossen ist).
+-- Ohne Field Manager bleibt der Reiter hinter "Preise".
+-- ---------------------------------------------------------------------
+LivingMarket.FIELD_MANAGER_PAGE = "pageFieldOverview"
+LivingMarket.MENU_PLACE_MAX_TRIES = 60
+
+local function isFieldManagerFrame(frame)
+    return frame ~= nil and (frame.name == LivingMarket.FIELD_MANAGER_PAGE or frame.pageName == LivingMarket.FIELD_MANAGER_PAGE)
+end
+
+function LivingMarket:placeMenuPageAfterFieldManager()
+    local menu = g_inGameMenu
+    local frame = self.menuFrame
+    if menu == nil or frame == nil or menu.pageFrames == nil or menu.pagingElement == nil then
+        return false
+    end
+    if menu.isOpen or (g_gui ~= nil and g_gui.currentGuiName == "InGameMenu") then
+        return false   -- nicht umsortieren, während das Menü offen ist
+    end
+    local fmIndex = findIndex(menu.pageFrames, isFieldManagerFrame)
+    local ownIndex = findIndex(menu.pageFrames, function(f) return f == frame end)
+    if fmIndex == nil or ownIndex == nil then
+        return false
+    end
+    if ownIndex == fmIndex + 1 then
+        return true   -- liegt schon richtig
+    end
+    local fmFrame = menu.pageFrames[fmIndex]
+    local function moveAfter(list, isOwn, isFm)
+        if list == nil then
+            return
+        end
+        local i = findIndex(list, isOwn)
+        if i == nil then
+            return
+        end
+        local item = table.remove(list, i)
+        local j = findIndex(list, isFm)
+        if j ~= nil then
+            table.insert(list, j + 1, item)
+        else
+            table.insert(list, i, item)   -- Field Manager hier nicht gefunden: zurück an alte Stelle
+        end
+    end
+    moveAfter(menu.pageFrames, function(f) return f == frame end, function(f) return f == fmFrame end)
+    moveAfter(menu.pagingElement.elements, function(e) return e == frame end, function(e) return e == fmFrame end)
+    moveAfter(menu.pagingElement.pages, function(p) return p.element == frame end, function(p) return p.element == fmFrame end)
+    if menu.pagingElement.updateAbsolutePosition ~= nil then
+        menu.pagingElement:updateAbsolutePosition()
+    end
+    if menu.pagingElement.updatePageMapping ~= nil then
+        menu.pagingElement:updatePageMapping()
+    end
+    menu:rebuildTabList()
+    log("Reiter hinter den Field Manager gesetzt")
+    return true
+end
+
+function LivingMarket:updateMenuPlacement(dt)
+    if self.menuFrame == nil or (self.menuPlaceTries or 0) >= self.MENU_PLACE_MAX_TRIES then
+        return
+    end
+    self.menuPlaceTimer = (self.menuPlaceTimer or 0) - dt
+    if self.menuPlaceTimer > 0 then
+        return
+    end
+    self.menuPlaceTimer = 1000
+    self.menuPlaceTries = (self.menuPlaceTries or 0) + 1
+    local ok, err = pcall(self.placeMenuPageAfterFieldManager, self)
+    if not ok then
+        log("Reiter umsetzen fehlgeschlagen: %s", tostring(err))
+        self.menuPlaceTries = self.MENU_PLACE_MAX_TRIES
+    end
 end
 
 -- ---------------------------------------------------------------------
