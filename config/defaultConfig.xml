@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="13">
+<livingMarket version="14">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -142,8 +142,8 @@
             <fillType name="GRASS_WINDROW"/> <fillType name="DRYGRASS_WINDROW"/> <fillType name="SILAGE"/> <fillType name="STRAW"/>
             <fillType name="CHAFF"/> <fillType name="FIELDGRASS"/> <fillType name="ALFALFA_WINDROW"/> <fillType name="DRYALFALFA_WINDROW"/>
             <fillType name="CLOVER_WINDROW"/> <fillType name="DRYCLOVER_WINDROW"/> <fillType name="FORAGE"/> <fillType name="FORAGE_MIXING"/>
-            <fillType name="HAY_PELLETS"/> <fillType name="STRAW_PELLETS"/> <fillType name="SOYBEANSTRAW"/> <fillType name="FLAX_WINDROW"/>
-            <fillType name="HEMP_WINDROW"/> <fillType name="PIGFOOD"/>
+            <fillType name="HAY_PELLETS"/> <fillType name="STRAW_PELLETS"/> <fillType name="SOYBEANSTRAW"/>
+            <fillType name="PIGFOOD"/>
         </group>
 
         <group name="wood" title="Holz" max="200000" refillPerMonth="0.30">
@@ -164,6 +164,7 @@
             <fillType name="BRAN"/> <fillType name="RICEFLOUR"/> <fillType name="BOARDS"/> <fillType name="PLANKS"/>
             <fillType name="WOODBEAM"/> <fillType name="CEMENT"/> <fillType name="CEMENTBRICKS"/> <fillType name="ROOFPLATES"/>
             <fillType name="PAPERROLL"/> <fillType name="CARTONROLL"/> <fillType name="FABRIC"/> <fillType name="THREAD"/>
+            <fillType name="FLAX_WINDROW"/> <fillType name="HEMP_WINDROW"/>
         </group>
 
         <group name="food" title="Lebensmittel" max="60000" refillPerMonth="0.30">
