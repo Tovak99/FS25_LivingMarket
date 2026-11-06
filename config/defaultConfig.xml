@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="11">
+<livingMarket version="12">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -100,6 +100,8 @@
         <priceTier minPrice="0"    group="intermediate"/>
     </autoGroups>
 
+    <!-- filter="gruppe": Gruppe erscheint im Gruppenfilter unter einer anderen Gruppe
+         (z. B. Milch unter Tierprodukte), behält aber ihren eigenen Bedarf. -->
     <groups>
         <group name="grain" title="Getreide &amp; Ölsaaten" max="500000" refillPerMonth="0.40">
             <fillType name="WHEAT"/> <fillType name="BARLEY"/> <fillType name="OAT"/> <fillType name="RYE"/>
@@ -128,7 +130,7 @@
             <fillType name="WOODCHIPS"/> <fillType name="WOOD"/> <fillType name="ROUNDBALE_WOOD"/> <fillType name="BARKMULCH"/>
         </group>
 
-        <group name="milk" title="Milch" max="120000" refillPerMonth="0.60">
+        <group name="milk" title="Milch" max="120000" refillPerMonth="0.60" filter="special">
             <fillType name="MILK"/> <fillType name="GOATMILK"/> <fillType name="BUFFALOMILK"/>
         </group>
 
@@ -146,11 +148,14 @@
             <fillType name="SUGARBEET_SYRUP"/>
         </group>
 
-        <group name="special" title="Tierprodukte &amp; Spezielles" max="30000" refillPerMonth="0.25">
-            <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/> <fillType name="GRAPE"/>
-            <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/> <fillType name="LETTUCE"/>
-            <fillType name="STRAWBERRY"/>
-            <!-- Obst und Gemüse von Karten/Mods (unbekannte Namen werden übersprungen) -->
+        <group name="special" title="Tierprodukte" max="30000" refillPerMonth="0.25">
+            <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/>
+        </group>
+
+        <!-- Obst & Gemüse (auch von Karten/Mods; unbekannte Namen werden übersprungen) -->
+        <group name="fruit" title="Obst &amp; Gemüse" max="30000" refillPerMonth="0.25">
+            <fillType name="GRAPE"/> <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/>
+            <fillType name="LETTUCE"/> <fillType name="STRAWBERRY"/>
             <fillType name="APPLE"/> <fillType name="PEAR"/> <fillType name="CHERRY"/> <fillType name="PLUM"/>
             <fillType name="APRICOT"/> <fillType name="PEACH"/> <fillType name="QUINCE"/> <fillType name="MIRABELLE"/>
             <fillType name="BLUEBERRY"/> <fillType name="RASPBERRY"/> <fillType name="BLACKBERRY"/> <fillType name="CURRANT"/>

@@ -424,6 +424,7 @@ function LivingMarket:loadConfig()
         local group = {
             name           = getXMLString(xmlFile, groupKey .. "#name") or tostring(g),
             title          = getXMLString(xmlFile, groupKey .. "#title"),
+            filter         = getXMLString(xmlFile, groupKey .. "#filter"),   -- im Gruppenfilter unter dieser Gruppe
             max            = getXMLFloat(xmlFile, groupKey .. "#max") or config.default.max,
             refillPerMonth = getXMLFloat(xmlFile, groupKey .. "#refillPerMonth") or config.default.refillPerMonth
         }
@@ -572,14 +573,23 @@ LivingMarket.GROUP_OTHER = "default"
 function LivingMarket:getGroupNameOf(fillTypeIndex)
     local config = self.config
     local group = config ~= nil and config.byFillType[fillTypeIndex] or nil
-    return group ~= nil and group.name or self.GROUP_OTHER
+    if group == nil then
+        return self.GROUP_OTHER
+    end
+    if group.filter ~= nil and config.groupsByName[group.filter] ~= nil then
+        return group.filter   -- z. B. Milch erscheint unter Tierprodukte
+    end
+    return group.name
 end
 
 function LivingMarket:getFilterGroups()
     local list = {}
     local config = self.config
     for _, group in ipairs(config ~= nil and config.groupOrder or {}) do
-        table.insert(list, { name = group.name, title = group.title })
+        -- Gruppen, die im Filter unter einer anderen erscheinen, bekommen keinen eigenen Knopf
+        if group.filter == nil or config.groupsByName[group.filter] == nil then
+            table.insert(list, { name = group.name, title = group.title })
+        end
     end
     table.insert(list, { name = self.GROUP_OTHER })
     return list

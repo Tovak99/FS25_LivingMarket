@@ -79,6 +79,7 @@
         <text name="livingMarket_grp_intermediate" text="Tussenproducten"/>
         <text name="livingMarket_grp_food" text="Voeding"/>
         <text name="livingMarket_grp_special" text="Dierproducten"/>
+        <text name="livingMarket_grp_fruit" text="Groente &amp; fruit"/>
         <text name="livingMarket_grp_premium" text="Eindproducten"/>
         <text name="livingMarket_grp_default" text="Overig"/>
         <text name="livingMarket_noGroupWares" text="Geen producten in deze groep."/>

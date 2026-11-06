@@ -79,6 +79,7 @@
         <text name="livingMarket_grp_intermediate" text="Intermediates"/>
         <text name="livingMarket_grp_food" text="Food"/>
         <text name="livingMarket_grp_special" text="Animal products"/>
+        <text name="livingMarket_grp_fruit" text="Fruit &amp; vegetables"/>
         <text name="livingMarket_grp_premium" text="Premium goods"/>
         <text name="livingMarket_grp_default" text="Other"/>
         <text name="livingMarket_noGroupWares" text="No goods in this group."/>

@@ -79,6 +79,7 @@
         <text name="livingMarket_grp_intermediate" text="Półprodukty"/>
         <text name="livingMarket_grp_food" text="Żywność"/>
         <text name="livingMarket_grp_special" text="Prod. zwierzęce"/>
+        <text name="livingMarket_grp_fruit" text="Owoce i warzywa"/>
         <text name="livingMarket_grp_premium" text="Prod. końcowe"/>
         <text name="livingMarket_grp_default" text="Inne"/>
         <text name="livingMarket_noGroupWares" text="Brak towarów w tej grupie."/>
