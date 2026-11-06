@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="14">
+<livingMarket version="15">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -158,7 +158,7 @@
             <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/>
         </group>
 
-        <group name="intermediate" title="Zwischenprodukte" max="80000" refillPerMonth="0.35">
+        <group name="intermediate" title="Zwischenprodukte" max="50000" refillPerMonth="0.25">
             <fillType name="FLOUR"/> <fillType name="SUGAR"/> <fillType name="SUNFLOWER_OIL"/> <fillType name="CANOLA_OIL"/>
             <fillType name="OLIVE_OIL"/> <fillType name="RICE_OIL"/> <fillType name="BUTTER"/> <fillType name="CREAM"/>
             <fillType name="BRAN"/> <fillType name="RICEFLOUR"/> <fillType name="BOARDS"/> <fillType name="PLANKS"/>
@@ -167,13 +167,13 @@
             <fillType name="FLAX_WINDROW"/> <fillType name="HEMP_WINDROW"/>
         </group>
 
-        <group name="food" title="Lebensmittel" max="60000" refillPerMonth="0.30">
+        <group name="food" title="Lebensmittel" max="80000" refillPerMonth="0.30">
             <fillType name="BREAD"/> <fillType name="CAKE"/> <fillType name="CHEESE"/> <fillType name="GRAPEJUICE"/>
             <fillType name="CEREAL"/> <fillType name="NOODLESOUP"/> <fillType name="POTATOCHIPS"/> <fillType name="RAISINS"/>
             <fillType name="SUGARBEET_SYRUP"/>
         </group>
 
-        <group name="premium" title="Hochwertige Endprodukte" max="20000" refillPerMonth="0.20">
+        <group name="premium" title="Hochwertige Endprodukte" max="30000" refillPerMonth="0.25">
             <fillType name="CHOCOLATE"/> <fillType name="CLOTHES"/> <fillType name="FURNITURE"/> <fillType name="PREFABWALL"/>
             <fillType name="BATHTUB"/> <fillType name="BARREL"/> <fillType name="BUCKET"/>
         </group>
