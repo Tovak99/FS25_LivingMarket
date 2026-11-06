@@ -164,6 +164,7 @@ function LivingMarketFrame:storeUiState()
         eventSort   = copy(self.eventSort),
         saleSort    = copy(self.saleSort),
     }
+    LivingMarket:onUiStateChanged()
 end
 
 function LivingMarketFrame:onFrameOpen()
@@ -437,6 +438,7 @@ function LivingMarketFrame:getFilteredWares()
 end
 
 function LivingMarketFrame:rebuildWareList()
+    self.shownFavoritesVersion = LivingMarket.favoritesVersion
     self.visibleWares = self:getFilteredWares()
 
     -- Hinweis bei leerer Liste
@@ -1003,6 +1005,10 @@ function LivingMarketFrame:update(dt)
         end
     end
 
+    -- Favoriten (z. B. von einem Mitspieler geändert): Warenliste sofort neu aufbauen
+    if self.viewMode == "market" and self.shownFavoritesVersion ~= LivingMarket.favoritesVersion then
+        self:rebuildWareList()
+    end
     -- Verkäufe: neue Einträge sofort zeigen
     if self.viewMode == "sales" and self.shownSalesVersion ~= LivingMarket.salesVersion then
         self:refreshSales()

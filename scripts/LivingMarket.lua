@@ -1687,6 +1687,12 @@ end
 
 -- Neuer Mitspieler: kompletten Stand schicken
 function LivingMarket.sendInitialClientState(mission, connection, user, farm)
+    if LivingMarketConfigEvent ~= nil then
+        local ok, snap = pcall(LivingMarket.getConfigSnapshot, LivingMarket)
+        if ok and snap ~= nil then
+            connection:sendEvent(LivingMarketConfigEvent.new(snap))
+        end
+    end
     local entries = LivingMarket:collectSyncEntries(false)
     for _, chunk in ipairs(LivingMarket.chunkEntries(entries)) do
         connection:sendEvent(LivingMarketSyncEvent.new(chunk))
@@ -1915,6 +1921,157 @@ end
 -- wenn der Spielstand noch keine Favoriten hat.
 -- ---------------------------------------------------------------------
 LivingMarket.favorites = nil   -- [fillTypeName] = true
+
+-- ---------------------------------------------------------------------
+-- Filter/Sortierung (UI-Zustand): Host im Spielstand, Mitspieler lokal in modSettings
+-- ---------------------------------------------------------------------
+function LivingMarket.readUiState(xmlFile, baseKey)
+    if not hasXMLProperty(xmlFile, baseKey) then
+        return nil
+    end
+    local function sortState(name)
+        local key = getXMLString(xmlFile, baseKey .. "#" .. name .. "Sort")
+        if key == nil then
+            return nil
+        end
+        local asc = getXMLBool(xmlFile, baseKey .. "#" .. name .. "Asc")
+        return { key = key, asc = asc ~= false }
+    end
+    return {
+        filterMode     = getXMLString(xmlFile, baseKey .. "#filter"),
+        eventFilter    = getXMLString(xmlFile, baseKey .. "#eventFilter"),
+        contractFilter = getXMLString(xmlFile, baseKey .. "#contractFilter"),
+        groupFilter    = getXMLString(xmlFile, baseKey .. "#groupFilter"),
+        wareSort       = sortState("ware"),
+        detailSort     = sortState("detail"),
+        eventSort      = sortState("event"),
+        saleSort       = sortState("sale"),
+    }
+end
+
+function LivingMarket.writeUiState(xmlFile, baseKey, ui)
+    if ui == nil then
+        return
+    end
+    for attr, value in pairs({ filter = ui.filterMode, eventFilter = ui.eventFilter,
+        contractFilter = ui.contractFilter, groupFilter = ui.groupFilter }) do
+        if value ~= nil then
+            setXMLString(xmlFile, baseKey .. "#" .. attr, value)
+        end
+    end
+    for _, name in ipairs({ "ware", "detail", "event", "sale" }) do
+        local state = ui[name .. "Sort"]
+        if state ~= nil and state.key ~= nil then
+            setXMLString(xmlFile, baseKey .. "#" .. name .. "Sort", state.key)
+            setXMLBool(xmlFile, baseKey .. "#" .. name .. "Asc", state.asc ~= false)
+        end
+    end
+end
+
+function LivingMarket:getLocalUiPath()
+    local path = self:getSettingsPath()
+    return path ~= nil and (string.gsub(path, "%.xml$", "_ui.xml")) or nil
+end
+
+-- Mitspieler: eigenen UI-Zustand lokal speichern (der Spielstand gehört dem Host)
+function LivingMarket:onUiStateChanged()
+    if g_currentMission == nil or g_currentMission:getIsServer() then
+        return   -- Host/Einzelspieler: kommt mit dem Spielstand
+    end
+    local path = self:getLocalUiPath()
+    if path == nil or self.uiState == nil then
+        return
+    end
+    local xmlFile = createXMLFile("LivingMarketUi", path, "livingMarketUi")
+    if xmlFile == nil or xmlFile == 0 then
+        return
+    end
+    self.writeUiState(xmlFile, "livingMarketUi.ui", self.uiState)
+    saveXMLFile(xmlFile)
+    delete(xmlFile)
+end
+
+function LivingMarket:loadLocalUiState()
+    local path = self:getLocalUiPath()
+    if path == nil or not fileExists(path) then
+        return
+    end
+    local xmlFile = loadXMLFile("LivingMarketUi", path)
+    if xmlFile == nil or xmlFile == 0 then
+        return
+    end
+    self.uiState = self.readUiState(xmlFile, "livingMarketUi.ui")
+    self.uiStateVersion = (self.uiStateVersion or 0) + 1
+    delete(xmlFile)
+end
+
+-- ---------------------------------------------------------------------
+-- Konfiguration des Hosts an die Mitspieler (Gruppen, Bedarf, Preiskurve, Vertragswerte),
+-- damit alle dieselben Gruppen und Werte anzeigen
+-- ---------------------------------------------------------------------
+function LivingMarket:getConfigSnapshot()
+    local config = self.config
+    if config == nil then
+        pcall(self.loadConfig, self)
+        config = self.config
+    end
+    local snap = {
+        price = { self.PRICE_FULL_SHARE, self.PRICE_MIN_SHARE, self.PRICE_MIN_FACTOR, self.PRICE_CURVE },
+        default = { max = config.default.max, refill = config.default.refillPerMonth },
+        groups = {},
+        fillTypes = {},
+        contract = {},
+    }
+    for _, group in ipairs(config.groupOrder or {}) do
+        table.insert(snap.groups, { name = group.name, title = group.title or "", filter = group.filter or "",
+            max = group.max, refill = group.refillPerMonth })
+    end
+    for fillTypeIndex, group in pairs(config.byFillType) do
+        local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+        if name ~= nil then
+            table.insert(snap.fillTypes, { name = name, group = group.name })
+        end
+    end
+    for key, value in pairs(self.CONTRACT_SETTINGS or {}) do
+        if type(value) == "number" then
+            table.insert(snap.contract, { key = key, value = value })
+        end
+    end
+    return snap
+end
+
+function LivingMarket:applyConfigSnapshot(snap)
+    if snap == nil or g_currentMission == nil or g_currentMission:getIsServer() then
+        return
+    end
+    self.PRICE_FULL_SHARE, self.PRICE_MIN_SHARE, self.PRICE_MIN_FACTOR, self.PRICE_CURVE =
+        snap.price[1], snap.price[2], snap.price[3], snap.price[4]
+    local config = self.config or {}
+    config.default = { max = snap.default.max, refillPerMonth = snap.default.refill }
+    config.groupsByName, config.groupOrder, config.byFillType = {}, {}, {}
+    for _, g in ipairs(snap.groups) do
+        local group = { name = g.name, title = g.title ~= "" and g.title or nil, filter = g.filter ~= "" and g.filter or nil,
+            max = g.max, refillPerMonth = g.refill }
+        config.groupsByName[group.name] = group
+        table.insert(config.groupOrder, group)
+    end
+    for _, f in ipairs(snap.fillTypes) do
+        local index = g_fillTypeManager:getFillTypeIndexByName(f.name)
+        local group = config.groupsByName[f.group]
+        if index ~= nil and group ~= nil then
+            config.byFillType[index] = group
+        end
+    end
+    self.config = config
+    for _, c in ipairs(snap.contract) do
+        if self.CONTRACT_SETTINGS ~= nil and type(self.CONTRACT_SETTINGS[c.key]) == "number" then
+            self.CONTRACT_SETTINGS[c.key] = c.value
+        end
+    end
+    self.yearPriceCache = {}
+    self.contractsVersion = (self.contractsVersion or 0) + 1
+    log("Konfiguration vom Host übernommen: %d Gruppen, %d Waren", #snap.groups, #snap.fillTypes)
+end
 
 function LivingMarket:getSettingsPath()
     local dir = g_modSettingsDirectory
@@ -2156,23 +2313,7 @@ function LivingMarket:loadFromSavegame()
 
     -- Filter und Sortierung der Menüseite
     if hasXMLProperty(xmlFile, "livingMarket.ui") then
-        local function sortState(name)
-            local key = getXMLString(xmlFile, "livingMarket.ui#" .. name .. "Sort")
-            if key == nil then
-                return nil
-            end
-            local asc = getXMLBool(xmlFile, "livingMarket.ui#" .. name .. "Asc")
-            return { key = key, asc = asc ~= false }
-        end
-        self.uiState = {
-            filterMode  = getXMLString(xmlFile, "livingMarket.ui#filter"),
-            eventFilter = getXMLString(xmlFile, "livingMarket.ui#eventFilter"),
-            contractFilter = getXMLString(xmlFile, "livingMarket.ui#contractFilter"),
-            wareSort    = sortState("ware"),
-            detailSort  = sortState("detail"),
-            eventSort   = sortState("event"),
-            saleSort    = sortState("sale"),
-        }
+        self.uiState = self.readUiState(xmlFile, "livingMarket.ui")
     end
     self.uiStateVersion = (self.uiStateVersion or 0) + 1
     delete(xmlFile)
@@ -2263,19 +2404,7 @@ function LivingMarket.saveToSavegame(missionInfo)
     writeFillTypeNames(xmlFile, "livingMarket.favorites", self.favorites)
 
     -- Filter und Sortierung der Menüseite
-    local ui = self.uiState
-    if ui ~= nil then
-        if ui.filterMode ~= nil then setXMLString(xmlFile, "livingMarket.ui#filter", ui.filterMode) end
-        if ui.eventFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#eventFilter", ui.eventFilter) end
-        if ui.contractFilter ~= nil then setXMLString(xmlFile, "livingMarket.ui#contractFilter", ui.contractFilter) end
-        for _, name in ipairs({ "ware", "detail", "event", "sale" }) do
-            local state = ui[name .. "Sort"]
-            if state ~= nil and state.key ~= nil then
-                setXMLString(xmlFile, "livingMarket.ui#" .. name .. "Sort", state.key)
-                setXMLBool(xmlFile, "livingMarket.ui#" .. name .. "Asc", state.asc ~= false)
-            end
-        end
-    end
+    self.writeUiState(xmlFile, "livingMarket.ui", self.uiState)
 
     saveXMLFile(xmlFile)
     delete(xmlFile)
@@ -2313,6 +2442,10 @@ function LivingMarket:loadMap(name)
     local okLoad, errLoad = pcall(self.loadFromSavegame, self)
     if not okLoad then
         print("[LivingMarket] FEHLER beim Laden des Spielstands: " .. tostring(errLoad))
+    end
+    -- Mitspieler: eigene Filter/Sortierung aus modSettings
+    if not isServer() then
+        pcall(self.loadLocalUiState, self)
     end
 
     local okDialog, errDialog = pcall(LivingMarketLocationDialog.register)

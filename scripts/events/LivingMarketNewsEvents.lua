@@ -564,3 +564,90 @@ function LivingMarketUnloadNotifyEvent:run(connection)
         LivingMarket:showUnloadNotification(self.data)
     end
 end
+
+-- ---------------------------------------------------------------------
+-- Konfiguration des Hosts (Server -> Mitspieler beim Beitreten):
+-- Preiskurve, Standard- und Gruppenwerte, Zuordnung der Waren, Vertragswerte
+-- ---------------------------------------------------------------------
+LivingMarketConfigEvent = {}
+local LivingMarketConfigEvent_mt = Class(LivingMarketConfigEvent, Event)
+InitEventClass(LivingMarketConfigEvent, "LivingMarketConfigEvent")
+
+function LivingMarketConfigEvent.emptyNew()
+    return Event.new(LivingMarketConfigEvent_mt)
+end
+
+function LivingMarketConfigEvent.new(snap)
+    local self = LivingMarketConfigEvent.emptyNew()
+    self.snap = snap
+    return self
+end
+
+function LivingMarketConfigEvent:writeStream(streamId, connection)
+    local snap = self.snap
+    for i = 1, 4 do
+        streamWriteFloat32(streamId, snap.price[i] or 0)
+    end
+    streamWriteFloat32(streamId, snap.default.max or 0)
+    streamWriteFloat32(streamId, snap.default.refill or 0)
+    streamWriteUInt16(streamId, #snap.groups)
+    for _, g in ipairs(snap.groups) do
+        streamWriteString(streamId, g.name)
+        streamWriteString(streamId, g.title or "")
+        streamWriteString(streamId, g.filter or "")
+        streamWriteFloat32(streamId, g.max or 0)
+        streamWriteFloat32(streamId, g.refill or 0)
+    end
+    streamWriteUInt16(streamId, #snap.fillTypes)
+    for _, f in ipairs(snap.fillTypes) do
+        streamWriteString(streamId, f.name)
+        streamWriteString(streamId, f.group)
+    end
+    streamWriteUInt16(streamId, #snap.contract)
+    for _, c in ipairs(snap.contract) do
+        streamWriteString(streamId, c.key)
+        streamWriteFloat32(streamId, c.value)
+    end
+end
+
+function LivingMarketConfigEvent:readStream(streamId, connection)
+    local snap = { price = {}, default = {}, groups = {}, fillTypes = {}, contract = {} }
+    for i = 1, 4 do
+        snap.price[i] = streamReadFloat32(streamId)
+    end
+    snap.default.max = streamReadFloat32(streamId)
+    snap.default.refill = streamReadFloat32(streamId)
+    -- einzeln nacheinander lesen (Reihenfolge in Tabellen-Konstruktoren ist in Lua nicht festgelegt)
+    for _ = 1, streamReadUInt16(streamId) do
+        local g = {}
+        g.name = streamReadString(streamId)
+        g.title = streamReadString(streamId)
+        g.filter = streamReadString(streamId)
+        g.max = streamReadFloat32(streamId)
+        g.refill = streamReadFloat32(streamId)
+        table.insert(snap.groups, g)
+    end
+    for _ = 1, streamReadUInt16(streamId) do
+        local f = {}
+        f.name = streamReadString(streamId)
+        f.group = streamReadString(streamId)
+        table.insert(snap.fillTypes, f)
+    end
+    for _ = 1, streamReadUInt16(streamId) do
+        local c = {}
+        c.key = streamReadString(streamId)
+        c.value = streamReadFloat32(streamId)
+        table.insert(snap.contract, c)
+    end
+    self.snap = snap
+    self:run(connection)
+end
+
+function LivingMarketConfigEvent:run(connection)
+    if connection:getIsServer() and g_server == nil then
+        local ok, err = pcall(LivingMarket.applyConfigSnapshot, LivingMarket, self.snap)
+        if not ok then
+            print("[LivingMarket] FEHLER beim Übernehmen der Host-Konfiguration: " .. tostring(err))
+        end
+    end
+end
