@@ -56,3 +56,12 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
 ## Fehlersuche
 
 Die Mod schreibt Zeilen mit dem Präfix `[LivingMarket]` in die `log.txt` (`Dokumente/My Games/FarmingSimulator2025/`), u. a. alle Stationen mit ihren Waren beim ersten Öffnen der Seite.
+
+Ein paar Screenshots
+<img width="1461" height="901" alt="image" src="https://github.com/user-attachments/assets/96ec7404-def3-420d-8bd0-be35610a2dfd" />
+<img width="1435" height="882" alt="image" src="https://github.com/user-attachments/assets/cdd917ed-62fb-4ff7-aa95-4ec6e5f5c7db" />
+<img width="1470" height="876" alt="image" src="https://github.com/user-attachments/assets/b7b0bc90-9917-4549-9307-97f8457b808f" />
+<img width="1441" height="856" alt="image" src="https://github.com/user-attachments/assets/e87d419b-c742-45ac-80c1-3ec6618dd191" />
+
+
+
