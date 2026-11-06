@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="15">
+<livingMarket version="16">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -103,7 +103,8 @@
     <!-- Reihenfolge der Gruppen = Reihenfolge im Gruppenfilter (entlang der Produktionskette:
          Acker, Grünland, Wald, Tierhaltung, dann Verarbeitung).
          filter="gruppe": Gruppe erscheint im Gruppenfilter unter einer anderen Gruppe
-         (z. B. Milch unter Tierprodukte), behält aber ihren eigenen Bedarf. -->
+         (z. B. Milch unter Tierprodukte), behält aber ihren eigenen Bedarf;
+         filter="default" = unter Sonstige. -->
     <groups>
         <group name="grain" title="Getreide &amp; Ölsaaten" max="500000" refillPerMonth="0.40">
             <fillType name="WHEAT"/> <fillType name="BARLEY"/> <fillType name="OAT"/> <fillType name="RYE"/>
@@ -113,11 +114,16 @@
             <fillType name="HEMP"/> <fillType name="LINSEED"/> <fillType name="MUSTARD"/> <fillType name="POPPY"/>
             <fillType name="LENTILS"/> <fillType name="PEA"/> <fillType name="CHICKPEAS"/> <fillType name="BROADBEAN"/>
             <fillType name="MILLET"/> <fillType name="QUINOA"/>
+            <!-- weitere Ackerfrüchte (Karten/Mods) -->
+            <fillType name="BEANS"/> <fillType name="PEAS"/> <fillType name="COTTON"/> <fillType name="OILSEEDRADISH"/>
+            <fillType name="TOBACCO"/>
         </group>
 
         <group name="roots" title="Hackfrüchte" max="400000" refillPerMonth="0.40">
             <fillType name="POTATO"/> <fillType name="SUGARBEET"/> <fillType name="SUGARBEET_CUT"/> <fillType name="BEETROOT"/>
             <fillType name="CARROT"/> <fillType name="PARSNIP"/> <fillType name="ONION"/> <fillType name="SUGARCANE"/>
+            <!-- weitere Hackfrüchte -->
+            <fillType name="ONION_DIRTY"/> <fillType name="REDONION"/>
         </group>
 
         <!-- Obst & Gemüse (auch von Karten/Mods; unbekannte Namen werden übersprungen) -->
@@ -136,6 +142,11 @@
             <fillType name="ASPARAGUS"/> <fillType name="GREENBEAN"/> <fillType name="RADISH"/> <fillType name="HOPS"/>
             <fillType name="APFEL"/> <fillType name="BIRNE"/> <fillType name="KIRSCHE"/> <fillType name="KIRSCHEN"/>
             <fillType name="PFLAUME"/> <fillType name="PFLAUMEN"/> <fillType name="KUERBIS"/> <fillType name="ERDBEERE"/>
+            <!-- weitere Sorten, Pilze und abgepacktes Gemüse -->
+            <fillType name="CURRANTS"/> <fillType name="MIRABELLES"/> <fillType name="MUSHROOMS"/> <fillType name="OYSTER"/>
+            <fillType name="ENOKI"/> <fillType name="CHILLI"/> <fillType name="NAPACABBAGE"/> <fillType name="SPRING_ONION"/>
+            <fillType name="VEGATABLECORN"/> <fillType name="CARROTBAG"/> <fillType name="ONIONBAG"/> <fillType name="WASHEDPOTATOES"/>
+            <fillType name="SPINACH_BAGS"/>
         </group>
 
         <group name="forage" title="Futter &amp; Halmgut" max="160000" refillPerMonth="0.30">
@@ -144,10 +155,14 @@
             <fillType name="CLOVER_WINDROW"/> <fillType name="DRYCLOVER_WINDROW"/> <fillType name="FORAGE"/> <fillType name="FORAGE_MIXING"/>
             <fillType name="HAY_PELLETS"/> <fillType name="STRAW_PELLETS"/> <fillType name="SOYBEANSTRAW"/>
             <fillType name="PIGFOOD"/>
+            <!-- weitere -->
+            <fillType name="ALFALFA"/> <fillType name="HAYPELLETS"/> <fillType name="STRAWPELLETS"/>
         </group>
 
         <group name="wood" title="Holz" max="200000" refillPerMonth="0.30">
             <fillType name="WOODCHIPS"/> <fillType name="WOOD"/> <fillType name="ROUNDBALE_WOOD"/> <fillType name="BARKMULCH"/>
+            <!-- weitere -->
+            <fillType name="WOODPELLETS"/>
         </group>
 
         <group name="milk" title="Milch" max="120000" refillPerMonth="0.60" filter="special">
@@ -156,26 +171,69 @@
 
         <group name="special" title="Tierprodukte" max="30000" refillPerMonth="0.25">
             <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/>
+            <!-- Daunen, Fisch und Meerestiere (frisch) -->
+            <fillType name="DOWN"/> <fillType name="COD"/> <fillType name="EEL"/> <fillType name="TROUT"/>
+            <fillType name="SALMON"/> <fillType name="HERRING"/> <fillType name="PLAICE"/> <fillType name="CRABS"/>
+            <fillType name="HUMMER"/> <fillType name="SHELL"/> <fillType name="SALMONYOUNG"/> <fillType name="TROUTYOUNG"/>
         </group>
 
         <group name="intermediate" title="Zwischenprodukte" max="50000" refillPerMonth="0.25">
             <fillType name="FLOUR"/> <fillType name="SUGAR"/> <fillType name="SUNFLOWER_OIL"/> <fillType name="CANOLA_OIL"/>
             <fillType name="OLIVE_OIL"/> <fillType name="RICE_OIL"/> <fillType name="BUTTER"/> <fillType name="CREAM"/>
             <fillType name="BRAN"/> <fillType name="RICEFLOUR"/> <fillType name="BOARDS"/> <fillType name="PLANKS"/>
-            <fillType name="WOODBEAM"/> <fillType name="CEMENT"/> <fillType name="CEMENTBRICKS"/> <fillType name="ROOFPLATES"/>
+            <fillType name="WOODBEAM"/>
             <fillType name="PAPERROLL"/> <fillType name="CARTONROLL"/> <fillType name="FABRIC"/> <fillType name="THREAD"/>
             <fillType name="FLAX_WINDROW"/> <fillType name="HEMP_WINDROW"/>
+            <!-- Rohstoffe für Weiterverarbeitung: Mehle, Hefe, Öle, Leder, Lavendel -->
+            <fillType name="LAVENDER"/> <fillType name="BUCKWHEATFLOUR"/> <fillType name="CORNFLOUR"/> <fillType name="MAIZEFLOUR"/>
+            <fillType name="PEASFLOUR"/> <fillType name="SOYFLOUR"/> <fillType name="WHOLEWHEATFLOUR"/> <fillType name="YEAST"/>
+            <fillType name="PUMPKIN_SEEDS"/> <fillType name="LAVENDER_OIL"/> <fillType name="LINSEED_OIL"/> <fillType name="MAIZE_OIL"/>
+            <fillType name="POPPY_OIL"/> <fillType name="SOYBEAN_OIL"/> <fillType name="HEMP_OIL"/> <fillType name="PUMPKIN_SEEDSOIL"/>
+            <fillType name="LEATHER"/>
         </group>
 
         <group name="food" title="Lebensmittel" max="80000" refillPerMonth="0.30">
             <fillType name="BREAD"/> <fillType name="CAKE"/> <fillType name="CHEESE"/> <fillType name="GRAPEJUICE"/>
             <fillType name="CEREAL"/> <fillType name="NOODLESOUP"/> <fillType name="POTATOCHIPS"/> <fillType name="RAISINS"/>
             <fillType name="SUGARBEET_SYRUP"/>
+            <!-- weitere Lebensmittel (Karten/Mods) -->
+            <fillType name="BUFFALOMILK_BOTTLED"/> <fillType name="GOATMILK_BOTTLED"/> <fillType name="MILK_BOTTLED"/> <fillType name="BUFFALOMOZZARELLA"/>
+            <fillType name="GOATCHEESE"/> <fillType name="CANNED_PEAS"/> <fillType name="CHOCOLATEICECREAM"/> <fillType name="STRAWBERRYICECREAM"/>
+            <fillType name="CRABSALAD"/> <fillType name="RICECAKES"/> <fillType name="RICE_BOXES"/> <fillType name="SMOKED_EEL"/>
+            <fillType name="LAMB"/> <fillType name="BEEFMEAT"/> <fillType name="PORKMEAT"/> <fillType name="CHICKENMEAT"/>
+            <fillType name="FERMENTEDNAPACABBAGE"/> <fillType name="PRESERVEDBEETROOT"/> <fillType name="PRESERVEDCARROTS"/> <fillType name="PRESERVEDPARSNIP"/>
         </group>
 
         <group name="premium" title="Hochwertige Endprodukte" max="30000" refillPerMonth="0.25">
             <fillType name="CHOCOLATE"/> <fillType name="CLOTHES"/> <fillType name="FURNITURE"/> <fillType name="PREFABWALL"/>
             <fillType name="BATHTUB"/> <fillType name="BARREL"/> <fillType name="BUCKET"/>
+            <!-- Haushalt und Kleidung -->
+            <fillType name="TOILETPAPER"/> <fillType name="STRAWHAT"/> <fillType name="SHOES"/> <fillType name="WOODSHOES"/>
+            <fillType name="ROPE"/> <fillType name="CHARCOAL"/>
+        </group>
+
+        <!-- Baustoffe & Garten (Baumarkt): eigene Gruppe im Filter -->
+        <group name="construction" title="Baustoffe &amp; Garten" max="50000" refillPerMonth="0.25">
+            <fillType name="CEMENT"/> <fillType name="CEMENTBRICKS"/> <fillType name="ROOFPLATES"/> <fillType name="SHINGLEROOF"/>
+            <fillType name="CASTLEROCK"/> <fillType name="CURB"/> <fillType name="PAVINGSTONE"/> <fillType name="PAVINGSTONE_RED"/>
+            <fillType name="GLASSPANES"/> <fillType name="WINDOW"/> <fillType name="INSULATION"/> <fillType name="OSBPALLET"/>
+            <fillType name="PLYWOOD"/> <fillType name="GRAVEL"/> <fillType name="SAND"/> <fillType name="STONE"/>
+            <fillType name="STONEBIG"/> <fillType name="DIRT"/> <fillType name="COMPOST"/> <fillType name="COMPOST_BOXED"/>
+            <fillType name="QUALITYCOMPOST"/> <fillType name="TURF"/> <fillType name="FLOWERPOT"/>
+        </group>
+
+        <!-- Futtermittel auf Paletten (Tierfutter): im Filter unter Futter, eigener Bedarf -->
+        <group name="feedgoods" title="Futtermittel" max="60000" refillPerMonth="0.30" filter="forage">
+            <fillType name="BIRDFOOD"/> <fillType name="CATFOOD"/> <fillType name="DOGFOOD"/> <fillType name="FISHFOOD"/>
+            <fillType name="FISHMEAL"/>
+        </group>
+
+        <!-- Betriebsmittel, Verpackung, Reststoffe: im Filter unter Sonstige -->
+        <group name="supplies" title="Betriebsmittel &amp; Verpackung" max="40000" refillPerMonth="0.30" filter="default">
+            <fillType name="EMPTYPALLET"/> <fillType name="EMPTYPALLET_OLD"/> <fillType name="EMPTYPALLETBOX"/> <fillType name="WOODENBOX"/>
+            <fillType name="BOTTLE"/> <fillType name="GLASS"/> <fillType name="POT"/> <fillType name="BALE_NET"/>
+            <fillType name="BALE_TWINE"/> <fillType name="BEEHIVE"/> <fillType name="SAPLINGS"/> <fillType name="RICESAPLINGS"/>
+            <fillType name="OLDGLASS"/> <fillType name="WASTE_PAPER"/> <fillType name="SIDE_PRODUCT"/> <fillType name="COAL"/>
         </group>
     </groups>
 </livingMarket>

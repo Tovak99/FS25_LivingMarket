@@ -81,6 +81,7 @@
         <text name="livingMarket_grp_special" text="Prod. animali"/>
         <text name="livingMarket_grp_fruit" text="Frutta e verdura"/>
         <text name="livingMarket_grp_premium" text="Prodotti finiti"/>
+        <text name="livingMarket_grp_construction" text="Edilizia"/>
         <text name="livingMarket_grp_default" text="Altro"/>
         <text name="livingMarket_noGroupWares" text="Nessun prodotto in questo gruppo."/>
         <text name="livingMarket_unloadSummary" text="%s → %s: %s venduti, %s · prezzo ora %s (%s) · %d %% libero"/>

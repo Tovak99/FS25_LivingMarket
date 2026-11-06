@@ -581,6 +581,9 @@ function LivingMarket:getGroupNameOf(fillTypeIndex)
     if group == nil then
         return self.GROUP_OTHER
     end
+    if group.filter == LivingMarket.GROUP_OTHER then
+        return LivingMarket.GROUP_OTHER   -- filter="default": unter Sonstige
+    end
     if group.filter ~= nil and config.groupsByName[group.filter] ~= nil then
         return group.filter   -- z. B. Milch erscheint unter Tierprodukte
     end
@@ -592,7 +595,7 @@ function LivingMarket:getFilterGroups()
     local config = self.config
     for _, group in ipairs(config ~= nil and config.groupOrder or {}) do
         -- Gruppen, die im Filter unter einer anderen erscheinen, bekommen keinen eigenen Knopf
-        if group.filter == nil or config.groupsByName[group.filter] == nil then
+        if group.filter == nil or (group.filter ~= self.GROUP_OTHER and config.groupsByName[group.filter] == nil) then
             table.insert(list, { name = group.name, title = group.title })
         end
     end
