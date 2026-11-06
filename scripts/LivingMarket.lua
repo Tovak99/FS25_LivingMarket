@@ -104,6 +104,11 @@ local function log(fmt, ...)
     end
 end
 
+-- immer ins Log (einmalige Übersichten beim Laden, z. B. Gruppenzuordnung)
+local function info(fmt, ...)
+    print(string.format("[LivingMarket] " .. fmt, ...))
+end
+
 -- ---------------------------------------------------------------------
 -- Hilfsfunktionen
 -- ---------------------------------------------------------------------
@@ -552,15 +557,15 @@ function LivingMarket:assignAutoGroups()
             if group ~= nil then
                 config.byFillType[index] = group
                 byGroup[groupName] = byGroup[groupName] or {}
-                table.insert(byGroup[groupName], fillType.name)
+                table.insert(byGroup[groupName], string.format("%s = %s", fillType.name, tostring(fillType.title or fillType.name)))
                 count = count + 1
             end
         end
     end
-    log("Automatisch zugeordnet: %d Waren", count)
+    info("Automatisch zugeordnet: %d Waren (interner Name = Anzeigename)", count)
     for groupName, names in pairs(byGroup) do
         table.sort(names)
-        log("  automatisch %s: %s", groupName, table.concat(names, ", "))
+        info("  automatisch %s: %s", groupName, table.concat(names, ", "))
     end
 end
 
