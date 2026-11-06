@@ -1863,8 +1863,8 @@ function LivingMarket:placeMenuPageAfterFieldManager()
     if menu == nil or frame == nil or menu.pageFrames == nil or menu.pagingElement == nil then
         return false
     end
-    if menu.isOpen or (g_gui ~= nil and g_gui.currentGuiName == "InGameMenu") then
-        return false   -- nicht umsortieren, während das Menü offen ist
+    if menu.currentPage == frame then
+        return false   -- nicht umsortieren, während unsere Seite gerade angezeigt wird
     end
     local fmIndex = findIndex(menu.pageFrames, isFieldManagerFrame)
     local ownIndex = findIndex(menu.pageFrames, function(f) return f == frame end)
@@ -1901,12 +1901,14 @@ function LivingMarket:placeMenuPageAfterFieldManager()
         menu.pagingElement:updatePageMapping()
     end
     menu:rebuildTabList()
-    log("Reiter hinter den Field Manager gesetzt")
+    info("Reiter hinter den Field Manager gesetzt")
     return true
 end
 
+-- Der Field Manager baut seine Seite erst beim ersten Öffnen des Menüs ein (auch nach Minuten).
+-- Deshalb dauerhaft einmal pro Sekunde prüfen (kostet fast nichts: ein Durchlauf über ~15 Seiten).
 function LivingMarket:updateMenuPlacement(dt)
-    if self.menuFrame == nil or (self.menuPlaceTries or 0) >= self.MENU_PLACE_MAX_TRIES then
+    if self.menuFrame == nil or self.menuPlaceFailed then
         return
     end
     self.menuPlaceTimer = (self.menuPlaceTimer or 0) - dt
@@ -1914,11 +1916,10 @@ function LivingMarket:updateMenuPlacement(dt)
         return
     end
     self.menuPlaceTimer = 1000
-    self.menuPlaceTries = (self.menuPlaceTries or 0) + 1
     local ok, err = pcall(self.placeMenuPageAfterFieldManager, self)
     if not ok then
-        log("Reiter umsetzen fehlgeschlagen: %s", tostring(err))
-        self.menuPlaceTries = self.MENU_PLACE_MAX_TRIES
+        print("[LivingMarket] Reiter umsetzen fehlgeschlagen: " .. tostring(err))
+        self.menuPlaceFailed = true
     end
 end
 
