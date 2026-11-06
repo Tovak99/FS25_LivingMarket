@@ -70,6 +70,18 @@
         <text name="livingMarket_ctNoStock" text="Je hebt deze waar helemaal niet op voorraad!"/>
         <text name="livingMarket_ctCancelText" text="Contract echt opzeggen?&#10;Tot nu geleverd: %s van %s %s aan %s.&#10;&#10;Boete %s en minder aanzien bij %s."/>
         <text name="livingMarket_ctLimit" text="Je hebt al %d lopende contracten."/>
+        <text name="livingMarket_grpAll" text="Alle"/>
+        <text name="livingMarket_grp_grain" text="Graan"/>
+        <text name="livingMarket_grp_roots" text="Knolgewassen"/>
+        <text name="livingMarket_grp_forage" text="Voer"/>
+        <text name="livingMarket_grp_wood" text="Hout"/>
+        <text name="livingMarket_grp_milk" text="Melk"/>
+        <text name="livingMarket_grp_intermediate" text="Tussenproducten"/>
+        <text name="livingMarket_grp_food" text="Voeding"/>
+        <text name="livingMarket_grp_special" text="Dierproducten"/>
+        <text name="livingMarket_grp_premium" text="Eindproducten"/>
+        <text name="livingMarket_grp_default" text="Overig"/>
+        <text name="livingMarket_noGroupWares" text="Geen producten in deze groep."/>
         <text name="livingMarket_unloadSummary" text="%s → %s: %s verkocht, %s · prijs nu %s (%s) · %d %% vrij"/>
         <text name="livingMarket_unloadFull" text="%s: vraag naar %s is gedekt – het verkooppunt neemt niets meer aan."/>
         <text name="livingMarket_unloadAlt" text="Beste alternatief: %s (%s, %d %% vrij)"/>

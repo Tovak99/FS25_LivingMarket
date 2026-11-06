@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="10">
+<livingMarket version="11">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -150,6 +150,19 @@
             <fillType name="EGG"/> <fillType name="WOOL"/> <fillType name="HONEY"/> <fillType name="GRAPE"/>
             <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/> <fillType name="LETTUCE"/>
             <fillType name="STRAWBERRY"/>
+            <!-- Obst und Gemüse von Karten/Mods (unbekannte Namen werden übersprungen) -->
+            <fillType name="APPLE"/> <fillType name="PEAR"/> <fillType name="CHERRY"/> <fillType name="PLUM"/>
+            <fillType name="APRICOT"/> <fillType name="PEACH"/> <fillType name="QUINCE"/> <fillType name="MIRABELLE"/>
+            <fillType name="BLUEBERRY"/> <fillType name="RASPBERRY"/> <fillType name="BLACKBERRY"/> <fillType name="CURRANT"/>
+            <fillType name="GOOSEBERRY"/> <fillType name="ELDERBERRY"/> <fillType name="WALNUT"/> <fillType name="HAZELNUT"/>
+            <fillType name="CHESTNUT"/> <fillType name="LEMON"/> <fillType name="ORANGE"/> <fillType name="BANANA"/>
+            <fillType name="MELON"/> <fillType name="WATERMELON"/> <fillType name="PUMPKIN"/> <fillType name="CABBAGE"/>
+            <fillType name="REDCABBAGE"/> <fillType name="WHITECABBAGE"/> <fillType name="CAULIFLOWER"/> <fillType name="BROCCOLI"/>
+            <fillType name="KALE"/> <fillType name="CUCUMBER"/> <fillType name="ZUCCHINI"/> <fillType name="PAPRIKA"/>
+            <fillType name="PEPPER"/> <fillType name="GARLIC"/> <fillType name="LEEK"/> <fillType name="CELERY"/>
+            <fillType name="ASPARAGUS"/> <fillType name="GREENBEAN"/> <fillType name="RADISH"/> <fillType name="HOPS"/>
+            <fillType name="APFEL"/> <fillType name="BIRNE"/> <fillType name="KIRSCHE"/> <fillType name="KIRSCHEN"/>
+            <fillType name="PFLAUME"/> <fillType name="PFLAUMEN"/> <fillType name="KUERBIS"/> <fillType name="ERDBEERE"/>
         </group>
 
         <group name="premium" title="Hochwertige Endprodukte" max="20000" refillPerMonth="0.20">

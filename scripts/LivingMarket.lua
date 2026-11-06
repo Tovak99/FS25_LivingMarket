@@ -351,6 +351,7 @@ function LivingMarket:loadConfig()
         default      = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL },
         byFillType   = {},
         groupsByName = {},
+        groupOrder   = {},   -- Reihenfolge wie in der Konfiguration (für den Gruppenfilter)
         -- Automatische Zuordnung für Waren, die nicht ausdrücklich in einer Gruppe stehen
         auto = {
             enabled      = true,
@@ -422,10 +423,14 @@ function LivingMarket:loadConfig()
         end
         local group = {
             name           = getXMLString(xmlFile, groupKey .. "#name") or tostring(g),
+            title          = getXMLString(xmlFile, groupKey .. "#title"),
             max            = getXMLFloat(xmlFile, groupKey .. "#max") or config.default.max,
             refillPerMonth = getXMLFloat(xmlFile, groupKey .. "#refillPerMonth") or config.default.refillPerMonth
         }
         groupCount = groupCount + 1
+        if config.groupsByName[group.name] == nil then
+            table.insert(config.groupOrder, group)
+        end
         config.groupsByName[group.name] = group
         local f = 0
         while true do
@@ -556,6 +561,37 @@ function LivingMarket:assignAutoGroups()
         table.sort(names)
         log("  automatisch %s: %s", groupName, table.concat(names, ", "))
     end
+end
+
+-- ---------------------------------------------------------------------
+-- Gruppenfilter: Bedarfsgruppe einer Ware und Liste der Gruppen (Reihenfolge der Konfiguration,
+-- zuletzt "Sonstige" = Waren mit Standardwerten)
+-- ---------------------------------------------------------------------
+LivingMarket.GROUP_OTHER = "default"
+
+function LivingMarket:getGroupNameOf(fillTypeIndex)
+    local config = self.config
+    local group = config ~= nil and config.byFillType[fillTypeIndex] or nil
+    return group ~= nil and group.name or self.GROUP_OTHER
+end
+
+function LivingMarket:getFilterGroups()
+    local list = {}
+    local config = self.config
+    for _, group in ipairs(config ~= nil and config.groupOrder or {}) do
+        table.insert(list, { name = group.name, title = group.title })
+    end
+    table.insert(list, { name = self.GROUP_OTHER })
+    return list
+end
+
+-- Anzeigename einer Gruppe: eingebaute Gruppen übersetzt, eigene mit ihrem title
+function LivingMarket:getGroupLabel(group)
+    local key = "livingMarket_grp_" .. tostring(group.name)
+    if g_i18n ~= nil and g_i18n.hasText ~= nil and g_i18n:hasText(key) then
+        return g_i18n:getText(key)
+    end
+    return group.title or group.name
 end
 
 -- Maximum (Liter) und Auffüllung (Liter je Spielmonat) für eine Ware

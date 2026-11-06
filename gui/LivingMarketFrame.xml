@@ -41,6 +41,12 @@
             <Text profile="lm_optionsBackText" id="optionsBackText" text="$l10n_livingMarket_optBack" visible="false"/>
         </GuiElement>
 
+        <!-- ============ Gruppenleiste (Filter nach Bedarfsgruppe, alle vier Ansichten) ============
+             Die Knöpfe zeichnet LivingMarketFrame:drawGroupBar() in diese Fläche. -->
+        <GuiElement profile="lm_groupBar" id="groupBar"/>
+
+        <!-- Inhalt unterhalb der Gruppenleiste (Tabellen aller vier Ansichten) -->
+        <GuiElement profile="lm_contentArea" id="contentArea">
 
         <!-- ============ Obere Liste: Waren ============ -->
         <!-- Rahmen hinter Kopfzeile und Warenliste -->
@@ -311,6 +317,8 @@
                 </ThreePartBitmap>
             </GuiElement>
             <Text profile="lm_emptyText" id="historyEmptyText" text="$l10n_livingMarket_ctNoHistory" visible="false"/>
+        </GuiElement>
+
         </GuiElement>
 
         <!-- ============ Optionen (wie im Feld-Info-Mod: Bereiche mit Zeilen, Regler rechts) ============ -->
@@ -758,6 +766,24 @@
             <textSize value="21px"/>
             <textBold value="true"/>
             <textColor value="0.47 0.64 0.11 1"/>
+        </Profile>
+
+        <!-- ============ Gruppenleiste ============ -->
+        <!-- Fläche oben im Inhaltsbereich (so breit wie die Tabellenzeilen) -->
+        <Profile name="lm_groupBar">
+            <anchors value="0 1 1 1"/>
+            <pivot value="0 1"/>
+            <position value="45px -2px"/>
+            <size value="100% 34px"/>
+            <absoluteSizeOffset value="90px 0px"/>
+        </Profile>
+        <!-- Inhaltsbereich: ganze Seite abzüglich der Gruppenleiste oben -->
+        <Profile name="lm_contentArea">
+            <anchors value="0 1 0 1"/>
+            <pivot value="0 0"/>
+            <position value="0px 0px"/>
+            <size value="100% 100%"/>
+            <absoluteSizeOffset value="0px 44px"/>
         </Profile>
     </GUIProfiles>
 </GUI>

@@ -42,6 +42,9 @@ function LivingMarketFrame.new(target, customMt)
     self.wareSort = { key = "title", asc = true }      -- Sortierung Warenliste
     self.detailSort = { key = "price", asc = false }   -- Sortierung Detailliste
     self.detailStations = {}      -- Stationen der gewählten Ware, sortiert
+    self.groupFilter = "all"      -- Gruppenfilter (gemeinsam für alle vier Ansichten): "all" oder Gruppenname
+    self.presentGroups = {}       -- [Ansicht] = { [Gruppenname] = true } (Gruppen mit Waren in der Liste)
+    self.groupChips = {}          -- gezeichnete Knöpfe der Gruppenleiste (für Mausklicks)
 
     self.hasCustomMenuButtons = true
     self.backButtonInfo = {}
@@ -119,8 +122,12 @@ function LivingMarketFrame:applyUiState()
     self.eventSort = { key = "status", asc = true }
     self.saleSort = { key = "time", asc = false }
     self.contractFilter = "all"
+    self.groupFilter = "all"
     if ui == nil then
         return
+    end
+    if type(ui.groupFilter) == "string" and ui.groupFilter ~= "" then
+        self.groupFilter = ui.groupFilter
     end
     if ui.filterMode == "all" or ui.filterMode == "stock" or ui.filterMode == "fav" then
         self.filterMode = ui.filterMode
@@ -151,6 +158,7 @@ function LivingMarketFrame:storeUiState()
         filterMode  = self.filterMode,
         eventFilter = self.eventFilter,
         contractFilter = self.contractFilter,
+        groupFilter = self.groupFilter,
         wareSort    = copy(self.wareSort),
         detailSort  = copy(self.detailSort),
         eventSort   = copy(self.eventSort),
@@ -382,6 +390,7 @@ function LivingMarketFrame:getFilteredWares()
     local searching = self:isSearching()
     local query = LivingMarket.toLower(self.searchText)
     local result = {}
+    local present = {}
 
     for _, ware in ipairs(self.wares) do
         local stockOk = true
@@ -415,9 +424,14 @@ function LivingMarketFrame:getFilteredWares()
             end
         end
         if stockOk and searchOk then
-            table.insert(result, row)
+            local group = LivingMarket:getGroupNameOf(ware.fillTypeIndex)
+            present[group] = true
+            if self:passesGroup(group) then
+                table.insert(result, row)
+            end
         end
     end
+    self.presentGroups.market = present
     self:sortWares(result)
     return result
 end
@@ -430,6 +444,8 @@ function LivingMarketFrame:rebuildWareList()
         local text = nil
         if #self.wares == 0 then
             text = g_i18n:getText("livingMarket_none")
+        elseif #self.visibleWares == 0 and self:isGroupEmpty("market") then
+            text = g_i18n:getText("livingMarket_noGroupWares")
         elseif #self.visibleWares == 0 and self:isSearching() then
             text = string.format(g_i18n:getText("livingMarket_noResults"), self.searchText)
         elseif #self.visibleWares == 0 and self.filterMode == "fav" then
@@ -1082,6 +1098,7 @@ end
 -- ---------------------------------------------------------------------
 local VIEW_ACTIVE   = { 0.212, 0.376, 0.012, 1 }   -- LS-Grün
 local VIEW_INACTIVE = { 0.85, 0.85, 0.85, 1 }
+local VIEW_ACTIVE_FILL = { 0.212, 0.376, 0.012, 1 }   -- aktiver Knopf der Gruppenleiste
 
 function LivingMarketFrame:onClickViewMarket()
     self:setViewMode("market")
@@ -1118,6 +1135,9 @@ function LivingMarketFrame:setViewMode(mode)
     end
     if self.optionsBackText ~= nil then
         self.optionsBackText:setVisible(showOptions)
+    end
+    if self.groupBar ~= nil then
+        self.groupBar:setVisible(not showOptions)
     end
     self:updateOptionsIcon()
 
@@ -1201,6 +1221,160 @@ function LivingMarketFrame:setViewMode(mode)
 end
 
 local EVENT_TYPE_LABELS = EVENT_LABELS
+
+-- ---------------------------------------------------------------------
+-- Gruppenfilter (Bedarfsgruppen), gemeinsam für alle vier Ansichten
+-- ---------------------------------------------------------------------
+function LivingMarketFrame:passesGroup(groupName)
+    return self.groupFilter == "all" or self.groupFilter == groupName
+end
+
+-- Zeilen mit fillTypeIndex filtern und die vorhandenen Gruppen merken
+function LivingMarketFrame:filterRowsByGroup(rows, view)
+    local present, out = {}, {}
+    for _, row in ipairs(rows) do
+        local group = LivingMarket:getGroupNameOf(row.fillTypeIndex)
+        present[group] = true
+        if self:passesGroup(group) then
+            table.insert(out, row)
+        end
+    end
+    self.presentGroups[view] = present
+    return out
+end
+
+-- Liste leer, weil die gewählte Gruppe hier keine Waren hat?
+function LivingMarketFrame:isGroupEmpty(view)
+    if self.groupFilter == "all" then
+        return false
+    end
+    local present = self.presentGroups[view] or {}
+    return not present[self.groupFilter]
+end
+
+function LivingMarketFrame:selectGroup(groupName)
+    if groupName == nil or groupName == self.groupFilter then
+        return
+    end
+    self.groupFilter = groupName
+    self:storeUiState()
+    if self.viewMode == "events" then
+        self:refreshEvents()
+    elseif self.viewMode == "sales" then
+        self:refreshSales()
+    elseif self.viewMode == "contracts" then
+        self:refreshContracts()
+    else
+        self:rebuildWareList()
+    end
+end
+
+-- Knöpfe der Gruppenleiste: ALLE, Gruppen der Konfiguration, SONSTIGE
+local CHIP_BORDER   = { 0.55, 0.55, 0.55, 1 }
+local CHIP_DISABLED = { 0.22, 0.22, 0.22, 1 }
+local CHIP_HOVER    = { 0.47, 0.64, 0.11, 1 }
+
+local function drawRect(x, y, w, h, c)
+    if drawFilledRect ~= nil then
+        drawFilledRect(x, y, w, h, c[1], c[2], c[3], c[4])
+    end
+end
+
+function LivingMarketFrame:drawGroupBar()
+    local bar = self.groupBar
+    self.groupChips = {}
+    if bar == nil or not bar:getIsVisible() or bar.absPosition == nil or bar.absSize == nil
+        or renderText == nil or getTextWidth == nil then
+        return
+    end
+    local view = self.viewMode
+    local present = self.presentGroups[view] or {}
+    local entries = { { name = "all", label = g_i18n:getText("livingMarket_grpAll") } }
+    for _, group in ipairs(LivingMarket:getFilterGroups()) do
+        table.insert(entries, { name = group.name, label = LivingMarket:getGroupLabel(group) })
+    end
+
+    local x0, y0 = bar.absPosition[1], bar.absPosition[2]
+    local w, h = bar.absSize[1], bar.absSize[2]
+    local chipH = h * 0.82
+    local textSize = h * 0.40
+    local pad = h * 0.45
+    local gap = h * 0.22
+    -- Breiten aus dem Text; passt es nicht, Schrift und Abstände verkleinern
+    setTextBold(true)
+    local total = 0
+    for _, e in ipairs(entries) do
+        e.label = utf8ToUpper ~= nil and utf8ToUpper(e.label) or string.upper(e.label)
+        e.textW = getTextWidth(textSize, e.label)
+        total = total + e.textW + 2 * pad
+    end
+    total = total + gap * (#entries - 1)
+    local scale = total > w and (w / total) or 1
+    textSize, pad, gap = textSize * scale, pad * scale, gap * scale
+
+    local pxX = 1 / (g_screenWidth or 1920)
+    local pxY = 1 / (g_screenHeight or 1080)
+    local y = y0 + (h - chipH) / 2
+    local x = x0
+    setTextAlignment(RenderText.ALIGN_CENTER)
+    if setTextVerticalAlignment ~= nil and RenderText.VERTICAL_ALIGN_MIDDLE ~= nil then
+        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+    end
+    for _, e in ipairs(entries) do
+        local chipW = e.textW * scale + 2 * pad
+        local active = e.name == self.groupFilter
+        local enabled = e.name == "all" or present[e.name] == true or active
+        local hover = enabled and not active and self.groupHover == e.name
+        if active then
+            drawRect(x, y, chipW, chipH, VIEW_ACTIVE_FILL)
+        else
+            local c = not enabled and CHIP_DISABLED or (hover and CHIP_HOVER or CHIP_BORDER)
+            drawRect(x, y, chipW, pxY, c)                    -- unten
+            drawRect(x, y + chipH - pxY, chipW, pxY, c)      -- oben
+            drawRect(x, y, pxX, chipH, c)                    -- links
+            drawRect(x + chipW - pxX, y, pxX, chipH, c)      -- rechts
+        end
+        local tc = active and COLOR_ON_GREEN or (not enabled and CHIP_DISABLED or (hover and CHIP_HOVER or COLOR_TEXT))
+        setTextColor(tc[1], tc[2], tc[3], tc[4])
+        renderText(x + chipW / 2, y + chipH / 2, textSize, e.label)
+        table.insert(self.groupChips, { name = e.name, enabled = enabled, x = x, y = y, w = chipW, h = chipH })
+        x = x + chipW + gap
+    end
+    -- Textzustand zurücksetzen
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    if setTextVerticalAlignment ~= nil and RenderText.VERTICAL_ALIGN_BASELINE ~= nil then
+        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+    end
+    setTextBold(false)
+    setTextColor(1, 1, 1, 1)
+end
+
+function LivingMarketFrame:draw()
+    LivingMarketFrame:superClass().draw(self)
+    local ok, err = pcall(self.drawGroupBar, self)
+    if not ok and not self.groupBarErrorLogged then
+        self.groupBarErrorLogged = true
+        print("[LivingMarket] FEHLER in der Gruppenleiste: " .. tostring(err))
+    end
+end
+
+function LivingMarketFrame:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
+    local hover = nil
+    for _, chip in ipairs(self.groupChips or {}) do
+        if posX >= chip.x and posX <= chip.x + chip.w and posY >= chip.y and posY <= chip.y + chip.h then
+            if chip.enabled then
+                hover = chip.name
+                if not eventUsed and isDown and button == Input.MOUSE_BUTTON_LEFT then
+                    self:selectGroup(chip.name)
+                    eventUsed = true
+                end
+            end
+            break
+        end
+    end
+    self.groupHover = hover
+    return LivingMarketFrame:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
+end
 
 -- ---------------------------------------------------------------------
 -- Optionen (Regler-Symbol oben rechts)
@@ -1300,6 +1474,7 @@ function LivingMarketFrame:refreshEvents()
         end
         rows = filtered
     end
+    rows = self:filterRowsByGroup(rows, "events")
     -- sortieren nach gewählter Spalte (bei Gleichstand: laufende zuerst, die bald enden)
     local key, asc = self.eventSort.key, self.eventSort.asc
     for _, row in ipairs(rows) do
@@ -1315,7 +1490,9 @@ function LivingMarketFrame:refreshEvents()
         self.eventFilterButton:setText(g_i18n:getText(self.eventFilter == "stock" and "livingMarket_evFilterStock" or "livingMarket_filterAll"))
     end
     if self.eventEmptyText ~= nil then
-        self.eventEmptyText:setText(g_i18n:getText(self.eventFilter == "stock" and "livingMarket_noEventsStock" or "livingMarket_noEvents"))
+        local key = self:isGroupEmpty("events") and "livingMarket_noGroupWares"
+            or (self.eventFilter == "stock" and "livingMarket_noEventsStock" or "livingMarket_noEvents")
+        self.eventEmptyText:setText(g_i18n:getText(key))
         self.eventEmptyText:setVisible(self.viewMode == "events" and #self.eventRows == 0)
     end
     if self.eventList ~= nil then
@@ -1391,6 +1568,7 @@ function LivingMarketFrame:refreshSales()
         })
         end
     end
+    rows = self:filterRowsByGroup(rows, "sales")
     local key, asc = self.saleSort.key, self.saleSort.asc
     table.sort(rows, function(a, b)
         return compare(saleValue(a, key), saleValue(b, key), asc, -a.id, -b.id)
@@ -1398,7 +1576,9 @@ function LivingMarketFrame:refreshSales()
     self.saleRows = rows
     self:updateSortHeaders()
     if self.saleEmptyText ~= nil then
-        if needle ~= nil then
+        if self:isGroupEmpty("sales") then
+            self.saleEmptyText:setText(g_i18n:getText("livingMarket_noGroupWares"))
+        elseif needle ~= nil then
             self.saleEmptyText:setText(string.format(g_i18n:getText("livingMarket_noResults"), self.searchText))
         else
             self.saleEmptyText:setText(g_i18n:getText("livingMarket_noSales"))
@@ -1471,6 +1651,26 @@ function LivingMarketFrame:refreshContracts()
             table.insert(rows, row)
         end
     end
+    -- Gruppenfilter: vorhandene Gruppen aus beiden Tabellen
+    local present = {}
+    for _, list in ipairs({ rows, history }) do
+        for _, row in ipairs(list) do
+            present[LivingMarket:getGroupNameOf(row.fillTypeIndex)] = true
+        end
+    end
+    self.presentGroups.contracts = present
+    if self.groupFilter ~= "all" then
+        local function keep(list)
+            local out = {}
+            for _, row in ipairs(list) do
+                if self:passesGroup(LivingMarket:getGroupNameOf(row.fillTypeIndex)) then
+                    table.insert(out, row)
+                end
+            end
+            return out
+        end
+        rows, history = keep(rows), keep(history)
+    end
     self.contractRows = rows
     self.historyRows = history
     if self.historyEmptyText ~= nil then
@@ -1489,7 +1689,9 @@ function LivingMarketFrame:refreshContracts()
         self.contractFilterButton:setText(g_i18n:getText(self.contractFilter == "stock" and "livingMarket_ctFilterStock" or "livingMarket_ctFilterAll"))
     end
     if self.contractEmptyText ~= nil then
-        self.contractEmptyText:setText(g_i18n:getText(self.contractFilter == "stock" and "livingMarket_noContractsStock" or "livingMarket_noContracts"))
+        local key = self:isGroupEmpty("contracts") and "livingMarket_noGroupWares"
+            or (self.contractFilter == "stock" and "livingMarket_noContractsStock" or "livingMarket_noContracts")
+        self.contractEmptyText:setText(g_i18n:getText(key))
         self.contractEmptyText:setVisible(self.viewMode == "contracts" and #rows == 0)
     end
     if self.contractList ~= nil then

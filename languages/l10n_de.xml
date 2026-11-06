@@ -70,6 +70,18 @@
         <text name="livingMarket_ctNoStock" text="Du hast diese Ware gar nicht auf Lager!"/>
         <text name="livingMarket_ctCancelText" text="Vertrag wirklich kündigen?&#10;Bisher geliefert: %s von %s %s an %s.&#10;&#10;Strafe %s und weniger Ansehen bei %s."/>
         <text name="livingMarket_ctLimit" text="Du hast bereits %d laufende Verträge."/>
+        <text name="livingMarket_grpAll" text="Alle"/>
+        <text name="livingMarket_grp_grain" text="Getreide"/>
+        <text name="livingMarket_grp_roots" text="Hackfrüchte"/>
+        <text name="livingMarket_grp_forage" text="Futter"/>
+        <text name="livingMarket_grp_wood" text="Holz"/>
+        <text name="livingMarket_grp_milk" text="Milch"/>
+        <text name="livingMarket_grp_intermediate" text="Zwischenprodukte"/>
+        <text name="livingMarket_grp_food" text="Lebensmittel"/>
+        <text name="livingMarket_grp_special" text="Tierprodukte"/>
+        <text name="livingMarket_grp_premium" text="Endprodukte"/>
+        <text name="livingMarket_grp_default" text="Sonstige"/>
+        <text name="livingMarket_noGroupWares" text="Keine Waren in dieser Gruppe."/>
         <text name="livingMarket_unloadSummary" text="%s → %s: %s verkauft, %s · Preis jetzt %s (%s) · frei %d %%"/>
         <text name="livingMarket_unloadFull" text="%s: Bedarf an %s gedeckt – die Station nimmt nichts mehr an."/>
         <text name="livingMarket_unloadAlt" text="Beste Alternative: %s (%s, frei %d %%)"/>
