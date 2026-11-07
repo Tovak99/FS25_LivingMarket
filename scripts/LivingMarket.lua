@@ -371,6 +371,7 @@ function LivingMarket:loadConfig()
         }
     }
     self.config = config
+    self.configVersion = (self.configVersion or 0) + 1   -- Gruppenleiste neu aufbauen
 
     local defaultPath = Utils.getFilename("config/defaultConfig.xml", self.modDir)
     local dir = self:getModSettingsDir()
@@ -2072,6 +2073,7 @@ function LivingMarket:applyConfigSnapshot(snap)
         end
     end
     self.config = config
+    self.configVersion = (self.configVersion or 0) + 1   -- Gruppenleiste neu aufbauen
     for _, c in ipairs(snap.contract) do
         if self.CONTRACT_SETTINGS ~= nil and type(self.CONTRACT_SETTINGS[c.key]) == "number" then
             self.CONTRACT_SETTINGS[c.key] = c.value

@@ -15,7 +15,8 @@ LivingMarket.UNLOAD_MIN_LITERS = 1      -- kleinere Mengen ohne Meldung
 LivingMarket.UNLOAD_SUMMARY = 1
 LivingMarket.UNLOAD_FULL    = 2
 
-LivingMarket.unloads = {}   -- [key] = laufender Abladevorgang (nur Server)
+LivingMarket.unloads = {}   -- [Station][Hof * 65536 + Ware] = laufender Abladevorgang (nur Server)
+LivingMarket.unloadCount = 0
 
 local function isMultiplayerGame()
     return g_currentMission ~= nil and g_currentMission.missionDynamicInfo ~= nil
@@ -59,8 +60,14 @@ function LivingMarket:trackUnload(station, farmId, fillTypeIndex, liters, priceP
     if not isPlayerFarm(farmId) or liters == nil or liters <= 0 then
         return
     end
-    local key = string.format("%d/%s/%d", farmId, tostring(station), fillTypeIndex)
-    local unload = self.unloads[key]
+    -- Schlüssel ohne Zeichenketten (wird in jedem Bild des Abladens aufgerufen)
+    local byStation = self.unloads[station]
+    if byStation == nil then
+        byStation = {}
+        self.unloads[station] = byStation
+    end
+    local key = farmId * 65536 + fillTypeIndex
+    local unload = byStation[key]
     if unload == nil then
         unload = {
             station       = station,
@@ -71,7 +78,8 @@ function LivingMarket:trackUnload(station, farmId, fillTypeIndex, liters, priceP
             money         = 0,
             startPrice    = pricePer1000,
         }
-        self.unloads[key] = unload
+        byStation[key] = unload
+        self.unloadCount = self.unloadCount + 1
     end
     unload.liters = unload.liters + liters
     unload.money = unload.money + liters * (pricePer1000 or 0) / 1000
@@ -95,33 +103,45 @@ end
 
 -- Jedes Bild (Server): beendete Abladevorgänge melden
 function LivingMarket:updateUnloads(dt)
-    if next(self.unloads) == nil then
+    if self.unloadCount == 0 then
         return
     end
-    for key, unload in pairs(self.unloads) do
-        unload.idle = (unload.idle or 0) + dt
-        if unload.idle > self.UNLOAD_IDLE_TIME then
-            self.unloads[key] = nil
-            if unload.liters >= self.UNLOAD_MIN_LITERS then
-                local priceNow = self:getPricePer1000(unload.station, unload.fillTypeIndex)
-                local change = 0
-                if unload.startPrice ~= nil and unload.startPrice > 0 then
-                    change = (priceNow / unload.startPrice - 1) * 100
-                end
-                self:sendUnloadNotification({
-                    kind          = self.UNLOAD_SUMMARY,
-                    farmId        = unload.farmId,
-                    fillTypeIndex = unload.fillTypeIndex,
-                    stationName   = self:getStationNameOf(unload.station) or "?",
-                    liters        = unload.liters,
-                    money         = unload.money,
-                    price         = priceNow,
-                    change        = change,
-                    free          = freePercent(unload.entry),
-                })
+    for station, byStation in pairs(self.unloads) do
+        for key, unload in pairs(byStation) do
+            unload.idle = (unload.idle or 0) + dt
+            if unload.idle > self.UNLOAD_IDLE_TIME then
+                byStation[key] = nil
+                self.unloadCount = self.unloadCount - 1
+                self:finishUnload(unload)
             end
         end
+        if next(byStation) == nil then
+            self.unloads[station] = nil
+        end
     end
+end
+
+-- Abladen beendet: Kurzmeldung schicken
+function LivingMarket:finishUnload(unload)
+    if unload.liters < self.UNLOAD_MIN_LITERS then
+        return
+    end
+    local priceNow = self:getPricePer1000(unload.station, unload.fillTypeIndex)
+    local change = 0
+    if unload.startPrice ~= nil and unload.startPrice > 0 then
+        change = (priceNow / unload.startPrice - 1) * 100
+    end
+    self:sendUnloadNotification({
+        kind          = self.UNLOAD_SUMMARY,
+        farmId        = unload.farmId,
+        fillTypeIndex = unload.fillTypeIndex,
+        stationName   = self:getStationNameOf(unload.station) or "?",
+        liters        = unload.liters,
+        money         = unload.money,
+        price         = priceNow,
+        change        = change,
+        free          = freePercent(unload.entry),
+    })
 end
 
 function LivingMarket:sendUnloadNotification(data)
@@ -162,4 +182,5 @@ end
 
 function LivingMarket:resetUnloads()
     self.unloads = {}
+    self.unloadCount = 0
 end

@@ -1279,6 +1279,7 @@ end
 local CHIP_BORDER   = { 0.55, 0.55, 0.55, 1 }
 local CHIP_DISABLED = { 0.22, 0.22, 0.22, 1 }
 local CHIP_HOVER    = { 0.47, 0.64, 0.11, 1 }
+local EMPTY = {}
 
 local function drawRect(x, y, w, h, c)
     if drawFilledRect ~= nil then
@@ -1286,22 +1287,20 @@ local function drawRect(x, y, w, h, c)
     end
 end
 
-function LivingMarketFrame:drawGroupBar()
-    local bar = self.groupBar
-    self.groupChips = {}
-    if bar == nil or not bar:getIsVisible() or bar.absPosition == nil or bar.absSize == nil
-        or renderText == nil or getTextWidth == nil then
-        return
+-- Aufbau der Knöpfe (Texte, Breiten, Positionen) nur neu berechnen, wenn sich Gruppen oder
+-- Größe/Position der Leiste ändern – nicht in jedem Bild
+function LivingMarketFrame:buildGroupBarLayout(bar)
+    local x0, y0 = bar.absPosition[1], bar.absPosition[2]
+    local w, h = bar.absSize[1], bar.absSize[2]
+    local key = string.format("%d|%.5f|%.5f|%.5f|%.5f", LivingMarket.configVersion or 0, x0, y0, w, h)
+    local layout = self.groupBarLayout
+    if layout ~= nil and layout.key == key then
+        return layout
     end
-    local view = self.viewMode
-    local present = self.presentGroups[view] or {}
     local entries = { { name = "all", label = g_i18n:getText("livingMarket_grpAll") } }
     for _, group in ipairs(LivingMarket:getFilterGroups()) do
         table.insert(entries, { name = group.name, label = LivingMarket:getGroupLabel(group) })
     end
-
-    local x0, y0 = bar.absPosition[1], bar.absPosition[2]
-    local w, h = bar.absSize[1], bar.absSize[2]
     local chipH = h * 0.82
     local textSize = h * 0.40
     local pad = h * 0.45
@@ -1314,23 +1313,46 @@ function LivingMarketFrame:drawGroupBar()
         e.textW = getTextWidth(textSize, e.label)
         total = total + e.textW + 2 * pad
     end
+    setTextBold(false)
     total = total + gap * (#entries - 1)
     local scale = total > w and (w / total) or 1
     textSize, pad, gap = textSize * scale, pad * scale, gap * scale
-
-    local pxX = 1 / (g_screenWidth or 1920)
-    local pxY = 1 / (g_screenHeight or 1080)
     local y = y0 + (h - chipH) / 2
     local x = x0
+    for _, e in ipairs(entries) do
+        e.x, e.y, e.w, e.h = x, y, e.textW * scale + 2 * pad, chipH
+        x = x + e.w + gap
+    end
+    layout = {
+        key = key, entries = entries, textSize = textSize,
+        pxX = 1 / (g_screenWidth or 1920), pxY = 1 / (g_screenHeight or 1080),
+    }
+    self.groupBarLayout = layout
+    return layout
+end
+
+function LivingMarketFrame:drawGroupBar()
+    local bar = self.groupBar
+    if bar == nil or not bar:getIsVisible() or bar.absPosition == nil or bar.absSize == nil
+        or renderText == nil or getTextWidth == nil then
+        self.groupChips = nil
+        return
+    end
+    local layout = self:buildGroupBarLayout(bar)
+    local present = self.presentGroups[self.viewMode] or EMPTY
+    local pxX, pxY, textSize = layout.pxX, layout.pxY, layout.textSize
+
+    setTextBold(true)
     setTextAlignment(RenderText.ALIGN_CENTER)
     if setTextVerticalAlignment ~= nil and RenderText.VERTICAL_ALIGN_MIDDLE ~= nil then
         setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
     end
-    for _, e in ipairs(entries) do
-        local chipW = e.textW * scale + 2 * pad
+    for _, e in ipairs(layout.entries) do
         local active = e.name == self.groupFilter
-        local enabled = e.name == "all" or present[e.name] == true or active
+        local enabled = active or e.name == "all" or present[e.name] == true
+        e.enabled = enabled
         local hover = enabled and not active and self.groupHover == e.name
+        local x, y, chipW, chipH = e.x, e.y, e.w, e.h
         if active then
             drawRect(x, y, chipW, chipH, VIEW_ACTIVE_FILL)
         else
@@ -1343,9 +1365,8 @@ function LivingMarketFrame:drawGroupBar()
         local tc = active and COLOR_ON_GREEN or (not enabled and CHIP_DISABLED or (hover and CHIP_HOVER or COLOR_TEXT))
         setTextColor(tc[1], tc[2], tc[3], tc[4])
         renderText(x + chipW / 2, y + chipH / 2, textSize, e.label)
-        table.insert(self.groupChips, { name = e.name, enabled = enabled, x = x, y = y, w = chipW, h = chipH })
-        x = x + chipW + gap
     end
+    self.groupChips = layout.entries   -- dieselben Einträge dienen als Klickflächen
     -- Textzustand zurücksetzen
     setTextAlignment(RenderText.ALIGN_LEFT)
     if setTextVerticalAlignment ~= nil and RenderText.VERTICAL_ALIGN_BASELINE ~= nil then
@@ -1366,7 +1387,7 @@ end
 
 function LivingMarketFrame:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
     local hover = nil
-    for _, chip in ipairs(self.groupChips or {}) do
+    for _, chip in ipairs(self.groupChips or EMPTY) do
         if posX >= chip.x and posX <= chip.x + chip.w and posY >= chip.y and posY <= chip.y + chip.h then
             if chip.enabled then
                 hover = chip.name
