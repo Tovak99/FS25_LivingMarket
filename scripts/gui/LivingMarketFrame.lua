@@ -6,6 +6,7 @@
 -- =====================================================================
 
 LivingMarketFrame = {}
+LivingMarketFrame.LIVE_REFRESH_INTERVAL = 500   -- ms: Änderungen von außen höchstens so oft übernehmen
 local LivingMarketFrame_mt = Class(LivingMarketFrame, TabbedMenuFrameElement)
 
 LivingMarketFrame.LOW_SHARE    = 0.15   -- ab hier gilt der Restbedarf als "knapp"
@@ -1005,22 +1006,20 @@ function LivingMarketFrame:update(dt)
         end
     end
 
-    -- Favoriten (z. B. von einem Mitspieler geändert): Warenliste sofort neu aufbauen
-    if self.viewMode == "market" and self.shownFavoritesVersion ~= LivingMarket.favoritesVersion then
-        self:rebuildWareList()
-    end
-    -- Verkäufe: neue Einträge sofort zeigen
-    if self.viewMode == "sales" and self.shownSalesVersion ~= LivingMarket.salesVersion then
-        self:refreshSales()
-    end
-    -- Verträge: Änderungen (neue Angebote, Fortschritt) sofort zeigen
-    if self.viewMode == "contracts" and self.shownContractsVersion ~= LivingMarket.contractsVersion then
-        self:refreshContracts()
-    end
-
-    -- Optionen: Änderungen (z. B. vom Host im Mehrspieler) sofort zeigen
-    if self.viewMode == "options" and self.shownOptionsVersion ~= LivingMarket.contractsVersion then
-        self:refreshOptions()
+    -- Änderungen von außen (Verkäufe beim Abladen, Mitspieler, Server) höchstens zweimal pro
+    -- Sekunde übernehmen: beim Abladen ändert sich die Verkaufsliste sonst in jedem Bild
+    self.liveRefreshTimer = (self.liveRefreshTimer or 0) - dt
+    if self.liveRefreshTimer <= 0 then
+        self.liveRefreshTimer = LivingMarketFrame.LIVE_REFRESH_INTERVAL
+        if self.viewMode == "market" and self.shownFavoritesVersion ~= LivingMarket.favoritesVersion then
+            self:rebuildWareList()
+        elseif self.viewMode == "sales" and self.shownSalesVersion ~= LivingMarket.salesVersion then
+            self:refreshSales()
+        elseif self.viewMode == "contracts" and self.shownContractsVersion ~= LivingMarket.contractsVersion then
+            self:refreshContracts()
+        elseif self.viewMode == "options" and self.shownOptionsVersion ~= LivingMarket.contractsVersion then
+            self:refreshOptions()
+        end
     end
 
     -- Uhr in Marktnachrichten, Verkäufen und Verträgen
@@ -1044,9 +1043,16 @@ function LivingMarketFrame:updateClock()
         if self.clockTextSmall ~= nil then
             self.clockTextSmall:setText("")
         end
+        self.clockStamp = nil
         return
     end
     local minutes = math.floor((env.dayTime or 0) / 60000)
+    -- nur bei neuer Spielminute neu setzen (Text bauen und setText kosten mehr als der Vergleich)
+    local stamp = (env.currentMonotonicDay or env.currentDay or 0) * 1440 + minutes
+    if stamp == self.clockStamp then
+        return
+    end
+    self.clockStamp = stamp
     local timeText = string.format("%02d:%02d", math.floor(minutes / 60) % 24, minutes % 60)
     local month = LivingMarket.getMonthName(LivingMarket.getCurrentMonth() or 1)
     local dateText = month
