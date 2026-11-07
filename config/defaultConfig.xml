@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="16">
+<livingMarket version="17">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -175,6 +175,11 @@
             <fillType name="DOWN"/> <fillType name="COD"/> <fillType name="EEL"/> <fillType name="TROUT"/>
             <fillType name="SALMON"/> <fillType name="HERRING"/> <fillType name="PLAICE"/> <fillType name="CRABS"/>
             <fillType name="HUMMER"/> <fillType name="SHELL"/> <fillType name="SALMONYOUNG"/> <fillType name="TROUTYOUNG"/>
+        </group>
+
+        <!-- Gülle und Mist: im Filter unter Tierprodukte, Bedarf wie bisher (Standardwerte) -->
+        <group name="manure" title="Gülle &amp; Mist" max="60000" refillPerMonth="0.30" filter="special">
+            <fillType name="LIQUIDMANURE"/> <fillType name="MANURE"/>
         </group>
 
         <group name="intermediate" title="Zwischenprodukte" max="50000" refillPerMonth="0.25">
