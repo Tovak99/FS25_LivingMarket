@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="17">
+<livingMarket version="18">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -195,6 +195,8 @@
             <fillType name="PUMPKIN_SEEDS"/> <fillType name="LAVENDER_OIL"/> <fillType name="LINSEED_OIL"/> <fillType name="MAIZE_OIL"/>
             <fillType name="POPPY_OIL"/> <fillType name="SOYBEAN_OIL"/> <fillType name="HEMP_OIL"/> <fillType name="PUMPKIN_SEEDSOIL"/>
             <fillType name="LEATHER"/>
+            <!-- Verpackung und Bindematerial für die Weiterverarbeitung -->
+            <fillType name="BALE_NET"/> <fillType name="BOTTLE"/> <fillType name="GLASS"/>
         </group>
 
         <group name="food" title="Lebensmittel" max="80000" refillPerMonth="0.30">
@@ -236,7 +238,7 @@
         <!-- Betriebsmittel, Verpackung, Reststoffe: im Filter unter Sonstige -->
         <group name="supplies" title="Betriebsmittel &amp; Verpackung" max="40000" refillPerMonth="0.30" filter="default">
             <fillType name="EMPTYPALLET"/> <fillType name="EMPTYPALLET_OLD"/> <fillType name="EMPTYPALLETBOX"/> <fillType name="WOODENBOX"/>
-            <fillType name="BOTTLE"/> <fillType name="GLASS"/> <fillType name="POT"/> <fillType name="BALE_NET"/>
+            <fillType name="POT"/>
             <fillType name="BALE_TWINE"/> <fillType name="BEEHIVE"/> <fillType name="SAPLINGS"/> <fillType name="RICESAPLINGS"/>
             <fillType name="OLDGLASS"/> <fillType name="WASTE_PAPER"/> <fillType name="SIDE_PRODUCT"/> <fillType name="COAL"/>
         </group>
