@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="22">
+<livingMarket version="23">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -168,7 +168,10 @@
             <fillType name="WOODCHIPS"/> <fillType name="WOOD"/> <fillType name="ROUNDBALE_WOOD"/> <fillType name="BARKMULCH"/>
             <!-- weitere -->
             <fillType name="WOODPELLETS"/>
-            <!-- Schnittholz aus dem Sägewerk (Bretter, lange Bretter, Balken) -->
+        </group>
+
+        <!-- Schnittholz aus dem Sägewerk: im Filter unter Holz, Bedarf wie Zwischenprodukte -->
+        <group name="lumber" title="Schnittholz" max="50000" refillPerMonth="0.25" filter="wood">
             <fillType name="PLANKS"/> <fillType name="BOARDS"/> <fillType name="WOODBEAM"/> <fillType name="PLANKS_LONG"/>
             <fillType name="LONGPLANKS"/> <fillType name="LONG_PLANKS"/> <fillType name="BOARDS_LONG"/>
         </group>
