@@ -669,11 +669,18 @@ function LivingMarket:getProductionInputs()
                 pointName = ok and value or nil
             end
             for _, production in pairs(productionPoint.productions or {}) do
-                -- nur echte Weiterverarbeitung: das Rezept muss etwas herstellen
-                -- (reine Abnehmer ohne Erzeugnis, z. B. Läden als Produktion, zählen nicht)
+                -- nur echte Weiterverarbeitung: das Rezept muss etwas NEUES herstellen.
+                -- Zählt nicht: reine Abnehmer ohne Erzeugnis, Lager-"Produktionen" (Ware rein = Ware raus,
+                -- z. B. "Zentrallager Werkstoffe") und Verkauf gegen Geld (Erzeugnis Bargeld/Geld)
+                local recipeInputs = {}
+                for _, input in pairs(production.inputs or {}) do
+                    if input.type ~= nil then
+                        recipeInputs[input.type] = true
+                    end
+                end
                 local makesSomething = false
                 for _, output in pairs(production.outputs or {}) do
-                    if output.type ~= nil then
+                    if output.type ~= nil and not recipeInputs[output.type] and not self:isExcludedFillType(output.type) then
                         makesSomething = true
                         break
                     end
