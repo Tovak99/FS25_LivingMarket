@@ -431,6 +431,7 @@ function LivingMarket:loadConfig()
             name           = getXMLString(xmlFile, groupKey .. "#name") or tostring(g),
             title          = getXMLString(xmlFile, groupKey .. "#title"),
             filter         = getXMLString(xmlFile, groupKey .. "#filter"),   -- im Gruppenfilter unter dieser Gruppe
+            processedAs    = getXMLString(xmlFile, groupKey .. "#processedAs"),  -- weiterverarbeitbare Waren: Bedarf dieser Gruppe
             max            = getXMLFloat(xmlFile, groupKey .. "#max") or config.default.max,
             refillPerMonth = getXMLFloat(xmlFile, groupKey .. "#refillPerMonth") or config.default.refillPerMonth
         }
@@ -469,6 +470,8 @@ function LivingMarket:loadConfig()
         auto.fruitGroup   = getXMLString(xmlFile, autoKey .. "#fruitGroup") or auto.fruitGroup
         auto.windrowGroup = getXMLString(xmlFile, autoKey .. "#windrowGroup") or auto.windrowGroup
         auto.milkGroup    = getXMLString(xmlFile, autoKey .. "#milkGroup") or auto.milkGroup
+        auto.processedGroup = getXMLString(xmlFile, autoKey .. "#processedGroup") or auto.processedGroup
+        auto.finalGroup     = getXMLString(xmlFile, autoKey .. "#finalGroup") or auto.finalGroup
         local tiers = {}
         local t = 0
         while true do
@@ -531,12 +534,22 @@ function LivingMarket:getAutoGroupName(fillType)
         and g_fruitTypeManager:getFruitTypeByFillTypeIndex(index) ~= nil then
         return auto.fruitGroup
     end
-    -- Paletten-/Stückware: je teurer, desto kleiner der Bedarf
+    -- Paletten-/Stückware: nach der Produktionskette der Karte – wird sie irgendwo weiterverarbeitet,
+    -- ist sie Zwischenware; sonst nach Preis (teuer = Endprodukt, sonst Lebensmittel)
     if fillType.palletFilename ~= nil then
+        local inputs = self:getProductionInputs()
+        local known = next(inputs) ~= nil
+        if known and auto.processedGroup ~= nil and inputs[index] then
+            return auto.processedGroup
+        end
         local price = self:getBasePricePer1000(index)
         if price ~= nil then
             for _, tier in ipairs(auto.priceTiers) do
                 if price >= tier.minPrice then
+                    -- nicht weiterverarbeitbar, aber nach Preis "Zwischenware": dann Endware der Grundstufe
+                    if known and tier.group == auto.processedGroup and auto.finalGroup ~= nil then
+                        return auto.finalGroup
+                    end
                     return tier.group
                 end
             end
@@ -623,6 +636,10 @@ function LivingMarket:getLimitFor(station, fillTypeIndex)
         end
     end
     local values = self.config.byFillType[fillTypeIndex] or self.config.default
+    -- weiterverarbeitbare Ware in einer Gruppe mit processedAs (z. B. Baustoffe): Bedarf der Zwischenware
+    if values.processedAs ~= nil and self:getProductionInputs()[fillTypeIndex] then
+        values = self.config.groupsByName[values.processedAs] or values
+    end
     -- wenige Abnehmer für die Ware: jede Station bekommt mehr Bedarf (bis ×2)
     local factor = self:getBuyerFactor(fillTypeIndex)
     return values.max * factor, values.max * values.refillPerMonth * factor
@@ -633,6 +650,79 @@ end
 -- die die Ware annehmen, begrenzt auf 1,0 … BUYER_MAX_FACTOR (1 Abnehmer ×2, 2 ×1,5, ab 3 ×1).
 -- Verkaufsstellen auf eigenen Produktionen zählen nicht (sie sind nicht begrenzt).
 -- ---------------------------------------------------------------------
+-- ---------------------------------------------------------------------
+-- Produktionskette der Karte: Waren, die eine Produktion als Rohstoff verbraucht
+-- (= weiterverarbeitbar). Erst nach Spielstart vollständig, dann einmal neu bewertet.
+-- ---------------------------------------------------------------------
+function LivingMarket:getProductionInputs()
+    if self.productionInputs ~= nil then
+        return self.productionInputs
+    end
+    local inputs = {}
+    local manager = g_currentMission ~= nil and g_currentMission.productionChainManager or nil
+    if manager ~= nil and manager.productionPoints ~= nil then
+        for _, productionPoint in pairs(manager.productionPoints) do
+            for _, production in pairs(productionPoint.productions or {}) do
+                for _, input in pairs(production.inputs or {}) do
+                    if input.type ~= nil then
+                        inputs[input.type] = true
+                    end
+                end
+            end
+        end
+    end
+    if g_currentMission ~= nil and g_currentMission.gameStarted then
+        self.productionInputs = inputs
+    end
+    return inputs
+end
+
+-- Nach Spielstart: Produktionen und Verkaufsstellen sind jetzt vollständig.
+-- Zuordnung neu lesen, Bedarf der vorhandenen Einträge anpassen (gelieferte Menge bleibt).
+function LivingMarket:refreshAfterGameStart()
+    self.productionInputs = nil
+    self.buyerCounts = nil
+    local inputs = self:getProductionInputs()
+    if self.configFromHost then
+        return   -- Mitspieler: Konfiguration kommt vom Host, nicht neu lesen
+    end
+    local ok, err = pcall(self.loadConfig, self)
+    if not ok then
+        print("[LivingMarket] FEHLER beim Neubewerten der Konfiguration: " .. tostring(err))
+        return
+    end
+    -- Übersicht der weiterverarbeitbaren Waren in Gruppen mit processedAs
+    local processed, final = {}, {}
+    for fillTypeIndex, group in pairs(self.config.byFillType) do
+        if group.processedAs ~= nil then
+            local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
+            local label = fillType ~= nil and string.format("%s = %s", fillType.name, tostring(fillType.title or fillType.name)) or tostring(fillTypeIndex)
+            table.insert(inputs[fillTypeIndex] and processed or final, label)
+        end
+    end
+    table.sort(processed)
+    table.sort(final)
+    if #processed + #final > 0 then
+        info("weiterverarbeitbar (Bedarf wie Zwischenprodukte): %s", #processed > 0 and table.concat(processed, ", ") or "-")
+        info("nicht weiterverarbeitbar (eigener Bedarf): %s", #final > 0 and table.concat(final, ", ") or "-")
+    end
+    if not isServer() then
+        return
+    end
+    for station, data in pairs(self.stations) do
+        for fillTypeIndex, entry in pairs(data) do
+            if type(entry) == "table" and entry.baseMax ~= nil then
+                local baseMax, baseRefill = self:getLimitFor(station, fillTypeIndex)
+                if math.abs(baseMax - entry.baseMax) > 0.5 or math.abs(baseRefill - (entry.baseRefill or 0)) > 0.5 then
+                    entry.baseMax, entry.baseRefill = baseMax, baseRefill
+                    self:recalcEntryLimits(entry, true)
+                    self:markDirty(entry)
+                end
+            end
+        end
+    end
+end
+
 LivingMarket.BUYER_REFERENCE  = 3
 LivingMarket.BUYER_MAX_FACTOR = 2
 
@@ -1792,6 +1882,13 @@ function LivingMarket:update(dt)
         self:updateUnloads(dt)
     end
     self:updateMenuPlacement(dt)
+    if not self.gameStartRefreshDone and g_currentMission ~= nil and g_currentMission.gameStarted then
+        self.gameStartRefreshDone = true
+        local ok, err = pcall(self.refreshAfterGameStart, self)
+        if not ok then
+            print("[LivingMarket] FEHLER nach Spielstart: " .. tostring(err))
+        end
+    end
     if not self.hasDirty then
         return
     end
@@ -2074,7 +2171,7 @@ function LivingMarket:getConfigSnapshot()
     }
     for _, group in ipairs(config.groupOrder or {}) do
         table.insert(snap.groups, { name = group.name, title = group.title or "", filter = group.filter or "",
-            max = group.max, refill = group.refillPerMonth })
+            processedAs = group.processedAs or "", max = group.max, refill = group.refillPerMonth })
     end
     for fillTypeIndex, group in pairs(config.byFillType) do
         local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
@@ -2101,6 +2198,7 @@ function LivingMarket:applyConfigSnapshot(snap)
     config.groupsByName, config.groupOrder, config.byFillType = {}, {}, {}
     for _, g in ipairs(snap.groups) do
         local group = { name = g.name, title = g.title ~= "" and g.title or nil, filter = g.filter ~= "" and g.filter or nil,
+            processedAs = (g.processedAs ~= nil and g.processedAs ~= "") and g.processedAs or nil,
             max = g.max, refillPerMonth = g.refill }
         config.groupsByName[group.name] = group
         table.insert(config.groupOrder, group)
@@ -2114,6 +2212,7 @@ function LivingMarket:applyConfigSnapshot(snap)
     end
     self.config = config
     self.configVersion = (self.configVersion or 0) + 1   -- Gruppenleiste neu aufbauen
+    self.configFromHost = true
     for _, c in ipairs(snap.contract) do
         if self.CONTRACT_SETTINGS ~= nil and type(self.CONTRACT_SETTINGS[c.key]) == "number" then
             self.CONTRACT_SETTINGS[c.key] = c.value
@@ -2121,6 +2220,8 @@ function LivingMarket:applyConfigSnapshot(snap)
     end
     self.yearPriceCache = {}
     self.buyerCounts = nil
+    self.productionInputs = nil
+    self.gameStartRefreshDone = nil
     self.contractsVersion = (self.contractsVersion or 0) + 1
     log("Konfiguration vom Host übernommen: %d Gruppen, %d Waren", #snap.groups, #snap.fillTypes)
 end
@@ -2532,6 +2633,8 @@ function LivingMarket:deleteMap()
     self.loggedMissionDeliveries = {}
     self.yearPriceCache = {}
     self.buyerCounts = nil
+    self.productionInputs = nil
+    self.gameStartRefreshDone = nil
     if self.resetUnloads ~= nil then
         self:resetUnloads()
     end

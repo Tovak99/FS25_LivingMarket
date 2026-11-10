@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="20">
+<livingMarket version="21">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -93,8 +93,10 @@
          4. Paletten-/Stückware nach Grundpreis je 1000 l -> erste passende priceTier (von oben)
          5. alles andere (Schüttgut, Flüssiges)  -> <default>
          Betriebsmittel (Diesel, Dünger, Saatgut ...) bekommen immer <default>.
+         Paletten-/Stückware: Rohstoff einer Produktion auf der Karte → processedGroup,
+         sonst nach Preis (die unterste Preisstufe wird dann zu finalGroup).
          enabled="false" schaltet die Automatik ab. -->
-    <autoGroups enabled="true" fruitGroup="grain" windrowGroup="forage" milkGroup="milk">
+    <autoGroups enabled="true" fruitGroup="grain" windrowGroup="forage" milkGroup="milk" processedGroup="intermediate" finalGroup="food">
         <priceTier minPrice="4000" group="premium"/>
         <priceTier minPrice="1500" group="food"/>
         <priceTier minPrice="0"    group="intermediate"/>
@@ -222,8 +224,10 @@
             <fillType name="ROPE"/> <fillType name="CHARCOAL"/>
         </group>
 
-        <!-- Baustoffe & Garten (Baumarkt): eigene Gruppe im Filter -->
-        <group name="construction" title="Baustoffe &amp; Garten" max="50000" refillPerMonth="0.25">
+        <!-- Baustoffe & Garten (Baumarkt): eigene Gruppe im Filter.
+             processedAs: Baustoffe, die eine Produktion auf der Karte weiterverarbeitet,
+             bekommen den Bedarf der Zwischenprodukte (Liste im Log). -->
+        <group name="construction" title="Baustoffe &amp; Garten" max="90000" refillPerMonth="0.30" processedAs="intermediate">
             <fillType name="CEMENT"/> <fillType name="CEMENTBRICKS"/> <fillType name="ROOFPLATES"/> <fillType name="SHINGLEROOF"/>
             <fillType name="CASTLEROCK"/> <fillType name="CURB"/> <fillType name="PAVINGSTONE"/> <fillType name="PAVINGSTONE_RED"/>
             <fillType name="GLASSPANES"/> <fillType name="WINDOW"/> <fillType name="INSULATION"/> <fillType name="OSBPALLET"/>
