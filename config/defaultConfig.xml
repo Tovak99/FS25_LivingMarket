@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="21">
+<livingMarket version="22">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -168,6 +168,9 @@
             <fillType name="WOODCHIPS"/> <fillType name="WOOD"/> <fillType name="ROUNDBALE_WOOD"/> <fillType name="BARKMULCH"/>
             <!-- weitere -->
             <fillType name="WOODPELLETS"/>
+            <!-- Schnittholz aus dem Sägewerk (Bretter, lange Bretter, Balken) -->
+            <fillType name="PLANKS"/> <fillType name="BOARDS"/> <fillType name="WOODBEAM"/> <fillType name="PLANKS_LONG"/>
+            <fillType name="LONGPLANKS"/> <fillType name="LONG_PLANKS"/> <fillType name="BOARDS_LONG"/>
         </group>
 
         <group name="milk" title="Milch" max="120000" refillPerMonth="0.60" filter="special">
@@ -190,8 +193,8 @@
         <group name="intermediate" title="Zwischenprodukte" max="50000" refillPerMonth="0.25">
             <fillType name="FLOUR"/> <fillType name="SUGAR"/> <fillType name="SUNFLOWER_OIL"/> <fillType name="CANOLA_OIL"/>
             <fillType name="OLIVE_OIL"/> <fillType name="RICE_OIL"/> <fillType name="BUTTER"/> <fillType name="CREAM"/>
-            <fillType name="BRAN"/> <fillType name="RICEFLOUR"/> <fillType name="BOARDS"/> <fillType name="PLANKS"/>
-            <fillType name="WOODBEAM"/>
+            <fillType name="BRAN"/> <fillType name="RICEFLOUR"/>
+           
             <fillType name="PAPERROLL"/> <fillType name="CARTONROLL"/> <fillType name="FABRIC"/> <fillType name="THREAD"/>
             <fillType name="FLAX_WINDROW"/> <fillType name="HEMP_WINDROW"/>
             <!-- Rohstoffe für Weiterverarbeitung: Mehle, Hefe, Öle, Leder, Lavendel -->
