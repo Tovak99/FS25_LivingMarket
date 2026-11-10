@@ -623,8 +623,44 @@ function LivingMarket:getLimitFor(station, fillTypeIndex)
         end
     end
     local values = self.config.byFillType[fillTypeIndex] or self.config.default
-    -- Platz für spätere Logik: Stationstyp, Ereignisse ...
-    return values.max, values.max * values.refillPerMonth
+    -- wenige Abnehmer für die Ware: jede Station bekommt mehr Bedarf (bis ×2)
+    local factor = self:getBuyerFactor(fillTypeIndex)
+    return values.max * factor, values.max * values.refillPerMonth * factor
+end
+
+-- ---------------------------------------------------------------------
+-- Bedarf nach Zahl der Abnehmer: Faktor = BUYER_REFERENCE ÷ Anzahl begrenzter Verkaufsstellen,
+-- die die Ware annehmen, begrenzt auf 1,0 … BUYER_MAX_FACTOR (1 Abnehmer ×2, 2 ×1,5, ab 3 ×1).
+-- Verkaufsstellen auf eigenen Produktionen zählen nicht (sie sind nicht begrenzt).
+-- ---------------------------------------------------------------------
+LivingMarket.BUYER_REFERENCE  = 3
+LivingMarket.BUYER_MAX_FACTOR = 2
+
+function LivingMarket:getBuyerCounts()
+    if self.buyerCounts ~= nil then
+        return self.buyerCounts
+    end
+    local counts = {}
+    for _, station in ipairs(self:collectStations()) do
+        for fillTypeIndex, accepted in pairs(station.acceptedFillTypes or {}) do
+            if accepted then
+                counts[fillTypeIndex] = (counts[fillTypeIndex] or 0) + 1
+            end
+        end
+    end
+    -- erst merken, wenn das Spiel läuft (vorher sind evtl. noch nicht alle Stationen gebaut)
+    if g_currentMission ~= nil and g_currentMission.gameStarted then
+        self.buyerCounts = counts
+    end
+    return counts
+end
+
+function LivingMarket:getBuyerFactor(fillTypeIndex)
+    local count = self:getBuyerCounts()[fillTypeIndex] or 0
+    if count <= 0 then
+        return 1
+    end
+    return math.max(1, math.min(self.BUYER_MAX_FACTOR, self.BUYER_REFERENCE / count))
 end
 
 -- Spielstunden je Monat (Tage je Monat aus den Spieleinstellungen × 24)
@@ -2080,6 +2116,7 @@ function LivingMarket:applyConfigSnapshot(snap)
         end
     end
     self.yearPriceCache = {}
+    self.buyerCounts = nil
     self.contractsVersion = (self.contractsVersion or 0) + 1
     log("Konfiguration vom Host übernommen: %d Gruppen, %d Waren", #snap.groups, #snap.fillTypes)
 end
@@ -2490,6 +2527,7 @@ function LivingMarket:deleteMap()
     self.categorizedFillTypes = nil
     self.loggedMissionDeliveries = {}
     self.yearPriceCache = {}
+    self.buyerCounts = nil
     if self.resetUnloads ~= nil then
         self:resetUnloads()
     end

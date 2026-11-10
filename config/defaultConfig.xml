@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="18">
+<livingMarket version="19">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -104,7 +104,9 @@
          Acker, Grünland, Wald, Tierhaltung, dann Verarbeitung).
          filter="gruppe": Gruppe erscheint im Gruppenfilter unter einer anderen Gruppe
          (z. B. Milch unter Tierprodukte), behält aber ihren eigenen Bedarf;
-         filter="default" = unter Sonstige. -->
+         filter="default" = unter Sonstige.
+         Bedarf je Station wird bei wenigen Abnehmern einer Ware erhöht:
+         Faktor = 3 ÷ Anzahl Abnehmer, zwischen 1,0 und 2,0 (1 Abnehmer ×2, 2 ×1,5, ab 3 ×1). -->
     <groups>
         <group name="grain" title="Getreide &amp; Ölsaaten" max="500000" refillPerMonth="0.40">
             <fillType name="WHEAT"/> <fillType name="BARLEY"/> <fillType name="OAT"/> <fillType name="RYE"/>
@@ -126,6 +128,11 @@
             <fillType name="ONION_DIRTY"/> <fillType name="REDONION"/>
         </group>
 
+        <!-- Buschbohnen: im Filter unter Hackfrüchte, Bedarf wie Obst & Gemüse -->
+        <group name="beans" title="Buschbohnen" max="30000" refillPerMonth="0.25" filter="roots">
+            <fillType name="GREENBEAN"/>
+        </group>
+
         <!-- Obst & Gemüse (auch von Karten/Mods; unbekannte Namen werden übersprungen) -->
         <group name="fruit" title="Obst &amp; Gemüse" max="30000" refillPerMonth="0.25">
             <fillType name="GRAPE"/> <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/>
@@ -139,7 +146,7 @@
             <fillType name="REDCABBAGE"/> <fillType name="WHITECABBAGE"/> <fillType name="CAULIFLOWER"/> <fillType name="BROCCOLI"/>
             <fillType name="KALE"/> <fillType name="CUCUMBER"/> <fillType name="ZUCCHINI"/> <fillType name="PAPRIKA"/>
             <fillType name="PEPPER"/> <fillType name="GARLIC"/> <fillType name="LEEK"/> <fillType name="CELERY"/>
-            <fillType name="ASPARAGUS"/> <fillType name="GREENBEAN"/> <fillType name="RADISH"/> <fillType name="HOPS"/>
+            <fillType name="ASPARAGUS"/> <fillType name="RADISH"/> <fillType name="HOPS"/>
             <fillType name="APFEL"/> <fillType name="BIRNE"/> <fillType name="KIRSCHE"/> <fillType name="KIRSCHEN"/>
             <fillType name="PFLAUME"/> <fillType name="PFLAUMEN"/> <fillType name="KUERBIS"/> <fillType name="ERDBEERE"/>
             <!-- weitere Sorten, Pilze und abgepacktes Gemüse -->
@@ -211,7 +218,7 @@
             <fillType name="FERMENTEDNAPACABBAGE"/> <fillType name="PRESERVEDBEETROOT"/> <fillType name="PRESERVEDCARROTS"/> <fillType name="PRESERVEDPARSNIP"/>
         </group>
 
-        <group name="premium" title="Hochwertige Endprodukte" max="30000" refillPerMonth="0.25">
+        <group name="premium" title="Hochwertige Endprodukte" max="40000" refillPerMonth="0.30">
             <fillType name="CHOCOLATE"/> <fillType name="CLOTHES"/> <fillType name="FURNITURE"/> <fillType name="PREFABWALL"/>
             <fillType name="BATHTUB"/> <fillType name="BARREL"/> <fillType name="BUCKET"/>
             <!-- Haushalt und Kleidung -->
