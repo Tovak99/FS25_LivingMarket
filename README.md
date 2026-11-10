@@ -2,7 +2,7 @@
 
 Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nicht mehr unbegrenzt an: Jede Station hat pro Ware einen **Bedarf**, der beim Verkauf sinkt und sich mit der Zeit langsam wieder auffüllt. Ziel ist ein lebendiger Markt mit Nachfrage, Engpässen, Preisänderungen und Angeboten.
 
-> Status: Entwicklungsversion 0.3.0.7 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
+> Status: Entwicklungsversion 0.3.0.18 (Singleplayer getestet, Multiplayer noch ungetestet), noch nicht veröffentlicht.
 
 ## Funktionen
 
@@ -28,6 +28,9 @@ Script-Mod für den **Landwirtschafts-Simulator 25**. Verkaufsstellen nehmen nic
   - **Gruppenfilter** unter der Kopfzeile in allen vier Ansichten (Getreide, Hackfrüchte, Obst & Gemüse, Futter, Holz, Tierprodukte, Zwischenprodukte, Lebensmittel, Endprodukte, Sonstige); Gruppen ohne Ware ausgegraut
   - **Hinweise beim Abladen:** Kurzmeldung nach dem Abladen (Menge, Erlös, Preis jetzt, freier Bedarf) und Warnung, wenn die Station voll ist – mit der besten Alternative
   - Reiter im ESC-Menü direkt hinter dem Field Manager (falls installiert)
+  - Bedarf je Station steigt bei wenigen Abnehmern einer Ware (1 Abnehmer ×2, 2 Abnehmer ×1,5)
+  - Gruppen zusätzlich: Baustoffe; Futtermittel, Gülle & Mist, Betriebsmittel erscheinen im Filter unter Futter, Tierprodukte bzw. Sonstige
+  - Multiplayer: Host-Konfiguration geht an alle Mitspieler, Filter der Mitspieler werden lokal gespeichert
 - **Schimpfwortfilter des Spiels abgeschaltet** (sonst wird z. B. „Aldi“ zu „Al$i“) – Idee aus „Disable Profanity Filter“ von Supermaschine
 - **Mehrsprachig:** Deutsch, Englisch, Französisch, Polnisch, Niederländisch, Spanisch, Italienisch
 - **Speichert den Bedarf im Spielstand** (`livingMarket.xml` im Savegame-Ordner)
