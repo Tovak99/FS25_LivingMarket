@@ -659,18 +659,42 @@ function LivingMarket:getProductionInputs()
         return self.productionInputs
     end
     local inputs = {}
+    local users = {}   -- [Ware] = { Produktionsname, ... } für das Log
     local manager = g_currentMission ~= nil and g_currentMission.productionChainManager or nil
     if manager ~= nil and manager.productionPoints ~= nil then
         for _, productionPoint in pairs(manager.productionPoints) do
+            local pointName = nil
+            if productionPoint.getName ~= nil then
+                local ok, value = pcall(productionPoint.getName, productionPoint)
+                pointName = ok and value or nil
+            end
             for _, production in pairs(productionPoint.productions or {}) do
-                for _, input in pairs(production.inputs or {}) do
-                    if input.type ~= nil then
-                        inputs[input.type] = true
+                -- nur echte Weiterverarbeitung: das Rezept muss etwas herstellen
+                -- (reine Abnehmer ohne Erzeugnis, z. B. Läden als Produktion, zählen nicht)
+                local makesSomething = false
+                for _, output in pairs(production.outputs or {}) do
+                    if output.type ~= nil then
+                        makesSomething = true
+                        break
+                    end
+                end
+                if makesSomething then
+                    for _, input in pairs(production.inputs or {}) do
+                        if input.type ~= nil then
+                            inputs[input.type] = true
+                            users[input.type] = users[input.type] or {}
+                            local label = tostring(production.name or pointName or "?")
+                            if pointName ~= nil and production.name ~= nil and production.name ~= pointName then
+                                label = string.format("%s: %s", pointName, production.name)
+                            end
+                            users[input.type][label] = true
+                        end
                     end
                 end
             end
         end
     end
+    self.productionInputUsers = users
     if g_currentMission ~= nil and g_currentMission.gameStarted then
         self.productionInputs = inputs
     end
@@ -697,7 +721,23 @@ function LivingMarket:refreshAfterGameStart()
         if group.processedAs ~= nil then
             local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex)
             local label = fillType ~= nil and string.format("%s = %s", fillType.name, tostring(fillType.title or fillType.name)) or tostring(fillTypeIndex)
-            table.insert(inputs[fillTypeIndex] and processed or final, label)
+            if inputs[fillTypeIndex] then
+                -- dazu, welche Produktion die Ware verbraucht (höchstens 3)
+                local names = {}
+                for name in pairs((self.productionInputUsers or {})[fillTypeIndex] or {}) do
+                    table.insert(names, name)
+                end
+                table.sort(names)
+                while #names > 3 do
+                    table.remove(names)
+                end
+                if #names > 0 then
+                    label = label .. " (← " .. table.concat(names, "; ") .. ")"
+                end
+                table.insert(processed, label)
+            else
+                table.insert(final, label)
+            end
         end
     end
     table.sort(processed)
