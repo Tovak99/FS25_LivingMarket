@@ -725,9 +725,13 @@ function LivingMarket:getEntry(station, fillTypeIndex)
             if saved.baseMax == nil then
                 -- Spielstand vor 0.2.1.29 (ohne gespeicherten Grundwert): einmalig voll
                 remaining = entry.max
-            elseif saved.baseMax > 0 and math.abs(saved.baseMax - (entry.baseMax or 0)) > 0.5 then
-                -- Grundwert in der Konfiguration geändert: freie Menge anteilig umrechnen
-                remaining = remaining * (entry.baseMax or 0) / saved.baseMax
+            elseif saved.baseMax > 0 and (entry.baseMax or 0) > 0 and math.abs(saved.baseMax - entry.baseMax) > 0.5 then
+                -- Grundwert geändert (Konfiguration, Zahl der Abnehmer): die bereits gelieferte Menge
+                -- bleibt erhalten, die Änderung des Bedarfs kommt auf die freie Menge
+                -- (wie recalcEntryLimits: 100.000 mit 50.000 geliefert → 80.000 = noch 30.000 frei)
+                local oldMax = entry.max * saved.baseMax / entry.baseMax
+                local delivered = math.max(0, oldMax - remaining)
+                remaining = entry.max - delivered
             end
             entry.remaining = math.max(0, math.min(remaining, entry.max))
         end
