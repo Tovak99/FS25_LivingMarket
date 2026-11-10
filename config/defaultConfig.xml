@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="19">
+<livingMarket version="20">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -126,10 +126,6 @@
             <fillType name="CARROT"/> <fillType name="PARSNIP"/> <fillType name="ONION"/> <fillType name="SUGARCANE"/>
             <!-- weitere Hackfrüchte -->
             <fillType name="ONION_DIRTY"/> <fillType name="REDONION"/>
-        </group>
-
-        <!-- Buschbohnen: im Filter unter Hackfrüchte, Bedarf wie Obst & Gemüse -->
-        <group name="beans" title="Buschbohnen" max="30000" refillPerMonth="0.25" filter="roots">
             <fillType name="GREENBEAN"/>
         </group>
 
