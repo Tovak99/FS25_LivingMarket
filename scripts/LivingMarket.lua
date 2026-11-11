@@ -29,7 +29,6 @@ LivingMarket.config           = nil     -- { default = {max, refillPerMonth}, by
 -- Geld/Bargeld: die Bank begrenzt auch nicht.
 LivingMarket.EXCLUDED_FILLTYPES = {
     MONEY       = true,
-    CASH        = true,
     SERVICE     = true,   -- Wartung: wird nur verteilt, nicht transportiert
     MAINTENANCE = true,
     ELECTRICCHARGE = true, -- Elektrische Energie: nur verteilt/direkt verkauft
@@ -246,8 +245,26 @@ local function isMultiplayer()
 end
 
 -- Ausgenommene Fruchtsorte (z. B. Geld)? Prüft den internen Namen und als
--- Rückfall alles, was "MONEY" oder "CASH" im Namen trägt (Mod-Füllarten).
+-- Rückfall alles, was "MONEY" im Namen trägt (Mod-Füllarten). Bargeld ("CASH") ist unbegrenzt, aber sichtbar.
 -- Ergebnis wird je Füllart gemerkt, weil die Abfrage beim Abladen jeden Frame kommt.
+-- Unbegrenzte Waren: werden angezeigt (Bestand, Station, Erlös), aber nie begrenzt,
+-- ohne Preisabschlag, Ereignisse und Verträge (z. B. Bargeld, das die Bank in Geld umtauscht)
+LivingMarket.UNLIMITED_FILLTYPES = {
+    CASH = true,
+}
+LivingMarket.UNLIMITED_LITERS = 1000000000
+
+function LivingMarket:isUnlimitedFillType(fillTypeIndex)
+    local name = fillTypeIndex ~= nil and g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex) or nil
+    if name == nil then
+        return false
+    end
+    name = string.upper(name)
+    -- Bargeld heißt je nach Karte/Mod etwas anders (CASH, CASHBAG ...)
+    return self.UNLIMITED_FILLTYPES[name] == true or string.find(name, "CASH", 1, true) ~= nil
+        or string.find(name, "BARGELD", 1, true) ~= nil
+end
+
 function LivingMarket:isExcludedFillType(fillTypeIndex)
     local cached = self.excludedCache[fillTypeIndex]
     if cached ~= nil then
@@ -256,6 +273,9 @@ function LivingMarket:isExcludedFillType(fillTypeIndex)
 
     local excluded = false
     local name = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+    if name ~= nil and self:isUnlimitedFillType(fillTypeIndex) then
+        name = nil   -- unbegrenzt, aber sichtbar
+    end
     if name ~= nil then
         name = string.upper(name)
         excluded = self.EXCLUDED_FILLTYPES[name] == true
@@ -635,6 +655,9 @@ function LivingMarket:getLimitFor(station, fillTypeIndex)
             self.config = self.config or { default = { max = self.FALLBACK_MAX, refillPerMonth = self.FALLBACK_REFILL }, byFillType = {} }
         end
     end
+    if self:isUnlimitedFillType(fillTypeIndex) then
+        return self.UNLIMITED_LITERS, 0
+    end
     local values = self.config.byFillType[fillTypeIndex] or self.config.default
     -- weiterverarbeitbare Ware in einer Gruppe mit processedAs (z. B. Baustoffe): Bedarf der Zwischenware
     if values.processedAs ~= nil and self:getProductionInputs()[fillTypeIndex] then
@@ -872,7 +895,11 @@ function LivingMarket:getEntry(station, fillTypeIndex)
             end
             entry.remaining = math.max(0, math.min(remaining, entry.max))
         end
+        entry.unlimited = self:isUnlimitedFillType(fillTypeIndex) or nil
         data[fillTypeIndex] = entry
+    end
+    if entry.unlimited then
+        entry.remaining = entry.max   -- nie begrenzt
     end
     return entry
 end
@@ -920,7 +947,7 @@ end
 -- Faktor auf den Spielpreis für diese Station und Ware (1 = unverändert)
 function LivingMarket:getPriceFactor(station, fillTypeIndex)
     local entry = self:getEntry(station, fillTypeIndex)
-    if entry == nil or entry.max <= 0 then
+    if entry == nil or entry.max <= 0 or entry.unlimited then
         return 1
     end
     return self:getFactorForShare(entry.remaining / entry.max) * (entry.eventPrice or 1)
@@ -929,7 +956,7 @@ end
 -- Nur der Malus durch Massenverkauf (Marktlage), ohne Ereignis
 function LivingMarket:getDemandFactor(station, fillTypeIndex)
     local entry = self:getEntry(station, fillTypeIndex)
-    if entry == nil or entry.max <= 0 then
+    if entry == nil or entry.max <= 0 or entry.unlimited then
         return 1
     end
     return self:getFactorForShare(entry.remaining / entry.max)
@@ -1205,6 +1232,7 @@ function LivingMarket:getWareData()
                         remaining = entry.remaining,
                         max       = entry.max,
                         share     = entry.max > 0 and entry.remaining / entry.max or 0,
+                        unlimited = entry.unlimited == true,   -- z. B. Bargeld: ohne Begrenzung
                         stars     = self.getStationStars ~= nil and self:getStationStars(self:getFarmId(), station) or 3,   -- Ansehen des eigenen Hofs
                         reputation = self.getStationReputation ~= nil and self:getStationReputation(self:getFarmId(), station) or 50,
                     })
@@ -1582,7 +1610,7 @@ end
 function LivingMarket.getFreeCapacity(station, superFunc, fillTypeIndex, ...)
     local capacity = superFunc(station, fillTypeIndex, ...)
     local entry = LivingMarket:getEntry(station, fillTypeIndex)
-    if entry == nil then
+    if entry == nil or entry.unlimited then
         return capacity
     end
     -- Hof ist hier nicht sicher bekannt: laufender Auftrag irgendeines Hofs gibt die Ware frei
@@ -1600,7 +1628,7 @@ function LivingMarket.addFillLevelFromTool(station, superFunc, farmId, deltaFill
     end
 
     local entry = LivingMarket:getEntry(station, fillTypeIndex)
-    if entry == nil then
+    if entry == nil or entry.unlimited then
         return superFunc(station, farmId, deltaFillLevel, fillTypeIndex, ...)
     end
 

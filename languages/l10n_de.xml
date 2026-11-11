@@ -70,6 +70,7 @@
         <text name="livingMarket_ctNoStock" text="Du hast diese Ware gar nicht auf Lager!"/>
         <text name="livingMarket_ctCancelText" text="Vertrag wirklich kündigen?&#10;Bisher geliefert: %s von %s %s an %s.&#10;&#10;Strafe %s und weniger Ansehen bei %s."/>
         <text name="livingMarket_ctLimit" text="Du hast bereits %d laufende Verträge."/>
+        <text name="livingMarket_unlimited" text="unbegrenzt"/>
         <text name="livingMarket_grpAll" text="Alle"/>
         <text name="livingMarket_grp_grain" text="Getreide"/>
         <text name="livingMarket_grp_roots" text="Hackfrüchte"/>

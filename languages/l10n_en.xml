@@ -70,6 +70,7 @@
         <text name="livingMarket_ctNoStock" text="You have none of this product in stock!"/>
         <text name="livingMarket_ctCancelText" text="Really cancel this contract?&#10;Delivered so far: %s of %s %s to %s.&#10;&#10;Penalty %s and lower standing with %s."/>
         <text name="livingMarket_ctLimit" text="You already have %d active contracts."/>
+        <text name="livingMarket_unlimited" text="unlimited"/>
         <text name="livingMarket_grpAll" text="All"/>
         <text name="livingMarket_grp_grain" text="Grain"/>
         <text name="livingMarket_grp_roots" text="Root crops"/>

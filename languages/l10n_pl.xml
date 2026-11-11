@@ -70,6 +70,7 @@
         <text name="livingMarket_ctNoStock" text="Nie masz tego towaru na stanie!"/>
         <text name="livingMarket_ctCancelText" text="Na pewno wypowiedzieć umowę?&#10;Dostarczono: %s z %s %s do %s.&#10;&#10;Kara %s i niższa renoma u %s."/>
         <text name="livingMarket_ctLimit" text="Masz już %d aktywne umowy."/>
+        <text name="livingMarket_unlimited" text="bez limitu"/>
         <text name="livingMarket_grpAll" text="Wszystko"/>
         <text name="livingMarket_grp_grain" text="Zboża"/>
         <text name="livingMarket_grp_roots" text="Okopowe"/>

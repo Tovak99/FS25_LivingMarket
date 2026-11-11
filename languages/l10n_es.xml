@@ -70,6 +70,7 @@
         <text name="livingMarket_ctNoStock" text="¡No tienes nada de este producto en stock!"/>
         <text name="livingMarket_ctCancelText" text="¿Rescindir realmente el contrato?&#10;Entregado hasta ahora: %s de %s de %s a %s.&#10;&#10;Penalización %s y menos reputación con %s."/>
         <text name="livingMarket_ctLimit" text="Ya tienes %d contratos en curso."/>
+        <text name="livingMarket_unlimited" text="ilimitado"/>
         <text name="livingMarket_grpAll" text="Todo"/>
         <text name="livingMarket_grp_grain" text="Cereales"/>
         <text name="livingMarket_grp_roots" text="Tubérculos"/>

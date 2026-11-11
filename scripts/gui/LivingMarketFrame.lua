@@ -2155,11 +2155,12 @@ function LivingMarketFrame:populateStationCell(station, cell)
         -- Bedarf durch Ereignis erhöht (Engpass, Gefragt) grün, gesenkt (Überangebot, Flaute) rot,
         -- dann mit dem Faktor in Klammern, z. B. "115.500 l (150 %)"
         local eventMax = station.eventMax or 1
-        maxText:setText(LivingMarket.formatLiters(station.max))   -- Änderung steht in der Spalte Wirkung
+        maxText:setText(station.unlimited and "-" or LivingMarket.formatLiters(station.max))   -- Änderung steht in der Spalte Wirkung
         local maxColor = eventMax > 1.001 and COLOR_GOOD or (eventMax < 0.999 and COLOR_LOW or COLOR_TEXT)
         setColor(maxText, isFull and COLOR_MUTED or maxColor)
     end
-    shareText:setText(string.format("%d %%", math.floor(station.share * 100 + 0.5)))
+    shareText:setText(station.unlimited and g_i18n:getText("livingMarket_unlimited")
+        or string.format("%d %%", math.floor(station.share * 100 + 0.5)))
 
     -- Volle Stationen ausgegraut
     local main = isFull and COLOR_MUTED or COLOR_TEXT
