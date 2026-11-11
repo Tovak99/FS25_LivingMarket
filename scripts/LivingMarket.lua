@@ -610,6 +610,9 @@ end
 LivingMarket.GROUP_OTHER = "default"
 
 function LivingMarket:getGroupNameOf(fillTypeIndex)
+    if self:isUnlimitedFillType(fillTypeIndex) then
+        return self.GROUP_OTHER   -- Bargeld u. Ä.: immer unter Sonstige
+    end
     local config = self.config
     local group = config ~= nil and config.byFillType[fillTypeIndex] or nil
     if group == nil then
