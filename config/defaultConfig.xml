@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="23">
+<livingMarket version="24">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -249,6 +249,12 @@
         </group>
 
         <!-- Betriebsmittel, Verpackung, Reststoffe: im Filter unter Sonstige -->
+        <!-- Kraftstoffe: großer Markt (Raffinerien produzieren viel); im Filter unter Sonstige -->
+        <group name="fuel" title="Kraftstoffe" max="150000" refillPerMonth="0.40" filter="default">
+            <fillType name="DIESEL"/> <fillType name="DEF"/> <fillType name="METHANE"/> <fillType name="BIODIESEL"/>
+            <fillType name="GASOLINE"/> <fillType name="PETROL"/> <fillType name="HYDROGEN"/> <fillType name="LPG"/>
+        </group>
+
         <group name="supplies" title="Betriebsmittel &amp; Verpackung" max="40000" refillPerMonth="0.30" filter="default">
             <fillType name="EMPTYPALLET"/> <fillType name="EMPTYPALLET_OLD"/> <fillType name="EMPTYPALLETBOX"/> <fillType name="WOODENBOX"/>
             <fillType name="POT"/>
