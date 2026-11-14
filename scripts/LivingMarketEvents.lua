@@ -164,7 +164,7 @@ function LivingMarket:getEventStationName(event)
     if station ~= nil then
         event.stationName = self:getStationNameOf(station)
     end
-    return event.stationName or "?"
+    return event.stationName or g_i18n:getText("livingMarket_unknownStation")
 end
 
 function LivingMarket:notify(text, isWarning)
@@ -418,6 +418,7 @@ function LivingMarket:createRandomEvent()
             return nil
         end
         event.fillTypeIndex, event.stationKey = fillTypeIndex, stationKey
+        event.stationName = self:getStationNameOf(station)   -- Name bleibt, auch wenn die Station später wegfällt
         event.startHour = now
     end
     event.endHour = event.startHour + months * hoursPerMonth
@@ -475,7 +476,15 @@ function LivingMarket:isEventWareSellable(event)
     end
     if event.stationKey ~= nil then
         local station = self:findStationByKey(event.stationKey)
-        return station == nil or self:isContractWareSellable(station, event.fillTypeIndex)
+        if station == nil then
+            -- Station nicht mehr begrenzt (z. B. Produktion vom Spieler gekauft) oder abgerissen:
+            -- Ereignis hat keine Wirkung mehr. Nur entfernen, wenn die Stationen schon erfasst sind.
+            return #self:collectStations() == 0
+        end
+        if event.stationName == nil then
+            event.stationName = self:getStationNameOf(station)
+        end
+        return self:isContractWareSellable(station, event.fillTypeIndex)
     end
     local fillType = g_fillTypeManager:getFillTypeByIndex(event.fillTypeIndex)
     return fillType ~= nil and (fillType.pricePerLiter or 0) > 0 and fillType.showOnPriceTable ~= false
@@ -583,6 +592,9 @@ function LivingMarket:saveEventsToXML(xmlFile, baseKey)
         setXMLString(xmlFile, key .. "#fillType", g_fillTypeManager:getFillTypeNameByIndex(event.fillTypeIndex) or "")
         if event.stationKey ~= nil then
             setXMLString(xmlFile, key .. "#station", event.stationKey)
+            if event.stationName ~= nil and event.stationName ~= "?" then
+                setXMLString(xmlFile, key .. "#stationName", event.stationName)
+            end
         end
         setXMLFloat(xmlFile, key .. "#price", event.price)
         setXMLFloat(xmlFile, key .. "#maxFactor", event.maxFactor)
@@ -610,6 +622,7 @@ function LivingMarket:loadEventsFromXML(xmlFile, baseKey)
                 type          = getXMLInt(xmlFile, key .. "#type") or self.EVENT_SHORTAGE,
                 fillTypeIndex = fillTypeIndex,
                 stationKey    = getXMLString(xmlFile, key .. "#station"),
+                stationName   = getXMLString(xmlFile, key .. "#stationName"),
                 price         = getXMLFloat(xmlFile, key .. "#price") or 1,
                 maxFactor     = getXMLFloat(xmlFile, key .. "#maxFactor") or 1,
                 refillFactor  = getXMLFloat(xmlFile, key .. "#refillFactor") or 1,
