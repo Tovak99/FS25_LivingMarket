@@ -37,14 +37,16 @@ end
 
 -- Beste andere Station für die Ware: höchster Preis bei freiem Bedarf
 function LivingMarket:findUnloadAlternative(station, fillTypeIndex)
-    local best, bestPrice, bestFree = nil, 0, 0
+    local best, bestPrice, bestFree, bestRemaining = nil, 0, 0, 0
     for _, other in ipairs(self:collectStations()) do
         if other ~= station then
             local entry = self:getEntry(other, fillTypeIndex)
             if entry ~= nil and entry.remaining >= 1 and self:isContractWareSellable(other, fillTypeIndex) then
                 local price = self:getPricePer1000(other, fillTypeIndex)
-                if price > bestPrice then
-                    best, bestPrice, bestFree = other, price, freePercent(entry)
+                local rounded, bestRounded = math.floor(price + 0.5), math.floor(bestPrice + 0.5)
+                -- höherer Preis; bei gleichem Preis die Station mit mehr freiem Bedarf
+                if rounded > bestRounded or (rounded == bestRounded and entry.remaining > bestRemaining) then
+                    best, bestPrice, bestFree, bestRemaining = other, price, freePercent(entry), entry.remaining
                 end
             end
         end

@@ -1262,9 +1262,15 @@ function LivingMarket:getWareData()
 
     -- Stationen je Ware nach Preis sortieren, beste Station mit freiem Bedarf bestimmen
     for _, ware in ipairs(wares) do
+        -- gleicher Preis (auf ganze Euro): die Station mit mehr freiem Bedarf zuerst,
+        -- sonst landet bei Gleichstand alles bei der alphabetisch ersten Station
         table.sort(ware.stations, function(a, b)
-            if a.price ~= b.price then
-                return a.price > b.price
+            local pa, pb = math.floor(a.price + 0.5), math.floor(b.price + 0.5)
+            if pa ~= pb then
+                return pa > pb
+            end
+            if a.remaining ~= b.remaining then
+                return a.remaining > b.remaining
             end
             return a.name < b.name
         end)

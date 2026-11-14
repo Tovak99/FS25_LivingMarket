@@ -420,7 +420,8 @@ function LivingMarketFrame:getFilteredWares()
                 row = setmetatable({}, { __index = ware })
                 row.best = match
                 -- gefundene Station ist zugleich die beste (höchster Preis mit freiem Bedarf)?
-                row.isBestStation = ware.best ~= nil and match.remaining >= 1 and match.price >= ware.best.price
+                row.isBestStation = ware.best ~= nil and match.remaining >= 1
+                    and math.floor(match.price + 0.5) >= math.floor(ware.best.price + 0.5)
                 row.sellable = math.min(ware.stock, math.max(match.remaining, 0))
                 row.revenue = LivingMarket:estimateRevenue(match.basePrice * (match.eventPrice or 1) / 1000, match.remaining, match.max, row.sellable)
             end
