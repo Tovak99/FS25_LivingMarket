@@ -1275,17 +1275,28 @@ function LivingMarket:getWareData()
             return a.name < b.name
         end)
 
+        -- Beste Station = höchster Erlös für den eigenen Lagerbestand (berücksichtigt Preis UND freien
+        -- Bedarf, denn der Preis sinkt beim Abladen). Ohne Lager: höchster Preis (Reihenfolge oben).
         ware.best = nil
+        local bestRevenue = -1
         for _, entry in ipairs(ware.stations) do
-            if entry.remaining >= 1 then
-                ware.best = entry   -- erste mit Bedarf = höchster Preis mit Bedarf
-                break
+            if entry.remaining >= 1 and not entry.unlimited then
+                local amount = math.min(ware.stock, entry.remaining)
+                local revenue = self:estimateRevenue(entry.basePrice * entry.eventPrice / 1000, entry.remaining, entry.max, amount)
+                entry.stockRevenue = revenue
+                -- auf ganze Euro: bei Gleichstand bleibt die Reihenfolge nach Preis/Bedarf
+                if math.floor(revenue + 0.5) > math.floor(bestRevenue + 0.5) then
+                    ware.best, bestRevenue = entry, revenue
+                end
+            elseif entry.remaining >= 1 and ware.best == nil then
+                ware.best, bestRevenue = entry, 0   -- unbegrenzte Ware (z. B. Bargeld)
             end
         end
 
         if ware.best ~= nil then
             ware.sellable = math.min(ware.stock, ware.best.remaining)
-            ware.revenue  = self:estimateRevenue(ware.best.basePrice * ware.best.eventPrice / 1000, ware.best.remaining, ware.best.max, ware.sellable)
+            ware.revenue  = ware.best.stockRevenue
+                or self:estimateRevenue(ware.best.basePrice * ware.best.eventPrice / 1000, ware.best.remaining, ware.best.max, ware.sellable)
         else
             ware.sellable = 0
             ware.revenue  = 0
