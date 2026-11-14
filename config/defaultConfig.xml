@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="25">
+<livingMarket version="26">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -133,25 +133,30 @@
 
         <!-- Obst & Gemüse (auch von Karten/Mods; unbekannte Namen werden übersprungen) -->
         <group name="fruit" title="Obst &amp; Gemüse" max="30000" refillPerMonth="0.25">
-            <fillType name="GRAPE"/> <fillType name="OLIVE"/> <fillType name="TOMATO"/>
-            <fillType name="LETTUCE"/> <fillType name="STRAWBERRY"/>
+            <fillType name="GRAPE"/> <fillType name="OLIVE"/>
             <fillType name="APPLE"/> <fillType name="PEAR"/> <fillType name="CHERRY"/> <fillType name="PLUM"/>
             <fillType name="APRICOT"/> <fillType name="PEACH"/> <fillType name="QUINCE"/> <fillType name="MIRABELLE"/>
             <fillType name="BLUEBERRY"/> <fillType name="RASPBERRY"/> <fillType name="BLACKBERRY"/> <fillType name="CURRANT"/>
             <fillType name="GOOSEBERRY"/> <fillType name="ELDERBERRY"/> <fillType name="WALNUT"/> <fillType name="HAZELNUT"/>
             <fillType name="CHESTNUT"/> <fillType name="LEMON"/> <fillType name="ORANGE"/> <fillType name="BANANA"/>
             <fillType name="MELON"/> <fillType name="WATERMELON"/> <fillType name="PUMPKIN"/> <fillType name="CABBAGE"/>
-            <fillType name="REDCABBAGE"/> <fillType name="WHITECABBAGE"/> <fillType name="CAULIFLOWER"/> <fillType name="BROCCOLI"/>
+            <fillType name="WHITECABBAGE"/> <fillType name="CAULIFLOWER"/> <fillType name="BROCCOLI"/>
             <fillType name="KALE"/> <fillType name="CUCUMBER"/> <fillType name="ZUCCHINI"/> <fillType name="PAPRIKA"/>
-            <fillType name="PEPPER"/> <fillType name="GARLIC"/> <fillType name="LEEK"/> <fillType name="CELERY"/>
+            <fillType name="PEPPER"/> <fillType name="LEEK"/> <fillType name="CELERY"/>
             <fillType name="ASPARAGUS"/> <fillType name="RADISH"/> <fillType name="HOPS"/>
             <fillType name="APFEL"/> <fillType name="BIRNE"/> <fillType name="KIRSCHE"/> <fillType name="KIRSCHEN"/>
             <fillType name="PFLAUME"/> <fillType name="PFLAUMEN"/> <fillType name="KUERBIS"/> <fillType name="ERDBEERE"/>
             <!-- weitere Sorten, Pilze und abgepacktes Gemüse -->
-            <fillType name="CURRANTS"/> <fillType name="MIRABELLES"/> <fillType name="MUSHROOMS"/> <fillType name="OYSTER"/>
-            <fillType name="ENOKI"/> <fillType name="CHILLI"/> <fillType name="NAPACABBAGE"/> <fillType name="SPRING_ONION"/>
+            <fillType name="CURRANTS"/> <fillType name="MIRABELLES"/>
             <fillType name="VEGATABLECORN"/> <fillType name="CARROTBAG"/> <fillType name="ONIONBAG"/> <fillType name="WASHEDPOTATOES"/>
             <fillType name="SPINACH_BAGS"/>
+        </group>
+
+        <!-- Gewächshaus-Ware: große Mengen (24 Zyklen im Monat), im Filter unter Obst & Gemüse -->
+        <group name="greenhouse" title="Gewächshaus" max="120000" refillPerMonth="0.40" filter="fruit">
+            <fillType name="LETTUCE"/> <fillType name="TOMATO"/> <fillType name="STRAWBERRY"/> <fillType name="SPRING_ONION"/>
+            <fillType name="NAPACABBAGE"/> <fillType name="REDCABBAGE"/> <fillType name="CHILLI"/> <fillType name="GARLIC"/>
+            <fillType name="ENOKI"/> <fillType name="OYSTER"/> <fillType name="MUSHROOMS"/>
         </group>
 
         <group name="forage" title="Futter &amp; Halmgut" max="160000" refillPerMonth="0.30">
