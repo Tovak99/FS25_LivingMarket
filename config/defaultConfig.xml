@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="26">
+<livingMarket version="27">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -153,7 +153,7 @@
         </group>
 
         <!-- Gewächshaus-Ware: große Mengen (24 Zyklen im Monat), im Filter unter Obst & Gemüse -->
-        <group name="greenhouse" title="Gewächshaus" max="120000" refillPerMonth="0.40" filter="fruit">
+        <group name="greenhouse" title="Gewächshaus" max="80000" refillPerMonth="0.35" filter="fruit">
             <fillType name="LETTUCE"/> <fillType name="TOMATO"/> <fillType name="STRAWBERRY"/> <fillType name="SPRING_ONION"/>
             <fillType name="NAPACABBAGE"/> <fillType name="REDCABBAGE"/> <fillType name="CHILLI"/> <fillType name="GARLIC"/>
             <fillType name="ENOKI"/> <fillType name="OYSTER"/> <fillType name="MUSHROOMS"/>
