@@ -100,6 +100,7 @@
         <text name="livingMarket_ctDone" text="Vertrag erfüllt: %s %s an %s – Bonus %s"/>
         <text name="livingMarket_ctFailed" text="Vertrag nicht erfüllt: %s %s an %s – Strafe %s"/>
         <text name="livingMarket_ctCancelled" text="Vertrag gekündigt: %s %s an %s – Strafe %s"/>
+        <text name="livingMarket_ctVoided" text="Vertrag aufgelöst: %s %s an %s – Station gehört jetzt einem Hof, keine Strafe"/>
         <text name="livingMarket_noContracts" text="Zurzeit keine Ausschreibungen"/>
         <text name="livingMarket_noContractsStock" text="Keine Ausschreibungen für vorrätige Waren"/>
         <text name="livingMarket_contractLabel" text="Vertrag"/>

@@ -100,6 +100,7 @@
         <text name="livingMarket_ctDone" text="Contratto adempiuto: %s di %s a %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contratto non adempiuto: %s di %s a %s – penale %s"/>
         <text name="livingMarket_ctCancelled" text="Contratto disdetto: %s di %s a %s – penale %s"/>
+        <text name="livingMarket_ctVoided" text="Contratto annullato: %s di %s a %s – la stazione ora appartiene a una fattoria, nessuna penale"/>
         <text name="livingMarket_noContracts" text="Nessuna gara al momento"/>
         <text name="livingMarket_noContractsStock" text="Nessuna gara per merci in magazzino"/>
         <text name="livingMarket_contractLabel" text="Contratto"/>

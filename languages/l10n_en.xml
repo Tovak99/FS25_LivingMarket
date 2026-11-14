@@ -100,6 +100,7 @@
         <text name="livingMarket_ctDone" text="Contract fulfilled: %s %s to %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contract not fulfilled: %s %s to %s – penalty %s"/>
         <text name="livingMarket_ctCancelled" text="Contract cancelled: %s %s to %s – penalty %s"/>
+        <text name="livingMarket_ctVoided" text="Contract voided: %s %s to %s – station is now owned by a farm, no penalty"/>
         <text name="livingMarket_noContracts" text="No tenders at the moment"/>
         <text name="livingMarket_noContractsStock" text="No tenders for products in stock"/>
         <text name="livingMarket_contractLabel" text="Contract"/>

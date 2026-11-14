@@ -496,6 +496,14 @@ function LivingMarket:failContract(contract, cancelled)
     self:contractsChanged()
 end
 
+-- Vertrag ohne Strafe und ohne Ansehensänderung auflösen (Station nicht mehr im Markt)
+function LivingMarket:voidContract(contract)
+    contract.repChange = 0
+    self:announceContract(contract.farmId, "livingMarket_ctVoided", contract, 0)
+    addToHistory(contract, "cancelled", 0)
+    removeContract(contract)
+end
+
 function LivingMarket:cancelContract(id, farmId)
     if not isServerSide() then
         return false
@@ -609,11 +617,21 @@ function LivingMarket:tickContracts()
     local changed = false
 
     -- Verträge über Waren, die die Station gar nicht bezahlt (ältere Ausschreibungen):
-    -- Angebote entfernen, laufende ohne Strafe auflösen
+    -- Angebote entfernen.
+    -- Station nicht mehr im Markt (Produktion von einem Hof gekauft, abgerissen):
+    -- Angebote entfernen, laufende ohne Strafe auflösen.
+    local stationsKnown = #self:collectStations() > 0
     for i = #self.contracts, 1, -1 do
         local contract = self.contracts[i]
         local station = self:findStationByKey(contract.stationKey)
-        if station ~= nil and not self:isContractWareSellable(station, contract.fillTypeIndex) then
+        if station == nil and stationsKnown then
+            if contract.state == "active" then
+                self:voidContract(contract)
+            else
+                table.remove(self.contracts, i)
+            end
+            changed = true
+        elseif station ~= nil and not self:isContractWareSellable(station, contract.fillTypeIndex) then
             table.remove(self.contracts, i)
             changed = true
         end

@@ -100,6 +100,7 @@
         <text name="livingMarket_ctDone" text="Contract nagekomen: %s %s aan %s – bonus %s"/>
         <text name="livingMarket_ctFailed" text="Contract niet nagekomen: %s %s aan %s – boete %s"/>
         <text name="livingMarket_ctCancelled" text="Contract opgezegd: %s %s aan %s – boete %s"/>
+        <text name="livingMarket_ctVoided" text="Contract vervallen: %s %s aan %s – station is nu van een boerderij, geen boete"/>
         <text name="livingMarket_noContracts" text="Momenteel geen aanbestedingen"/>
         <text name="livingMarket_noContractsStock" text="Geen aanbestedingen voor waren op voorraad"/>
         <text name="livingMarket_contractLabel" text="Contract"/>
