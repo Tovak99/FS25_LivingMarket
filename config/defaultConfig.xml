@@ -19,7 +19,7 @@
   Fehlt ein Abschnitt oder ein Wert, gilt der Standardwert des Mods.
   Anteile werden als Dezimalzahl mit Punkt angegeben (0.25 = 25 %).
 -->
-<livingMarket version="24">
+<livingMarket version="25">
     <default max="60000" refillPerMonth="0.30"/>
 
     <!-- Marktlage: Preis abhängig vom offenen Bedarf
@@ -128,12 +128,12 @@
             <fillType name="CARROT"/> <fillType name="PARSNIP"/> <fillType name="ONION"/> <fillType name="SUGARCANE"/>
             <!-- weitere Hackfrüchte -->
             <fillType name="ONION_DIRTY"/> <fillType name="REDONION"/>
-            <fillType name="GREENBEAN"/>
+            <fillType name="GREENBEAN"/> <fillType name="SPINACH"/>
         </group>
 
         <!-- Obst & Gemüse (auch von Karten/Mods; unbekannte Namen werden übersprungen) -->
         <group name="fruit" title="Obst &amp; Gemüse" max="30000" refillPerMonth="0.25">
-            <fillType name="GRAPE"/> <fillType name="OLIVE"/> <fillType name="SPINACH"/> <fillType name="TOMATO"/>
+            <fillType name="GRAPE"/> <fillType name="OLIVE"/> <fillType name="TOMATO"/>
             <fillType name="LETTUCE"/> <fillType name="STRAWBERRY"/>
             <fillType name="APPLE"/> <fillType name="PEAR"/> <fillType name="CHERRY"/> <fillType name="PLUM"/>
             <fillType name="APRICOT"/> <fillType name="PEACH"/> <fillType name="QUINCE"/> <fillType name="MIRABELLE"/>
